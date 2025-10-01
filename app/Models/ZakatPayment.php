@@ -11,6 +11,7 @@ class ZakatPayment extends Model
 
     protected $fillable = [
         'payment_code',
+        'snap_token',
         'muzakki_id',
         'zakat_type_id',
         'program_category',
@@ -109,7 +110,7 @@ class ZakatPayment extends Model
         return $query->whereYear('payment_date', $year)
             ->whereMonth('payment_date', $month);
     }
-    
+
     public function scopeByProgramCategory($query, $category)
     {
         return $query->where('program_category', $category);
