@@ -17,6 +17,11 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
+    public function showAdminLogin()
+    {
+        return view('auth.admin-login');
+    }
+
     public function login(Request $request)
     {
         $request->validate([
@@ -34,18 +39,48 @@ class AuthController extends Controller
                 return back()->withErrors(['email' => 'Akun Anda tidak aktif. Silakan hubungi administrator.']);
             }
 
+            // Check if user has muzakki role
+            if ($user->role !== 'muzakki') {
+                Auth::logout();
+                return back()->withErrors(['email' => 'Halaman ini hanya untuk muzakki. Silakan gunakan halaman login admin.']);
+            }
+
             $request->session()->regenerate();
 
-            // Redirect based on role
-            switch ($user->role) {
-                case 'admin':
-                case 'staff':
-                    return redirect()->intended('/dashboard');
-                case 'muzakki':
-                    return redirect()->intended('/muzakki/dashboard');
-                default:
-                    return redirect()->intended('/');
+            return redirect()->intended('/');
+        }
+
+        return back()->withErrors([
+            'email' => 'Email atau password yang Anda masukkan salah.',
+        ]);
+    }
+
+    public function adminLogin(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|min:6',
+        ]);
+
+        $credentials = $request->only('email', 'password');
+
+        if (Auth::attempt($credentials)) {
+            $user = Auth::user();
+
+            if (!$user->is_active) {
+                Auth::logout();
+                return back()->withErrors(['email' => 'Akun Anda tidak aktif. Silakan hubungi administrator.']);
             }
+
+            // Check if user has admin or staff role
+            if ($user->role !== 'admin' && $user->role !== 'staff') {
+                Auth::logout();
+                return back()->withErrors(['email' => 'Anda tidak memiliki akses ke halaman admin.']);
+            }
+
+            $request->session()->regenerate();
+
+            return redirect()->intended('/dashboard');
         }
 
         return back()->withErrors([
@@ -64,59 +99,71 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'phone' => 'required|string|max:20',
-            'nik' => 'required|string|max:20|unique:muzakki',
-            'gender' => 'required|in:male,female',
-            'address' => 'required|string',
-            'city' => 'required|string|max:255',
-            'province' => 'required|string|max:255',
-            'occupation' => 'required|in:employee,entrepreneur,civil_servant,teacher,doctor,farmer,trader,other',
-            'monthly_income' => 'nullable|numeric|min:0',
         ]);
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
 
-        // Create user account
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => 'muzakki',
-            'is_active' => true,
-            'phone' => $request->phone,
-        ]);
+        try {
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => 'muzakki',
+                'is_active' => true,
+                'phone' => $request->phone ?? null,
+            ]);
 
-        // Create muzakki profile
-        Muzakki::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'nik' => $request->nik,
-            'gender' => $request->gender,
-            'address' => $request->address,
-            'city' => $request->city,
-            'province' => $request->province,
-            'occupation' => $request->occupation,
-            'monthly_income' => $request->monthly_income,
-            'date_of_birth' => $request->date_of_birth,
-            'user_id' => $user->id,
-            'is_active' => true,
-        ]);
+            // Gunakan updateOrCreate untuk hindari duplikat
+            Muzakki::updateOrCreate(
+                ['email' => $request->email],
+                [
+                    'name' => $request->name,
+                    'phone' => $request->phone ?? null,
+                    'nik' => $request->nik ?? null,
+                    'gender' => $request->gender ?? null,
+                    'address' => $request->address ?? null,
+                    'city' => $request->city ?? null,
+                    'province' => $request->province ?? null,
+                    'occupation' => $request->occupation ?? null,
+                    'monthly_income' => $request->monthly_income ?? null,
+                    'date_of_birth' => $request->date_of_birth ?? null,
+                    'user_id' => $user->id,
+                    'is_active' => true,
+                ]
+            );
 
-        Auth::login($user);
+            Auth::login($user);
 
-        return redirect('/muzakki/dashboard')->with('success', 'Registrasi berhasil! Selamat datang di Sistem Zakat.');
+            return redirect('/')->with('success', 'Registrasi berhasil! Selamat datang di Sistem Zakat.');
+        } catch (\Exception $e) {
+            if (isset($user)) {
+                $user->delete();
+            }
+
+            return back()->withErrors([
+                'email' => 'Registrasi gagal: ' . $e->getMessage(),
+            ])->withInput();
+        }
     }
+
 
     public function logout(Request $request)
     {
+        // Store the referrer URL before logout
+        $referrer = $request->headers->get('referer');
+
         Auth::logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/')->with('success', 'Anda telah berhasil logout.');
+        // Check if the referrer contains admin paths
+        if ($referrer && (strpos($referrer, '/admin') !== false || strpos($referrer, '/dashboard') !== false)) {
+            return redirect('/admin/login')->with('success', 'Anda telah berhasil logout.');
+        } else {
+            return redirect('/')->with('success', 'Anda telah berhasil logout.');
+        }
     }
 }

@@ -11,17 +11,18 @@ class ZakatPayment extends Model
 
     protected $fillable = [
         'payment_code',
+        'midtrans_order_id',
         'snap_token',
         'muzakki_id',
-        'zakat_type_id',
         'program_category',
-        'wealth_amount',
+        'program_type_id',
+        'zakat_type_id', // Add this back since it's still used in some places
         'zakat_amount',
         'paid_amount',
         'payment_method',
+        'midtrans_payment_method',
         'payment_reference',
         'payment_date',
-        'hijri_year',
         'notes',
         'status',
         'receipt_number',
@@ -30,7 +31,6 @@ class ZakatPayment extends Model
     ];
 
     protected $casts = [
-        'wealth_amount' => 'decimal:2',
         'zakat_amount' => 'decimal:2',
         'paid_amount' => 'decimal:2',
         'payment_date' => 'date',
@@ -42,14 +42,19 @@ class ZakatPayment extends Model
         return $this->belongsTo(Muzakki::class);
     }
 
-    public function zakatType()
+    public function programType()
     {
-        return $this->belongsTo(ZakatType::class);
+        return $this->belongsTo(ProgramType::class, 'program_type_id');
     }
 
     public function receivedBy()
     {
         return $this->belongsTo(User::class, 'received_by');
+    }
+
+    public function notifications()
+    {
+        return $this->morphMany(Notification::class, 'notifiable');
     }
 
     // Methods
@@ -114,5 +119,40 @@ class ZakatPayment extends Model
     public function scopeByProgramCategory($query, $category)
     {
         return $query->where('program_category', $category);
+    }
+
+    public function scopePending($query)
+    {
+        return $query->where('status', 'pending');
+    }
+
+    public function program()
+    {
+        return $this->belongsTo(Program::class);
+    }
+
+    // Event handling for notifications
+    public static function boot()
+    {
+        parent::boot();
+
+        // When a payment is created
+        static::created(function ($payment) {
+            // Create a notification for the muzakki
+            if ($payment->muzakki) {
+                Notification::createPaymentNotification($payment->muzakki, $payment, $payment->status);
+            }
+        });
+
+        // When a payment is updated
+        static::updated(function ($payment) {
+            // Check if status has changed
+            if ($payment->isDirty('status')) {
+                // Create a notification for the muzakki
+                if ($payment->muzakki) {
+                    Notification::createPaymentNotification($payment->muzakki, $payment, $payment->status);
+                }
+            }
+        });
     }
 }

@@ -336,7 +336,7 @@ class ZakatDistributionController extends Controller
 
         // Calculate statistics with current filters
         $statsQuery = ZakatDistribution::query();
-        
+
         // Apply same filters to statistics
         if ($request->has('search') && $request->search != '') {
             $search = $request->get('search');

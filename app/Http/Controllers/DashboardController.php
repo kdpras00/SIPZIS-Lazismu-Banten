@@ -9,6 +9,7 @@ use App\Models\ZakatPayment;
 use App\Models\ZakatDistribution;
 use App\Models\ZakatType;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -17,7 +18,7 @@ class DashboardController extends Controller
 
     public function index()
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         if ($user->role === 'muzakki') {
             return $this->muzakkiDashboard();
@@ -44,7 +45,7 @@ class DashboardController extends Controller
         ];
 
         // Recent payments
-        $recentPayments = ZakatPayment::with(['muzakki', 'zakatType'])
+        $recentPayments = ZakatPayment::with(['muzakki', 'programType'])
             ->completed()
             ->latest('payment_date')
             ->take(5)
@@ -73,11 +74,11 @@ class DashboardController extends Controller
         }
 
         // Zakat type distribution
-        $zakatTypeStats = ZakatPayment::completed()
+        $programTypeStats = ZakatPayment::completed()
             ->byYear($currentYear)
-            ->selectRaw('zakat_type_id, SUM(paid_amount) as total')
-            ->groupBy('zakat_type_id')
-            ->with('zakatType')
+            ->selectRaw('program_type_id, SUM(paid_amount) as total')
+            ->groupBy('program_type_id')
+            ->with('programType')
             ->get();
 
         // Mustahik category distribution
@@ -91,14 +92,14 @@ class DashboardController extends Controller
             'recentPayments',
             'recentDistributions',
             'chartData',
-            'zakatTypeStats',
+            'programTypeStats',
             'mustahikCategoryStats'
         ));
     }
 
     private function muzakkiDashboard()
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $muzakki = $user->muzakki;
 
         if (!$muzakki) {
@@ -118,7 +119,7 @@ class DashboardController extends Controller
 
         // Recent payments
         $recentPayments = $muzakki->zakatPayments()
-            ->with('zakatType')
+            ->with('programType')
             ->completed()
             ->latest('payment_date')
             ->take(5)
@@ -166,5 +167,63 @@ class DashboardController extends Controller
         ];
 
         return response()->json($data);
+    }
+
+    // Muzakki dashboard section methods
+    public function transactions()
+    {
+        $user = Auth::user();
+        $muzakki = $user->muzakki;
+
+        if (!$muzakki) {
+            return redirect()->route('profile.create')->with('info', 'Silakan lengkapi profil muzakki Anda.');
+        }
+
+        $payments = $muzakki->zakatPayments()
+            ->with('programType')
+            ->latest('payment_date')
+            ->paginate(10);
+
+        return view('muzakki.dashboard.transactions', compact('muzakki', 'payments'));
+    }
+
+    public function recurringDonations()
+    {
+        $user = Auth::user();
+        $muzakki = $user->muzakki;
+
+        if (!$muzakki) {
+            return redirect()->route('profile.create')->with('info', 'Silakan lengkapi profil muzakki Anda.');
+        }
+
+        // For now, we're just returning the view
+        // In a real implementation, this would fetch recurring donations
+        return view('muzakki.dashboard.recurring-donations', compact('muzakki'));
+    }
+
+    public function bankAccounts()
+    {
+        $user = Auth::user();
+        $muzakki = $user->muzakki;
+
+        if (!$muzakki) {
+            return redirect()->route('profile.create')->with('info', 'Silakan lengkapi profil muzakki Anda.');
+        }
+
+        // For now, we're just returning the view
+        // In a real implementation, this would fetch bank accounts
+        return view('muzakki.dashboard.bank-accounts', compact('muzakki'));
+    }
+
+    public function accountManagement()
+    {
+        $user = Auth::user();
+        $muzakki = $user->muzakki;
+
+        if (!$muzakki) {
+            return redirect()->route('profile.create')->with('info', 'Silakan lengkapi profil muzakki Anda.');
+        }
+
+        return view('muzakki.dashboard.account-management', compact('muzakki'));
     }
 }

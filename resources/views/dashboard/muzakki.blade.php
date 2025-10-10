@@ -78,7 +78,7 @@
                         <h6 class="card-title text-uppercase mb-1">Terakhir Bayar</h6>
                         @if($stats['last_payment'])
                         <h6 class="mb-0">{{ $stats['last_payment']->payment_date->format('d M Y') }}</h6>
-                        <small class="text-light">{{ $stats['last_payment']->zakatType->name ?? 'Donasi Umum' }}</small>
+                        <small class="text-light">{{ $stats['last_payment']->programType ? $stats['last_payment']->programType->name : 'Donasi Umum' }}</small>
                         @else
                         <h6 class="mb-0">Belum ada</h6>
                         <small class="text-light">Pembayaran</small>
@@ -95,7 +95,7 @@
 
 <div class="row">
     <!-- Quick Actions -->
-    <div class="col-lg-4 mb-4">
+    <!-- <div class="col-lg-4 mb-4">
         <div class="card border-0 shadow-sm">
             <div class="card-header bg-white">
                 <h5 class="mb-0"><i class="bi bi-lightning"></i> Aksi Cepat</h5>
@@ -112,34 +112,12 @@
                         <i class="bi bi-book"></i> Panduan Zakat
                     </a>
                 </div>
-
-                <!-- Zakat Calculator Mini -->
-                <hr>
-                <h6>Kalkulator Zakat Cepat</h6>
-                <form id="quickCalculator">
-                    @csrf
-                    <div class="mb-2">
-                        <select name="zakat_type_id" class="form-select form-select-sm" required>
-                            <option value="">Pilih Jenis</option>
-                            @foreach($zakatTypes as $type)
-                            <option value="{{ $type->id }}">{{ $type->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="mb-2">
-                        <input type="text" name="wealth_amount" class="form-control form-control-sm currency-input" placeholder="Jumlah Harta" required>
-                    </div>
-                    <button type="submit" class="btn btn-outline-primary btn-sm w-100">
-                        <i class="bi bi-calculator"></i> Hitung
-                    </button>
-                </form>
-                <div id="quickResult" class="mt-2"></div>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <!-- Yearly Summary -->
-    <div class="col-lg-4 mb-4">
+    <!-- <div class="col-lg-4 mb-4">
         <div class="card border-0 shadow-sm">
             <div class="card-header bg-white">
                 <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Ringkasan Per Tahun</h5>
@@ -163,10 +141,10 @@
                 @endforelse
             </div>
         </div>
-    </div>
+    </div> -->
 
     <!-- Recent Payments -->
-    <div class="col-lg-4 mb-4">
+    <div class="col-12 mb-4">
         <div class="card border-0 shadow-sm">
             <div class="card-header bg-white d-flex justify-content-between align-items-center">
                 <h5 class="mb-0"><i class="bi bi-credit-card"></i> Riwayat Terbaru</h5>
@@ -176,7 +154,7 @@
                 @forelse($recentPayments as $payment)
                 <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
                     <div>
-                        <h6 class="mb-1">{{ $payment->zakatType->name ?? 'Donasi Umum' }}</h6>
+                        <h6 class="mb-1">{{ $payment->programType ? $payment->programType->name : 'Donasi Umum' }}</h6>
                         <small class="text-muted">{{ $payment->payment_code }}</small>
                     </div>
                     <div class="text-end">

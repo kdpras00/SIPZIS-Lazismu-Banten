@@ -3,7 +3,7 @@ $user = auth()->user();
 $currentRoute = Route::currentRouteName();
 @endphp
 
-<div id="sidebar" class="sidebar d-flex flex-column p-3" style="width: 250px;">
+<div id="sidebar" class="sidebar d-flex flex-column p-3 h-100" style="background: linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%);">
     {{-- SIPZIS Logo and Text --}}
     {{-- Menggunakan d-flex dan align-items-center untuk memastikan ikon dan teks sejajar --}}
     <div class="d-flex justify-content-center align-items-center mb-3">
@@ -27,7 +27,41 @@ $currentRoute = Route::currentRouteName();
             </a>
         </li>
 
-        @if(in_array($user->role, ['admin', 'staff']))
+        @if($user->role === 'muzakki')
+        {{-- Muzakki-specific menu items --}}
+        <li class="nav-item">
+            <a href="{{ route('muzakki.dashboard.transactions') }}"
+                class="nav-link {{ str_contains($currentRoute, 'transactions') && str_contains($currentRoute, 'muzakki.dashboard') ? 'active' : '' }}">
+                <i class="bi bi-credit-card me-2"></i>
+                Transaksi saya
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a href="{{ route('muzakki.dashboard.recurring') }}"
+                class="nav-link {{ str_contains($currentRoute, 'recurring') && str_contains($currentRoute, 'muzakki.dashboard') ? 'active' : '' }}">
+                <i class="bi bi-arrow-repeat me-2"></i>
+                Donasi rutin saya
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a href="{{ route('muzakki.dashboard.bank-accounts') }}"
+                class="nav-link {{ str_contains($currentRoute, 'bank-accounts') && str_contains($currentRoute, 'muzakki.dashboard') ? 'active' : '' }}">
+                <i class="bi bi-bank me-2"></i>
+                Akun bank
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a href="{{ route('muzakki.dashboard.management') }}"
+                class="nav-link {{ str_contains($currentRoute, 'management') && str_contains($currentRoute, 'muzakki.dashboard') ? 'active' : '' }}">
+                <i class="bi bi-person me-2"></i>
+                Manajemen akun
+            </a>
+        </li>
+        @else
+        {{-- Admin/Staff menu items --}}
         {{-- Muzakki Management --}}
         <li class="nav-item">
             <a href="{{ route('muzakki.index') }}"
@@ -45,26 +79,16 @@ $currentRoute = Route::currentRouteName();
                 Mustahik
             </a>
         </li>
-        @endif
 
         {{-- Zakat Payments --}}
         <li class="nav-item">
-            @if($user->role === 'muzakki')
-            <a href="{{ route('payments.create') }}"
-                class="nav-link {{ str_contains($currentRoute, 'payments') ? 'active' : '' }}">
-                <i class="bi bi-credit-card me-2"></i>
-                Bayar Zakat
-            </a>
-            @else
             <a href="{{ route('payments.index') }}"
                 class="nav-link {{ str_contains($currentRoute, 'payments') ? 'active' : '' }}">
                 <i class="bi bi-credit-card me-2"></i>
                 Pembayaran Zakat
             </a>
-            @endif
         </li>
 
-        @if(in_array($user->role, ['admin', 'staff']))
         {{-- Zakat Distributions --}}
         <li class="nav-item">
             <a href="{{ route('distributions.index') }}"
@@ -114,23 +138,31 @@ $currentRoute = Route::currentRouteName();
             </ul>
         </li>
 
-        @endif
-
-        {{-- Calculator --}}
+        {{-- Campaign Management --}}
         <li class="nav-item">
-            <a href="{{ route('calculator.index') }}"
-                class="nav-link {{ str_contains($currentRoute, 'calculator') ? 'active' : '' }}">
-                <i class="bi bi-calculator me-2"></i>
-                Kalkulator Zakat
+            <a href="{{ route('admin.campaigns.index') }}"
+                class="nav-link {{ str_contains($currentRoute, 'campaigns') ? 'active' : '' }}">
+                <i class="bi bi-bullseye me-2"></i>
+                Kelola Campaign
             </a>
         </li>
+
+        {{-- Program Management --}}
+        <li class="nav-item">
+            <a href="{{ route('admin.programs.index') }}"
+                class="nav-link {{ str_contains($currentRoute, 'programs') ? 'active' : '' }}">
+                <i class="bi bi-grid me-2"></i>
+                Kelola Program
+            </a>
+        </li>
+        @endif
 
         {{-- Divider --}}
         <hr class="text-white">
     </ul>
 
     {{-- User info --}}
-    <div class="dropdown border-top pt-3">
+    <div class="dropdown border-top pt-3 mt-auto">
         <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
             id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="bi bi-person-circle me-2 fs-4"></i>
@@ -140,9 +172,11 @@ $currentRoute = Route::currentRouteName();
             </div>
         </a>
         <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-            <li><a class="dropdown-item" href="#">Profile</a></li>
+            <li><a class="dropdown-item" href="{{ route('profile.show') }}">Profile</a></li>
             <li><a class="dropdown-item" href="#">Settings</a></li>
-            <li><hr class="dropdown-divider"></li>
+            <li>
+                <hr class="dropdown-divider">
+            </li>
             <li>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
@@ -160,8 +194,10 @@ $currentRoute = Route::currentRouteName();
 
     /* Pastikan sidebar punya background hijau (ganti kode warna bila perlu) */
     #sidebar {
-        background-color: #198754; /* atau ganti sesuai warna sidebarmu */
-        overflow: visible; /* biarkan dropdown terlihat, kalau parent overflow hidden => hilang */
+        background-color: #198754;
+        /* atau ganti sesuai warna sidebarmu */
+        overflow: visible;
+        /* biarkan dropdown terlihat, kalau parent overflow hidden => hilang */
     }
 
     /* Base link warna putih */
@@ -172,24 +208,30 @@ $currentRoute = Route::currentRouteName();
 
     /* Make dropdown behave like nested nav (tidak absolute) */
     #sidebar .nav-item.dropdown {
-        position: relative; /* safe */
+        position: relative;
+        /* safe */
     }
 
     /* Override dropdown menu: tampilkan sebagai bagian sidebar, nggak putih */
     #sidebar .nav-item .dropdown-menu {
-        position: static;        /* jangan absolute */
-        display: none;          /* hidden by default, ditampilkan di hover */
+        position: static;
+        /* jangan absolute */
+        display: none;
+        /* hidden by default, ditampilkan di hover */
         float: none;
-        margin: 0;              /* rapikan margin */
-        padding: 0.25rem 0;     /* sedikit padding vertikal */
+        margin: 0;
+        /* rapikan margin */
+        padding: 0.25rem 0;
+        /* sedikit padding vertikal */
         border: 0;
         box-shadow: none;
-        background: transparent; /* biarkan warna sidebar terlihat */
+        background: transparent;
+        /* biarkan warna sidebar terlihat */
     }
 
     /* Tampilkan on hover — hanya di perangkat yang support hover (desktop) */
     @media (hover: hover) and (pointer: fine) {
-        #sidebar .nav-item.dropdown:hover > .dropdown-menu {
+        #sidebar .nav-item.dropdown:hover>.dropdown-menu {
             display: block;
         }
     }
@@ -199,13 +241,15 @@ $currentRoute = Route::currentRouteName();
         color: #fff;
         padding: 0.5rem 1rem;
         background: transparent;
-        border-left: 0.25rem solid transparent; /* opsi: indikator aktif */
+        border-left: 0.25rem solid transparent;
+        /* opsi: indikator aktif */
     }
 
     /* Hover / fokus item */
     #sidebar .dropdown-item:hover,
     #sidebar .dropdown-item:focus {
-        background-color: rgba(255,255,255,0.06); /* highlight lembut */
+        background-color: rgba(255, 255, 255, 0.06);
+        /* highlight lembut */
         color: #fff;
         text-decoration: none;
     }
@@ -213,9 +257,10 @@ $currentRoute = Route::currentRouteName();
     /* Active state */
     #sidebar .dropdown-item.active,
     #sidebar .dropdown-item:active {
-        background-color: rgba(255,255,255,0.12);
+        background-color: rgba(255, 255, 255, 0.12);
         color: #fff;
-        border-left-color: rgba(255,255,255,0.18); /* optional */
+        border-left-color: rgba(255, 255, 255, 0.18);
+        /* optional */
     }
 
     /* Untuk safety: jika ada dropdown-menu-dark, override agar tetap transparan */
@@ -227,13 +272,30 @@ $currentRoute = Route::currentRouteName();
 
     /* Mobile fallback: jangan paksa hover di layar kecil (biarkan klik bootstrap bekerja) */
     @media (max-width: 767.98px) {
-        #sidebar .nav-item.dropdown:hover > .dropdown-menu {
+        #sidebar .nav-item.dropdown:hover>.dropdown-menu {
             display: none;
         }
-        
+
         /* Ensure dropdown works on mobile with click */
         #sidebar .nav-item.dropdown.show .dropdown-menu {
             display: block;
+        }
+    }
+
+    /* Mobile sidebar toggle */
+    @media (max-width: 767.98px) {
+        #sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 1050;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        #sidebar.show {
+            transform: translateX(0);
         }
     }
 </style>

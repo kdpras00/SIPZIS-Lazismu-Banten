@@ -3,7 +3,7 @@
 @section('title', 'Program Ekonomi - SIPZIS')
 
 @section('navbar')
-    @include('partials.navbarHome')
+@include('partials.navbarHome')
 @endsection
 
 @section('content')
@@ -15,14 +15,14 @@
         <div class="absolute top-20 right-10 w-72 h-72 bg-orange-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce animation-delay-3000"></div>
         <div class="absolute -bottom-8 left-20 w-72 h-72 bg-red-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce animation-delay-5000"></div>
     </div>
-    
+
     <div class="relative z-10 py-20">
         <div class="container mx-auto px-4 py-16">
             <!-- Back Button -->
             <div class="mb-8">
                 <a href="{{ route('program') }}" class="inline-flex items-center text-amber-700 hover:text-amber-900 font-semibold transition-colors duration-300">
                     <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
                     </svg>
                     Kembali ke Program
                 </a>
@@ -51,7 +51,7 @@
                             <div class="rounded-2xl overflow-hidden shadow-lg">
                                 <img src="{{ asset('img/program/ekonomi.jpg') }}" alt="Program Ekonomi" class="w-full h-64 object-cover">
                             </div>
-                            
+
                             <!-- Collected Amount Card -->
                             <div class="mt-6 bg-gradient-to-br from-amber-100 to-orange-100 rounded-2xl p-6 border border-amber-200">
                                 <h3 class="text-xl font-bold text-amber-800 mb-3">Dana Terkumpul</h3>
@@ -59,16 +59,34 @@
                                     <span class="text-3xl font-bold text-amber-700">Rp {{ number_format($collectedAmount, 0, ',', '.') }}</span>
                                 </div>
                                 <p class="text-center text-amber-600 mt-2">dari semua donasi program ekonomi</p>
+                                <!-- Progress Bar for Program -->
+                                <div class="mt-4">
+                                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                        @php
+                                        $progressPercentage = $totalTarget > 0 ? min(100, ($collectedAmount / $totalTarget) * 100) : 0;
+                                        @endphp
+                                        <div class="bg-gradient-to-r from-amber-500 to-orange-600 h-2.5 rounded-full progress-bar"
+                                            data-width="{{ $progressPercentage }}"></div>
+                                    </div>
+                                    <div class="flex justify-between text-xs mt-1 text-amber-700">
+                                        <span>Rp {{ number_format($collectedAmount, 0, ',', '.') }}</span>
+                                        <span>Rp {{ number_format($totalTarget, 0, ',', '.') }}</span>
+                                    </div>
+                                    <div class="flex justify-between text-xs mt-1 text-amber-600">
+                                        <span>Dana Terkumpul</span>
+                                        <span>Target Dana</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        
+
                         <!-- Program Description -->
                         <div class="lg:col-span-2">
                             <h2 class="text-3xl font-bold text-amber-800 mb-4">Tentang Program Ekonomi</h2>
                             <p class="text-gray-700 mb-6 text-lg leading-relaxed">
                                 Program Ekonomi SIPZIS bertujuan untuk memberdayakan masyarakat secara ekonomi melalui berbagai inisiatif yang mencakup pengembangan UMKM, pelatihan keterampilan, dan penyediaan modal usaha. Kami percaya bahwa kemandirian ekonomi adalah kunci untuk mengentaskan kemiskinan.
                             </p>
-                            
+
                             <h3 class="text-2xl font-bold text-amber-700 mb-3">Fokus Program</h3>
                             <ul class="list-disc list-inside text-gray-700 mb-6 space-y-2">
                                 <li>Penyediaan modal usaha bagi pelaku UMKM</li>
@@ -77,7 +95,7 @@
                                 <li>Pendampingan teknis pengelolaan usaha</li>
                                 <li>Fasilitasi akses permodalan dan teknologi</li>
                             </ul>
-                            
+
                             <div class="bg-amber-50 rounded-xl p-4 mb-6">
                                 <h3 class="text-lg font-bold text-amber-800 mb-2">Dana akan digunakan untuk:</h3>
                                 <ul class="space-y-1 text-amber-700">
@@ -95,13 +113,13 @@
                                     </li>
                                 </ul>
                             </div>
-                            
+
                             <!-- Call to Action -->
                             <div class="text-center mt-8">
-                                <a href="{{ route('guest.payment.create', ['category' => 'ekonomi']) }}" 
-                                   class="inline-flex items-center bg-gradient-to-r from-amber-600 to-orange-600 text-white px-8 py-4 rounded-xl hover:from-amber-700 hover:to-orange-700 transition-all duration-300 font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105">
+                                <a href="{{ route('guest.payment.create', ['category' => 'ekonomi']) }}"
+                                    class="inline-flex items-center bg-gradient-to-r from-amber-600 to-orange-600 text-white px-8 py-4 rounded-xl hover:from-amber-700 hover:to-orange-700 transition-all duration-300 font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105">
                                     <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
+                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z" />
                                     </svg>
                                     Donasi Sekarang
                                 </a>
@@ -112,38 +130,51 @@
             </div>
         </div>
     </div>
-</div>
 
-<style>
-@keyframes blob {
-    0% {
-        transform: translate(0px, 0px) scale(1);
-    }
-    33% {
-        transform: translate(30px, -50px) scale(1.1);
-    }
-    66% {
-        transform: translate(-20px, 20px) scale(0.9);
-    }
-    100% {
-        transform: translate(0px, 0px) scale(1);
-    }
-}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set the width of progress bars
+            const progressBars = document.querySelectorAll('.progress-bar');
+            progressBars.forEach(function(bar) {
+                const width = bar.getAttribute('data-width');
+                bar.style.width = width + '%';
+            });
+        });
+    </script>
 
-.animate-bounce {
-    animation: blob 7s infinite;
-}
+    <style>
+        @keyframes blob {
+            0% {
+                transform: translate(0px, 0px) scale(1);
+            }
 
-.animation-delay-1000 {
-    animation-delay: 1s;
-}
+            33% {
+                transform: translate(30px, -50px) scale(1.1);
+            }
 
-.animation-delay-3000 {
-    animation-delay: 3s;
-}
+            66% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
 
-.animation-delay-5000 {
-    animation-delay: 5s;
-}
-</style>
-@endsection
+            100% {
+                transform: translate(0px, 0px) scale(1);
+            }
+        }
+
+        .animate-bounce {
+            animation: blob 7s infinite;
+        }
+
+        .animation-delay-1000 {
+            animation-delay: 1s;
+        }
+
+        .animation-delay-3000 {
+            animation-delay: 3s;
+        }
+
+        .animation-delay-5000 {
+            animation-delay: 5s;
+        }
+    </style>
+    @endsection

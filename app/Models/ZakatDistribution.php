@@ -44,6 +44,11 @@ class ZakatDistribution extends Model
         return $this->belongsTo(User::class, 'distributed_by');
     }
 
+    public function notifications()
+    {
+        return $this->morphMany(Notification::class, 'notifiable');
+    }
+
     // Methods
     public static function generateDistributionCode()
     {
@@ -111,5 +116,28 @@ class ZakatDistribution extends Model
     public function scopeByYear($query, $year)
     {
         return $query->whereYear('distribution_date', $year);
+    }
+
+    // Event handling for notifications
+    public static function boot()
+    {
+        parent::boot();
+
+        // When a distribution is created
+        static::created(function ($distribution) {
+            // Create a notification for related muzakki (if any)
+            // This would require linking distributions to specific muzakki
+            // For now, we'll leave this as a placeholder
+        });
+
+        // When a distribution is updated
+        static::updated(function ($distribution) {
+            // Check if distribution has been marked as received
+            if ($distribution->isDirty('is_received') && $distribution->is_received) {
+                // Create a notification for related muzakki (if any)
+                // This would require linking distributions to specific muzakki
+                // For now, we'll leave this as a placeholder
+            }
+        });
     }
 }

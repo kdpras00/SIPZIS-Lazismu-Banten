@@ -259,7 +259,7 @@
                                 </td>
                                 <td>
                                     <span class="badge bg-info-subtle text-info-emphasis">
-                                        {{ $payment->zakatType->name ?? 'Donasi Umum' }}
+                                        {{ $payment->programType ? $payment->programType->name : 'Donasi Umum' }}
                                     </span>
                                 </td>
                                 <td>
@@ -270,17 +270,17 @@
                                 </td>
                                 <td>
                                     @switch($payment->payment_method)
-                                        @case('cash')
-                                            <span class="badge bg-success-subtle text-success-emphasis">Tunai</span>
-                                            @break
-                                        @case('transfer')
-                                            <span class="badge bg-primary-subtle text-primary-emphasis">Transfer</span>
-                                            @break
-                                        @case('online')
-                                            <span class="badge bg-warning-subtle text-warning-emphasis">Online</span>
-                                            @break
-                                        @default
-                                            <span class="badge bg-secondary-subtle text-secondary-emphasis">{{ ucfirst($payment->payment_method) }}</span>
+                                    @case('cash')
+                                    <span class="badge bg-success-subtle text-success-emphasis">Tunai</span>
+                                    @break
+                                    @case('transfer')
+                                    <span class="badge bg-primary-subtle text-primary-emphasis">Transfer</span>
+                                    @break
+                                    @case('online')
+                                    <span class="badge bg-warning-subtle text-warning-emphasis">Online</span>
+                                    @break
+                                    @default
+                                    <span class="badge bg-secondary-subtle text-secondary-emphasis">{{ ucfirst($payment->payment_method) }}</span>
                                     @endswitch
                                 </td>
                                 <td>
@@ -289,17 +289,17 @@
                                 </td>
                                 <td>
                                     @switch($payment->status)
-                                        @case('completed')
-                                            <span class="badge bg-success">Selesai</span>
-                                            @break
-                                        @case('pending')
-                                            <span class="badge bg-warning">Pending</span>
-                                            @break
-                                        @case('cancelled')
-                                            <span class="badge bg-danger">Dibatalkan</span>
-                                            @break
-                                        @default
-                                            <span class="badge bg-secondary">{{ ucfirst($payment->status) }}</span>
+                                    @case('completed')
+                                    <span class="badge bg-success">Selesai</span>
+                                    @break
+                                    @case('pending')
+                                    <span class="badge bg-warning">Pending</span>
+                                    @break
+                                    @case('cancelled')
+                                    <span class="badge bg-danger">Dibatalkan</span>
+                                    @break
+                                    @default
+                                    <span class="badge bg-secondary">{{ ucfirst($payment->status) }}</span>
                                     @endswitch
                                 </td>
                                 <td>
@@ -375,12 +375,12 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
     });
-});
 </script>
 @endpush

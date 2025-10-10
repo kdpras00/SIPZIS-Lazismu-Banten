@@ -9,9 +9,9 @@
         <p class="text-muted">{{ $payment->payment_code }}</p>
     </div>
     <div class="btn-group">
-        <a href="{{ route('payments.index') }}" class="btn btn-outline-secondary">
+        <!-- <a href="{{ route('payments.index') }}" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left"></i> Kembali
-        </a>
+        </a> -->
         @if($payment->status === 'completed')
         <a href="{{ route('payments.receipt', $payment) }}" class="btn btn-outline-success" target="_blank">
             <i class="bi bi-receipt"></i> Kwitansi
@@ -74,17 +74,17 @@
                                 <td class="text-muted" width="140">Status</td>
                                 <td>
                                     @switch($payment->status)
-                                        @case('completed')
-                                            <span class="badge bg-success">Selesai</span>
-                                            @break
-                                        @case('pending')
-                                            <span class="badge bg-warning">Pending</span>
-                                            @break
-                                        @case('cancelled')
-                                            <span class="badge bg-danger">Dibatalkan</span>
-                                            @break
-                                        @default
-                                            <span class="badge bg-secondary">{{ ucfirst($payment->status) }}</span>
+                                    @case('completed')
+                                    <span class="badge bg-success">Selesai</span>
+                                    @break
+                                    @case('pending')
+                                    <span class="badge bg-warning">Pending</span>
+                                    @break
+                                    @case('cancelled')
+                                    <span class="badge bg-danger">Dibatalkan</span>
+                                    @break
+                                    @default
+                                    <span class="badge bg-secondary">{{ ucfirst($payment->status) }}</span>
                                     @endswitch
                                 </td>
                             </tr>
@@ -92,33 +92,33 @@
                                 <td class="text-muted">Metode Pembayaran</td>
                                 <td>
                                     @switch($payment->payment_method)
-                                        @case('cash')
-                                            <span class="badge bg-success-subtle text-success-emphasis">
-                                                <i class="bi bi-cash me-1"></i>Tunai
-                                            </span>
-                                            @break
-                                        @case('transfer')
-                                            <span class="badge bg-primary-subtle text-primary-emphasis">
-                                                <i class="bi bi-bank me-1"></i>Transfer Bank
-                                            </span>
-                                            @break
-                                        @case('online')
-                                            <span class="badge bg-warning-subtle text-warning-emphasis">
-                                                <i class="bi bi-globe me-1"></i>Online
-                                            </span>
-                                            @break
-                                        @case('midtrans')
-                                            <span class="badge bg-info-subtle text-info-emphasis">
-                                                <i class="bi bi-credit-card me-1"></i>Midtrans
-                                            </span>
-                                            @break
-                                        @case('check')
-                                            <span class="badge bg-secondary-subtle text-secondary-emphasis">
-                                                <i class="bi bi-file-text me-1"></i>Cek
-                                            </span>
-                                            @break
-                                        @default
-                                            <span class="badge bg-light text-dark">{{ ucfirst($payment->payment_method) }}</span>
+                                    @case('cash')
+                                    <span class="badge bg-success-subtle text-success-emphasis">
+                                        <i class="bi bi-cash me-1"></i>Tunai
+                                    </span>
+                                    @break
+                                    @case('transfer')
+                                    <span class="badge bg-primary-subtle text-primary-emphasis">
+                                        <i class="bi bi-bank me-1"></i>Transfer Bank
+                                    </span>
+                                    @break
+                                    @case('online')
+                                    <span class="badge bg-warning-subtle text-warning-emphasis">
+                                        <i class="bi bi-globe me-1"></i>Online
+                                    </span>
+                                    @break
+                                    @case('midtrans')
+                                    <span class="badge bg-info-subtle text-info-emphasis">
+                                        <i class="bi bi-credit-card me-1"></i>Midtrans
+                                    </span>
+                                    @break
+                                    @case('check')
+                                    <span class="badge bg-secondary-subtle text-secondary-emphasis">
+                                        <i class="bi bi-file-text me-1"></i>Cek
+                                    </span>
+                                    @break
+                                    @default
+                                    <span class="badge bg-light text-dark">{{ ucfirst($payment->payment_method) }}</span>
                                     @endswitch
                                 </td>
                             </tr>
@@ -128,6 +128,48 @@
                                 <td class="font-monospace">{{ $payment->payment_reference }}</td>
                             </tr>
                             @endif
+
+                            <!-- Add Midtrans specific fields -->
+                            @if($payment->midtrans_order_id)
+                            <tr>
+                                <td class="text-muted">Midtrans Order ID</td>
+                                <td class="font-monospace">{{ $payment->midtrans_order_id }}</td>
+                            </tr>
+                            @endif
+
+                            @if($payment->midtrans_payment_method)
+                            <tr>
+                                <td class="text-muted">Metode Pembayaran Midtrans</td>
+                                <td>
+                                    <span class="badge bg-info-subtle text-info-emphasis">
+                                        {{ $payment->midtrans_payment_method }}
+                                    </span>
+                                </td>
+                            </tr>
+                            @endif
+
+                            @if($payment->program_category)
+                            <tr>
+                                <td class="text-muted">Kategori Program</td>
+                                <td>
+                                    <span class="badge bg-primary-subtle text-primary-emphasis">
+                                        {{ ucfirst(str_replace('-', ' ', $payment->program_category)) }}
+                                    </span>
+                                </td>
+                            </tr>
+                            @endif
+
+                            @if($payment->programType)
+                            <tr>
+                                <td class="text-muted">Jenis Program</td>
+                                <td>
+                                    <span class="badge bg-info-subtle text-info-emphasis">
+                                        {{ $payment->programType ? $payment->programType->name : 'Donasi Umum' }}
+                                    </span>
+                                </td>
+                            </tr>
+                            @endif
+
                             @if($payment->receivedBy)
                             <tr>
                                 <td class="text-muted">Diterima oleh</td>
@@ -184,27 +226,27 @@
                         </div>
                     </div>
                 </div>
-                
+
                 @if($payment->paid_amount > $payment->zakat_amount)
                 <div class="alert alert-info mt-3">
                     <i class="bi bi-info-circle me-2"></i>
-                    <strong>Kelebihan Pembayaran:</strong> 
+                    <strong>Kelebihan Pembayaran:</strong>
                     Rp {{ number_format($payment->paid_amount - $payment->zakat_amount, 0, ',', '.') }}
                     <br>
                     <small>Kelebihan ini dapat dianggap sebagai infaq atau shodaqoh.</small>
                 </div>
                 @elseif($payment->paid_amount < $payment->zakat_amount)
-                <div class="alert alert-warning mt-3">
-                    <i class="bi bi-exclamation-triangle me-2"></i>
-                    <strong>Kekurangan Pembayaran:</strong> 
-                    Rp {{ number_format($payment->zakat_amount - $payment->paid_amount, 0, ',', '.') }}
-                </div>
-                @else
-                <div class="alert alert-success mt-3">
-                    <i class="bi bi-check-circle me-2"></i>
-                    <strong>Pembayaran Pas:</strong> Jumlah yang dibayar sesuai dengan kewajiban zakat.
-                </div>
-                @endif
+                    <div class="alert alert-warning mt-3">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <strong>Kekurangan Pembayaran:</strong>
+                        Rp {{ number_format($payment->zakat_amount - $payment->paid_amount, 0, ',', '.') }}
+                    </div>
+                    @else
+                    <div class="alert alert-success mt-3">
+                        <i class="bi bi-check-circle me-2"></i>
+                        <strong>Pembayaran Pas:</strong> Jumlah yang dibayar sesuai dengan kewajiban zakat.
+                    </div>
+                    @endif
             </div>
         </div>
 
@@ -241,9 +283,9 @@
                     </div>
                     <h5 class="mt-2 mb-1">{{ $payment->muzakki->name }}</h5>
                     @if(!$payment->is_guest_payment)
-                        <span class="badge bg-success">Terdaftar</span>
+                    <span class="badge bg-success">Terdaftar</span>
                     @else
-                        <span class="badge bg-info">Guest</span>
+                    <span class="badge bg-info">Guest</span>
                     @endif
                 </div>
 
@@ -314,7 +356,7 @@
                             </p>
                         </div>
                     </div>
-                    
+
                     @if($payment->status === 'completed')
                     <div class="timeline-item">
                         <div class="timeline-marker bg-success"></div>
@@ -380,7 +422,7 @@
                             Konfirmasi Pembayaran
                         </button>
                     </form>
-                    
+
                     <form action="{{ route('payments.update', $payment) }}" method="POST" class="d-inline">
                         @csrf
                         @method('PUT')
@@ -400,71 +442,71 @@
 
 <!-- Custom Timeline Styles -->
 <style>
-.timeline {
-    position: relative;
-    padding-left: 2rem;
-}
+    .timeline {
+        position: relative;
+        padding-left: 2rem;
+    }
 
-.timeline-item {
-    position: relative;
-    margin-bottom: 1.5rem;
-}
+    .timeline-item {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
 
-.timeline-item:not(:last-child)::before {
-    content: '';
-    position: absolute;
-    left: -1.4375rem;
-    top: 1.5rem;
-    width: 2px;
-    height: calc(100% + 0.5rem);
-    background-color: #dee2e6;
-}
+    .timeline-item:not(:last-child)::before {
+        content: '';
+        position: absolute;
+        left: -1.4375rem;
+        top: 1.5rem;
+        width: 2px;
+        height: calc(100% + 0.5rem);
+        background-color: #dee2e6;
+    }
 
-.timeline-marker {
-    position: absolute;
-    left: -1.875rem;
-    top: 0.25rem;
-    width: 1rem;
-    height: 1rem;
-    border-radius: 50%;
-    border: 3px solid #fff;
-    box-shadow: 0 0 0 1px #dee2e6;
-}
+    .timeline-marker {
+        position: absolute;
+        left: -1.875rem;
+        top: 0.25rem;
+        width: 1rem;
+        height: 1rem;
+        border-radius: 50%;
+        border: 3px solid #fff;
+        box-shadow: 0 0 0 1px #dee2e6;
+    }
 
-.timeline-content {
-    margin-left: 0.5rem;
-}
+    .timeline-content {
+        margin-left: 0.5rem;
+    }
 
-.timeline-title {
-    font-size: 0.875rem;
-    font-weight: 600;
-    margin-bottom: 0.25rem;
-}
+    .timeline-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
 
-.timeline-text {
-    line-height: 1.4;
-}
+    .timeline-text {
+        line-height: 1.4;
+    }
 </style>
 @endsection
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Copy payment code functionality
-    const paymentCode = '{{ $payment->payment_code }}';
-    
-    // Add click-to-copy functionality if needed
-    document.querySelectorAll('.font-monospace').forEach(element => {
-        element.style.cursor = 'pointer';
-        element.title = 'Klik untuk menyalin';
-        
-        element.addEventListener('click', function() {
-            navigator.clipboard.writeText(this.textContent).then(function() {
-                // Show toast or notification
-                console.log('Copied to clipboard');
+    document.addEventListener('DOMContentLoaded', function() {
+        // Copy payment code functionality
+        const paymentCode = '{{ $payment->payment_code }}';
+
+        // Add click-to-copy functionality if needed
+        document.querySelectorAll('.font-monospace').forEach(element => {
+            element.style.cursor = 'pointer';
+            element.title = 'Klik untuk menyalin';
+
+            element.addEventListener('click', function() {
+                navigator.clipboard.writeText(this.textContent).then(function() {
+                    // Show toast or notification
+                    console.log('Copied to clipboard');
+                });
             });
         });
     });
-});
 </script>
 @endpush

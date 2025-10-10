@@ -26,10 +26,10 @@ class ZakatType extends Model
     ];
 
     // Relationships
-    public function zakatPayments()
-    {
-        return $this->hasMany(ZakatPayment::class);
-    }
+    // public function zakatPayments()
+    // {
+    //     return $this->hasMany(ZakatPayment::class);
+    // }
 
     // Methods
     public function calculateZakat($wealthAmount)

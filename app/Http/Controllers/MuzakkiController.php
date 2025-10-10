@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Muzakki;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
@@ -128,7 +129,7 @@ class MuzakkiController extends Controller
      */
     public function show(Muzakki $muzakki)
     {
-        $muzakki->load(['user', 'zakatPayments.zakatType']);
+        $muzakki->load(['user', 'zakatPayments.programType']);
 
         $stats = [
             'total_zakat' => $muzakki->zakatPayments()->completed()->sum('paid_amount'),
@@ -137,7 +138,7 @@ class MuzakkiController extends Controller
         ];
 
         $recentPayments = $muzakki->zakatPayments()
-            ->with('zakatType')
+            ->with('programType')
             ->completed()
             ->latest('payment_date')
             ->take(10)
@@ -153,12 +154,12 @@ class MuzakkiController extends Controller
     {
         // If no muzakki is provided, get current user's muzakki profile (for profile editing)
         if (!$muzakki) {
-            $muzakki = auth()->user()->muzakki;
+            $muzakki = Auth::user()->muzakki;
             if (!$muzakki) {
                 abort(404, 'Profil muzakki tidak ditemukan.');
             }
         }
-        
+
         return view('muzakki.edit', compact('muzakki'));
     }
 
@@ -169,45 +170,90 @@ class MuzakkiController extends Controller
     {
         // If no muzakki is provided, get current user's muzakki profile (for profile update)
         if (!$muzakki) {
-            $muzakki = auth()->user()->muzakki;
+            $muzakki = Auth::user()->muzakki;
             if (!$muzakki) {
                 abort(404, 'Profil muzakki tidak ditemukan.');
             }
         }
-        
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => ['nullable', 'email', Rule::unique('muzakki', 'email')->ignore($muzakki->id)],
-            'phone' => 'nullable|string|max:20',
-            'nik' => ['nullable', 'string', 'max:20', Rule::unique('muzakki', 'nik')->ignore($muzakki->id)],
-            'gender' => 'required|in:male,female',
-            'address' => 'nullable|string',
-            'city' => 'nullable|string|max:255',
-            'province' => 'nullable|string|max:255',
-            'postal_code' => 'nullable|string|max:10',
-            'occupation' => 'nullable|in:employee,entrepreneur,civil_servant,teacher,doctor,farmer,trader,other',
-            'monthly_income' => 'nullable|numeric|min:0',
-            'date_of_birth' => 'nullable|date',
-            'is_active' => 'boolean',
-        ]);
 
-        $muzakki->update($request->all());
+        // Check if this is a password-only update
+        $isPasswordUpdate = $request->has('current_password') && $request->has('new_password');
 
-        // Update related user account if exists
-        if ($muzakki->user) {
-            $muzakki->user->update([
-                'name' => $request->name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'is_active' => $request->is_active ?? true,
+        if ($isPasswordUpdate) {
+            // Validate password fields with custom rules
+            $request->validate([
+                'current_password' => 'required|string',
+                'new_password' => [
+                    'required',
+                    'string',
+                    'min:8',
+                    'confirmed',
+                    function ($attribute, $value, $fail) {
+                        if (!preg_match('/[A-Z]/', $value)) {
+                            $fail('Password harus mengandung minimal 1 huruf kapital.');
+                        }
+                        if (!preg_match('/\d/', $value)) {
+                            $fail('Password harus mengandung minimal 1 angka.');
+                        }
+                    },
+                ],
+            ], [
+                'new_password.min' => 'Password harus mengandung minimal 8 karakter.',
+                'new_password.confirmed' => 'Konfirmasi password tidak sesuai.',
             ]);
-        }
 
-        // Check if this is a profile update (no muzakki parameter) vs admin update
-        if (request()->route()->hasParameter('muzakki')) {
-            return redirect()->route('muzakki.index')->with('success', 'Data muzakki berhasil diperbarui.');
+            // Check if current password is correct
+            if (!Hash::check($request->current_password, $muzakki->user->password)) {
+                return back()->withErrors(['current_password' => 'Password saat ini tidak sesuai.']);
+            }
+
+            // Update password
+            $muzakki->user->update([
+                'password' => Hash::make($request->new_password),
+            ]);
+
+            // Check if this is a profile update (no muzakki parameter) vs admin update
+            if (request()->route()->hasParameter('muzakki')) {
+                return redirect()->route('muzakki.index')->with('success', 'Password berhasil diperbarui.');
+            } else {
+                return redirect()->route('muzakki.dashboard.management')->with('success', 'Password berhasil diperbarui.');
+            }
         } else {
-            return redirect()->route('muzakki.dashboard')->with('success', 'Profil berhasil diperbarui.');
+            // Regular profile update - validate all fields
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => ['nullable', 'email', Rule::unique('muzakki', 'email')->ignore($muzakki->id)],
+                'phone' => 'nullable|string|max:20',
+                'nik' => ['nullable', 'string', 'max:20', Rule::unique('muzakki', 'nik')->ignore($muzakki->id)],
+                'gender' => 'required|in:male,female',
+                'address' => 'nullable|string',
+                'city' => 'nullable|string|max:255',
+                'province' => 'nullable|string|max:255',
+                'postal_code' => 'nullable|string|max:10',
+                'occupation' => 'nullable|in:employee,entrepreneur,civil_servant,teacher,doctor,farmer,trader,other',
+                'monthly_income' => 'nullable|numeric|min:0',
+                'date_of_birth' => 'nullable|date',
+                'is_active' => 'boolean',
+            ]);
+
+            $muzakki->update($request->all());
+
+            // Update related user account if exists
+            if ($muzakki->user) {
+                $muzakki->user->update([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'phone' => $request->phone,
+                    'is_active' => $request->is_active ?? true,
+                ]);
+            }
+
+            // Check if this is a profile update (no muzakki parameter) vs admin update
+            if (request()->route()->hasParameter('muzakki')) {
+                return redirect()->route('muzakki.index')->with('success', 'Data muzakki berhasil diperbarui.');
+            } else {
+                return redirect()->route('muzakki.dashboard.management')->with('success', 'Profil berhasil diperbarui.');
+            }
         }
     }
 

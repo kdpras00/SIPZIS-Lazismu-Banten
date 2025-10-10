@@ -3,7 +3,7 @@
 @section('title', 'Program Lingkungan - SIPZIS')
 
 @section('navbar')
-    @include('partials.navbarHome')
+@include('partials.navbarHome')
 @endsection
 
 @section('content')
@@ -15,14 +15,14 @@
         <div class="absolute top-20 right-10 w-72 h-72 bg-cyan-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce animation-delay-3000"></div>
         <div class="absolute -bottom-8 left-20 w-72 h-72 bg-sky-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce animation-delay-5000"></div>
     </div>
-    
+
     <div class="relative z-10 py-20">
         <div class="container mx-auto px-4 py-16">
             <!-- Back Button -->
             <div class="mb-8">
                 <a href="{{ route('program') }}" class="inline-flex items-center text-teal-700 hover:text-teal-900 font-semibold transition-colors duration-300">
                     <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
                     </svg>
                     Kembali ke Program
                 </a>
@@ -51,7 +51,7 @@
                             <div class="rounded-2xl overflow-hidden shadow-lg">
                                 <img src="{{ asset('img/program/lingkungan.jpg') }}" alt="Program Lingkungan" class="w-full h-64 object-cover">
                             </div>
-                            
+
                             <!-- Collected Amount Card -->
                             <div class="mt-6 bg-gradient-to-br from-teal-100 to-cyan-100 rounded-2xl p-6 border border-teal-200">
                                 <h3 class="text-xl font-bold text-teal-800 mb-3">Dana Terkumpul</h3>
@@ -61,14 +61,14 @@
                                 <p class="text-center text-teal-600 mt-2">dari semua donasi program lingkungan</p>
                             </div>
                         </div>
-                        
+
                         <!-- Program Description -->
                         <div class="lg:col-span-2">
                             <h2 class="text-3xl font-bold text-teal-800 mb-4">Tentang Program Lingkungan</h2>
                             <p class="text-gray-700 mb-6 text-lg leading-relaxed">
                                 Program Lingkungan SIPZIS bertujuan untuk melestarikan lingkungan hidup melalui berbagai inisiatif yang mencakup penghijauan, pengelolaan sampah, dan kegiatan ramah lingkungan lainnya. Kami percaya bahwa menjaga lingkungan adalah tanggung jawab kita semua.
                             </p>
-                            
+
                             <h3 class="text-2xl font-bold text-teal-700 mb-3">Fokus Program</h3>
                             <ul class="list-disc list-inside text-gray-700 mb-6 space-y-2">
                                 <li>Program penghijauan dan reboisasi</li>
@@ -77,7 +77,7 @@
                                 <li>Pengembangan energi terbarukan</li>
                                 <li>Konservasi sumber daya alam</li>
                             </ul>
-                            
+
                             <div class="bg-teal-50 rounded-xl p-4 mb-6">
                                 <h3 class="text-lg font-bold text-teal-800 mb-2">Dana akan digunakan untuk:</h3>
                                 <ul class="space-y-1 text-teal-700">
@@ -95,13 +95,13 @@
                                     </li>
                                 </ul>
                             </div>
-                            
+
                             <!-- Call to Action -->
                             <div class="text-center mt-8">
-                                <a href="{{ route('guest.payment.create', ['category' => 'lingkungan']) }}" 
-                                   class="inline-flex items-center bg-gradient-to-r from-cyan-600 to-sky-600 text-white px-8 py-4 rounded-xl hover:from-cyan-700 hover:to-sky-700 transition-all duration-300 font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105">
+                                <a href="{{ route('guest.payment.create', ['category' => 'lingkungan', 'amount' => 75000]) }}"
+                                    class="inline-flex items-center bg-gradient-to-r from-cyan-600 to-sky-600 text-white px-8 py-4 rounded-xl hover:from-cyan-700 hover:to-sky-700 transition-all duration-300 font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105">
                                     <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
+                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z" />
                                     </svg>
                                     Donasi Sekarang
                                 </a>
@@ -115,35 +115,38 @@
 </div>
 
 <style>
-@keyframes blob {
-    0% {
-        transform: translate(0px, 0px) scale(1);
-    }
-    33% {
-        transform: translate(30px, -50px) scale(1.1);
-    }
-    66% {
-        transform: translate(-20px, 20px) scale(0.9);
-    }
-    100% {
-        transform: translate(0px, 0px) scale(1);
-    }
-}
+    @keyframes blob {
+        0% {
+            transform: translate(0px, 0px) scale(1);
+        }
 
-.animate-bounce {
-    animation: blob 7s infinite;
-}
+        33% {
+            transform: translate(30px, -50px) scale(1.1);
+        }
 
-.animation-delay-1000 {
-    animation-delay: 1s;
-}
+        66% {
+            transform: translate(-20px, 20px) scale(0.9);
+        }
 
-.animation-delay-3000 {
-    animation-delay: 3s;
-}
+        100% {
+            transform: translate(0px, 0px) scale(1);
+        }
+    }
 
-.animation-delay-5000 {
-    animation-delay: 5s;
-}
+    .animate-bounce {
+        animation: blob 7s infinite;
+    }
+
+    .animation-delay-1000 {
+        animation-delay: 1s;
+    }
+
+    .animation-delay-3000 {
+        animation-delay: 3s;
+    }
+
+    .animation-delay-5000 {
+        animation-delay: 5s;
+    }
 </style>
 @endsection

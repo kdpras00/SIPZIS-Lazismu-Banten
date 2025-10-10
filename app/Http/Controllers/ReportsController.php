@@ -4,13 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\ZakatPayment;
 use App\Models\ZakatDistribution;
-use App\Models\Muzakki;
 use App\Models\Mustahik;
 use App\Models\ZakatType;
+use App\Models\ProgramType;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ReportsController extends Controller
 {
@@ -24,7 +23,7 @@ class ReportsController extends Controller
         ]);
 
         // Build query for zakat payments
-        $query = ZakatPayment::with(['muzakki', 'zakatType', 'receivedBy']);
+        $query = ZakatPayment::with(['muzakki', 'programType', 'receivedBy']);
 
         // Search functionality
         if ($request->has('search')) {
@@ -41,6 +40,11 @@ class ReportsController extends Controller
         // Filter by zakat type
         if ($request->has('zakat_type') && $request->zakat_type != '') {
             $query->where('zakat_type_id', $request->zakat_type);
+        }
+
+        // Filter by program type
+        if ($request->has('program_type') && $request->program_type != '') {
+            $query->where('program_type_id', $request->program_type);
         }
 
         // Filter by payment method
@@ -60,7 +64,7 @@ class ReportsController extends Controller
         if ($request->has('export')) {
             $exportFormat = $request->get('export');
             Log::info('Export requested', ['format' => $exportFormat]);
-            
+
             $payments = $query->latest('payment_date')->get();
             return $this->exportIncomingReport($payments, $exportFormat);
         }
@@ -76,16 +80,16 @@ class ReportsController extends Controller
             'pending' => ZakatPayment::where('status', 'pending')->count(),
         ];
 
-        // Get zakat types for filter dropdown
-        $zakatTypes = ZakatType::active()->get();
+        // Get program types for filter dropdown
+        $programTypes = ProgramType::all();
 
         return view('reports.incoming', compact(
             'payments',
             'stats',
-            'zakatTypes'
+            'programTypes'
         ));
     }
-    
+
     public function outgoing(Request $request)
     {
         // Log the request for debugging
@@ -134,7 +138,7 @@ class ReportsController extends Controller
         if ($request->has('export')) {
             $exportFormat = $request->get('export');
             Log::info('Export requested', ['format' => $exportFormat]);
-            
+
             $distributions = $query->latest('distribution_date')->get();
             return $this->exportOutgoingReport($distributions, $exportFormat);
         }
@@ -144,7 +148,7 @@ class ReportsController extends Controller
 
         // Get filter options and statistics
         $categories = array_keys(Mustahik::CATEGORIES);
-        
+
         $stats = [
             'total_amount' => ZakatDistribution::sum('amount'),
             'total_count' => ZakatDistribution::count(),
@@ -163,7 +167,7 @@ class ReportsController extends Controller
     private function exportIncomingReport($payments, $format)
     {
         Log::info('Exporting incoming report', ['format' => $format, 'payment_count' => $payments->count()]);
-        
+
         $data = [
             'title' => 'Laporan Zakat Masuk',
             'date' => date('d/m/Y'),
@@ -192,7 +196,7 @@ class ReportsController extends Controller
     private function exportOutgoingReport($distributions, $format)
     {
         Log::info('Exporting outgoing report', ['format' => $format, 'distribution_count' => $distributions->count()]);
-        
+
         $data = [
             'title' => 'Laporan Zakat Keluar',
             'date' => date('d/m/Y'),
@@ -226,7 +230,7 @@ class ReportsController extends Controller
             'Content-Disposition' => 'attachment; filename="laporan-zakat-masuk.csv"',
         ];
 
-        $callback = function() use ($payments) {
+        $callback = function () use ($payments) {
             $file = fopen('php://output', 'w');
             fputcsv($file, ['No', 'Kode Pembayaran', 'Nama Muzakki', 'Jenis Zakat', 'Metode Pembayaran', 'Nominal', 'Tanggal', 'Status']);
 
@@ -235,7 +239,7 @@ class ReportsController extends Controller
                     $index + 1,
                     $payment->payment_code,
                     $payment->muzakki->name,
-                    $payment->zakatType->name ?? '-',
+                    '-',
                     $this->getPaymentMethodLabel($payment->payment_method),
                     'Rp ' . number_format($payment->paid_amount, 0, ',', '.'),
                     $payment->payment_date->format('d M Y'),
@@ -257,7 +261,7 @@ class ReportsController extends Controller
             'Content-Disposition' => 'attachment; filename="laporan-zakat-keluar.csv"',
         ];
 
-        $callback = function() use ($distributions) {
+        $callback = function () use ($distributions) {
             $file = fopen('php://output', 'w');
             fputcsv($file, ['No', 'Kode Distribusi', 'Nama Mustahik', 'Kategori', 'Jenis Distribusi', 'Nominal', 'Tanggal', 'Status']);
 

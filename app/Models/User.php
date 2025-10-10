@@ -71,6 +71,11 @@ class User extends Authenticatable
         return $this->hasMany(ZakatDistribution::class, 'distributed_by');
     }
 
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
+
     // Methods
     public function isAdmin()
     {
@@ -92,6 +97,18 @@ class User extends Authenticatable
         return $this->role === $role;
     }
 
+    // Get count of unread notifications
+    public function getUnreadNotificationsCountAttribute()
+    {
+        return $this->notifications()->unread()->count();
+    }
+
+    // Get latest notifications
+    public function getLatestNotifications($limit = 10)
+    {
+        return $this->notifications()->latest()->limit($limit)->get();
+    }
+
     // Scopes
     public function scopeActive($query)
     {
@@ -101,5 +118,20 @@ class User extends Authenticatable
     public function scopeByRole($query, $role)
     {
         return $query->where('role', $role);
+    }
+
+    // Event handling for notifications
+    public static function boot()
+    {
+        parent::boot();
+
+        // When a user is updated
+        static::updated(function ($user) {
+            // Check if password has changed
+            if ($user->isDirty('password')) {
+                // Create a notification about password change
+                Notification::createAccountNotification($user, 'password');
+            }
+        });
     }
 }

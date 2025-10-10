@@ -47,7 +47,7 @@
                         <h6 class="dropdown-header">{{ ucfirst(auth()->user()->role) }}</h6>
                     </li>
                     <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Profile</a></li>
-                    <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a></li>
+                    <!-- <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a></li> -->
                     <li>
                         <hr class="dropdown-divider">
                     </li>
@@ -64,3 +64,11 @@
         </div>
     </div>
 </nav>
+
+<style>
+    /* Ensure navbar works properly with new layout */
+    .navbar {
+        margin-bottom: 0;
+        border-radius: 0;
+    }
+</style>

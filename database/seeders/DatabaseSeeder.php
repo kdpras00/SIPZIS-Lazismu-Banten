@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             MuzakkiSeeder::class,
             MustahikSeeder::class,
+            ProgramTargetAmountSeeder::class,
         ]);
     }
 }

@@ -7,7 +7,7 @@
         <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
         <li class="breadcrumb-item active">Laporan Masuk</li>
     </ol>
-    
+
     <!-- Filter Section -->
     <div class="card mb-4">
         <div class="card-header">
@@ -24,17 +24,6 @@
                     <div class="col-md-3 mb-3">
                         <label for="date_to" class="form-label">Tanggal Akhir</label>
                         <input type="date" class="form-control" id="date_to" name="date_to" value="{{ request('date_to') }}">
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <label for="zakat_type" class="form-label">Jenis Zakat</label>
-                        <select class="form-select" id="zakat_type" name="zakat_type">
-                            <option value="">Semua Jenis</option>
-                            @foreach($zakatTypes as $type)
-                                <option value="{{ $type->id }}" {{ request('zakat_type') == $type->id ? 'selected' : '' }}>
-                                    {{ $type->name }}
-                                </option>
-                            @endforeach
-                        </select>
                     </div>
                     <div class="col-md-3 mb-3">
                         <label for="payment_method" class="form-label">Metode Pembayaran</label>
@@ -172,43 +161,43 @@
                     </thead>
                     <tbody>
                         @forelse($payments as $payment)
-                            <tr>
-                                <td>{{ $loop->iteration + ($payments->currentPage() - 1) * $payments->perPage() }}</td>
-                                <td>{{ $payment->payment_code }}</td>
-                                <td>{{ $payment->muzakki->name }}</td>
-                                <td>{{ $payment->zakatType->name ?? '-' }}</td>
-                                <td>
-                                    @switch($payment->payment_method)
-                                        @case('cash')
-                                            Tunai
-                                            @break
-                                        @case('transfer')
-                                            Transfer
-                                            @break
-                                        @case('check')
-                                            Cek
-                                            @break
-                                        @case('online')
-                                            Online
-                                            @break
-                                    @endswitch
-                                </td>
-                                <td>Rp {{ number_format($payment->paid_amount, 0, ',', '.') }}</td>
-                                <td>{{ $payment->payment_date->format('d M Y') }}</td>
-                                <td>
-                                    @if($payment->status == 'completed')
-                                        <span class="badge bg-success">Selesai</span>
-                                    @elseif($payment->status == 'pending')
-                                        <span class="badge bg-warning">Pending</span>
-                                    @else
-                                        <span class="badge bg-danger">Batal</span>
-                                    @endif
-                                </td>
-                            </tr>
+                        <tr>
+                            <td>{{ $loop->iteration + ($payments->currentPage() - 1) * $payments->perPage() }}</td>
+                            <td>{{ $payment->payment_code }}</td>
+                            <td>{{ $payment->muzakki->name }}</td>
+                            <td>{{ $payment->zakatType->name ?? '-' }}</td>
+                            <td>
+                                @switch($payment->payment_method)
+                                @case('cash')
+                                Tunai
+                                @break
+                                @case('transfer')
+                                Transfer
+                                @break
+                                @case('check')
+                                Cek
+                                @break
+                                @case('online')
+                                Online
+                                @break
+                                @endswitch
+                            </td>
+                            <td>Rp {{ number_format($payment->paid_amount, 0, ',', '.') }}</td>
+                            <td>{{ $payment->payment_date->format('d M Y') }}</td>
+                            <td>
+                                @if($payment->status == 'completed')
+                                <span class="badge bg-success">Selesai</span>
+                                @elseif($payment->status == 'pending')
+                                <span class="badge bg-warning">Pending</span>
+                                @else
+                                <span class="badge bg-danger">Batal</span>
+                                @endif
+                            </td>
+                        </tr>
                         @empty
-                            <tr>
-                                <td colspan="8" class="text-center">Tidak ada data pembayaran zakat</td>
-                            </tr>
+                        <tr>
+                            <td colspan="8" class="text-center">Tidak ada data pembayaran zakat</td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -227,33 +216,33 @@
 
 @push('scripts')
 <script>
-function exportReport(format) {
-    // Get current form data
-    const form = document.getElementById('filterForm');
-    const formData = new FormData(form);
-    
-    // Build query string
-    const params = new URLSearchParams();
-    for (const [key, value] of formData.entries()) {
-        if (value) {
-            params.append(key, value);
-        }
-    }
-    
-    // Add export parameter
-    params.append('export', format);
-    
-    // Redirect to export URL
-    window.location.href = "{{ route('reports.incoming') }}?" + params.toString();
-}
+    function exportReport(format) {
+        // Get current form data
+        const form = document.getElementById('filterForm');
+        const formData = new FormData(form);
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Ensure dropdown functionality works
-    var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
-    var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
-        return new bootstrap.Dropdown(dropdownToggleEl);
+        // Build query string
+        const params = new URLSearchParams();
+        for (const [key, value] of formData.entries()) {
+            if (value) {
+                params.append(key, value);
+            }
+        }
+
+        // Add export parameter
+        params.append('export', format);
+
+        // Redirect to export URL
+        window.location.href = "{{ route('reports.incoming') }}?" + params.toString();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Ensure dropdown functionality works
+        var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+        var dropdownList = dropdownElementList.map(function(dropdownToggleEl) {
+            return new bootstrap.Dropdown(dropdownToggleEl);
+        });
     });
-});
 </script>
 @endpush
 @endsection
