@@ -73,8 +73,9 @@
                                             <td class="align-middle">
                                                 <div class="d-flex px-2 py-1">
                                                     <div class="d-flex flex-column justify-content-center me-3">
-                                                        <img src="{{ $program->photo ? asset('storage/' . $program->photo) : asset('img/masjid.webp') }}"
+                                                        <img src="{{ $program->photo ? (filter_var($program->photo, FILTER_VALIDATE_URL) ? $program->photo : asset('storage/' . $program->photo)) : asset('img/masjid.webp') }}"
                                                             class="avatar avatar-lg me-3" alt="{{ $program->name }}"
+                                                            onerror="this.onerror=null; this.src='/img/masjid.webp';"
                                                             style="width: 80px; height: 80px; object-fit: cover;">
                                                     </div>
                                                     <div class="d-flex flex-column justify-content-center">
@@ -186,8 +187,9 @@
                                             <td class="align-middle">
                                                 <div class="d-flex px-2 py-1">
                                                     <div class="d-flex flex-column justify-content-center me-3">
-                                                        <img src="{{ $program->photo ? asset('storage/' . $program->photo) : asset('img/masjid.webp') }}"
+                                                        <img src="{{ $program->photo ? (filter_var($program->photo, FILTER_VALIDATE_URL) ? $program->photo : asset('storage/' . $program->photo)) : asset('img/masjid.webp') }}"
                                                             class="avatar avatar-lg me-3" alt="{{ $program->name }}"
+                                                            onerror="this.onerror=null; this.src='/img/masjid.webp';"
                                                             style="width: 80px; height: 80px; object-fit: cover;">
                                                     </div>
                                                     <div class="d-flex flex-column justify-content-center">
@@ -299,8 +301,9 @@
                                             <td class="align-middle">
                                                 <div class="d-flex px-2 py-1">
                                                     <div class="d-flex flex-column justify-content-center me-3">
-                                                        <img src="{{ $program->photo ? asset('storage/' . $program->photo) : asset('img/masjid.webp') }}"
+                                                        <img src="{{ $program->photo ? (filter_var($program->photo, FILTER_VALIDATE_URL) ? $program->photo : asset('storage/' . $program->photo)) : asset('img/masjid.webp') }}"
                                                             class="avatar avatar-lg me-3" alt="{{ $program->name }}"
+                                                            onerror="this.onerror=null; this.src='/img/masjid.webp';"
                                                             style="width: 80px; height: 80px; object-fit: cover;">
                                                     </div>
                                                     <div class="d-flex flex-column justify-content-center">
@@ -412,8 +415,9 @@
                                             <td class="align-middle">
                                                 <div class="d-flex px-2 py-1">
                                                     <div class="d-flex flex-column justify-content-center me-3">
-                                                        <img src="{{ $program->photo ? asset('storage/' . $program->photo) : asset('img/masjid.webp') }}"
+                                                        <img src="{{ $program->photo ? (filter_var($program->photo, FILTER_VALIDATE_URL) ? $program->photo : asset('storage/' . $program->photo)) : asset('img/masjid.webp') }}"
                                                             class="avatar avatar-lg me-3" alt="{{ $program->name }}"
+                                                            onerror="this.onerror=null; this.src='/img/masjid.webp';"
                                                             style="width: 80px; height: 80px; object-fit: cover;">
                                                     </div>
                                                     <div class="d-flex flex-column justify-content-center">

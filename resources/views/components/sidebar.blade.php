@@ -9,8 +9,8 @@ $currentRoute = Route::currentRouteName();
     <div class="d-flex justify-content-center align-items-center mb-3">
         <a href="{{ $user->role === 'muzakki' ? route('muzakki.dashboard') : route('dashboard') }}" class="navbar-brand text-decoration-none d-flex align-items-center">
             <i class="fas fa-mosque me-2 text-white fs-4"></i>
-            <div>
-                <span class="fw-bold fs-5" style="color: white; font-family: 'Poppins', sans-serif;">SIPZIS</span>
+            <div class="d-flex flex-column">
+                <span class="fw-bold fs-5" style="color: white; font-family: 'Poppins', sans-serif; margin-left: -5px;">SIPZIS</span>
             </div>
         </a>
     </div>
@@ -152,7 +152,7 @@ $currentRoute = Route::currentRouteName();
             <a href="{{ route('admin.programs.index') }}"
                 class="nav-link {{ str_contains($currentRoute, 'programs') ? 'active' : '' }}">
                 <i class="bi bi-grid me-2"></i>
-                Kelola Program
+                <span style="margin-left: -5px;">Kelola Program</span>
             </a>
         </li>
         @endif
@@ -297,5 +297,27 @@ $currentRoute = Route::currentRouteName();
         #sidebar.show {
             transform: translateX(0);
         }
+    }
+
+
+
+    .sidebar a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        color: white;
+        padding: 10px 15px;
+        white-space: nowrap;
+        /* 👈 mencegah teks turun ke bawah */
+    }
+
+
+    .sidebar a:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar i {
+        font-size: 1.2rem;
     }
 </style>

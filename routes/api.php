@@ -19,3 +19,5 @@ Route::post('/midtrans/notification', [ZakatPaymentController::class, 'handleNot
 
 Route::post('/midtrans/callback', [ZakatPaymentController::class, 'midtransCallback'])
     ->name('midtrans.callback');
+
+// 

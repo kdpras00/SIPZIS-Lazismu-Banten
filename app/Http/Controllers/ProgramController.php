@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Program;
 use App\Models\ProgramType;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ProgramController extends Controller
 {
@@ -57,32 +58,52 @@ class ProgramController extends Controller
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $data = $request->only([
-            'name',
-            'description',
-            'target_amount',
-            'status'
-        ]);
+        $data = $request->only(['name', 'description', 'target_amount', 'status']);
 
-        // Set category based on selection
-        if ($request->category === 'zakat') {
-            $data['category'] = 'zakat-' . ($request->zakat_type ?? 'umum');
-        } elseif ($request->category === 'infaq') {
-            $data['category'] = 'infaq-' . ($request->infaq_type ?? 'umum');
-        } elseif ($request->category === 'shadaqah') {
-            $data['category'] = 'shadaqah-' . ($request->shadaqah_type ?? 'umum');
-        } else {
-            $data['category'] = $request->pilar_category ?? 'umum';
+        // ✅ Cek kategori utama & subkategori
+        switch ($request->category) {
+            case 'zakat':
+                if ($request->zakat_type === 'other' && $request->filled('zakat_type_other')) {
+                    $data['category'] = 'zakat-' . Str::slug($request->zakat_type_other, '-');
+                } else {
+                    $data['category'] = 'zakat-' . ($request->zakat_type ?? 'umum');
+                }
+                break;
+
+            case 'infaq':
+                if ($request->infaq_type === 'other' && $request->filled('infaq_type_other')) {
+                    $data['category'] = 'infaq-' . Str::slug($request->infaq_type_other, '-');
+                } else {
+                    $data['category'] = 'infaq-' . ($request->infaq_type ?? 'umum');
+                }
+                break;
+
+            case 'shadaqah':
+                if ($request->shadaqah_type === 'other' && $request->filled('shadaqah_type_other')) {
+                    $data['category'] = 'shadaqah-' . Str::slug($request->shadaqah_type_other, '-');
+                } else {
+                    $data['category'] = 'shadaqah-' . ($request->shadaqah_type ?? 'umum');
+                }
+                break;
+
+            case 'pilar':
+                if ($request->pilar_category === 'other' && $request->filled('pilar_type_other')) {
+                    $data['category'] = Str::slug($request->pilar_type_other, '-');
+                } else {
+                    $data['category'] = $request->pilar_category ?? 'umum';
+                }
+                break;
         }
 
-        // Handle photo upload
+        // Upload foto
         if ($request->hasFile('photo')) {
             $data['photo'] = $request->file('photo')->store('programs', 'public');
         }
 
-        $program = Program::create($data);
+        Program::create($data);
 
-        return redirect()->route('admin.programs.index')->with('success', 'Program created successfully.');
+        return redirect()->route('admin.programs.index')
+            ->with('success', 'Program created successfully.');
     }
 
     /**
@@ -166,27 +187,45 @@ class ProgramController extends Controller
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $data = $request->only([
-            'name',
-            'description',
-            'target_amount',
-            'status'
-        ]);
+        $data = $request->only(['name', 'description', 'target_amount', 'status']);
 
-        // Set category based on selection
-        if ($request->category === 'zakat') {
-            $data['category'] = 'zakat-' . ($request->zakat_type ?? 'umum');
-        } elseif ($request->category === 'infaq') {
-            $data['category'] = 'infaq-' . ($request->infaq_type ?? 'umum');
-        } elseif ($request->category === 'shadaqah') {
-            $data['category'] = 'shadaqah-' . ($request->shadaqah_type ?? 'umum');
-        } else {
-            $data['category'] = $request->pilar_category ?? 'umum';
+        // ✅ Periksa apakah user memilih "Lainnya"
+        switch ($request->category) {
+            case 'zakat':
+                if ($request->zakat_type === 'other' && $request->filled('zakat_type_other')) {
+                    $data['category'] = 'zakat-' . Str::slug($request->zakat_type_other, '-');
+                } else {
+                    $data['category'] = 'zakat-' . ($request->zakat_type ?? 'umum');
+                }
+                break;
+
+            case 'infaq':
+                if ($request->infaq_type === 'other' && $request->filled('infaq_type_other')) {
+                    $data['category'] = 'infaq-' . Str::slug($request->infaq_type_other, '-');
+                } else {
+                    $data['category'] = 'infaq-' . ($request->infaq_type ?? 'umum');
+                }
+                break;
+
+            case 'shadaqah':
+                if ($request->shadaqah_type === 'other' && $request->filled('shadaqah_type_other')) {
+                    $data['category'] = 'shadaqah-' . Str::slug($request->shadaqah_type_other, '-');
+                } else {
+                    $data['category'] = 'shadaqah-' . ($request->shadaqah_type ?? 'umum');
+                }
+                break;
+
+            case 'pilar':
+                if ($request->pilar_category === 'other' && $request->filled('pilar_type_other')) {
+                    $data['category'] = Str::slug($request->pilar_type_other, '-');
+                } else {
+                    $data['category'] = $request->pilar_category ?? 'umum';
+                }
+                break;
         }
 
-        // Handle photo upload
+        // Ganti foto kalau diupload baru
         if ($request->hasFile('photo')) {
-            // Delete old photo if exists
             if ($program->photo) {
                 Storage::disk('public')->delete($program->photo);
             }
@@ -195,7 +234,8 @@ class ProgramController extends Controller
 
         $program->update($data);
 
-        return redirect()->route('admin.programs.index')->with('success', 'Program updated successfully.');
+        return redirect()->route('admin.programs.index')
+            ->with('success', 'Program updated successfully.');
     }
 
     /**

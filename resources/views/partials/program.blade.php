@@ -177,21 +177,21 @@
                                     <div class="relative h-48 overflow-hidden">
                                         <div class="absolute inset-0 bg-cover bg-center" data-bg-url="{{ $program->photo ?? 'https://via.placeholder.com/400x300/cccccc/ffffff?text=' . urlencode($program->name) }}"></div>
                                         <div class="absolute top-4 left-4">
-                                            <span class="inline-block bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full">Program Pilar</span>
+                                            <span class="inline-block bg-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full">Program Pilar</span>
                                         </div>
                                     </div>
 
                                     <div class="p-6">
-                                        <h3 class="text-xl font-black text-blue-800 mb-2">{{ $program->name }}</h3>
+                                        <h3 class="text-xl font-black text-purple-800 mb-2">{{ $program->name }}</h3>
                                         <p class="text-gray-600 text-sm mb-4">{{ $program->description }}</p>
 
                                         <div class="space-y-2">
                                             <div class="flex justify-between text-sm">
                                                 <span class="text-gray-500">Donasi Terkumpul</span>
-                                                <span class="text-blue-600 font-bold">{{ $program->formatted_total_collected }}</span>
+                                                <span class="text-purple-600 font-bold">{{ $program->formatted_total_collected }}</span>
                                             </div>
                                             <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                                                <div class="bg-blue-500 h-full rounded-full progress-bar" data-width="{{ $program->progress_percentage }}"></div>
+                                                <div class="bg-purple-500 h-full rounded-full progress-bar" data-width="{{ $program->progress_percentage }}"></div>
                                             </div>
                                             <div class="flex justify-between items-center">
                                                 <span class="text-gray-500 text-xs">Target: {{ $program->formatted_total_target }}</span>

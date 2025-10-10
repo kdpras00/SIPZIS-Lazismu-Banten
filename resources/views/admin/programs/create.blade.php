@@ -18,6 +18,7 @@
 
                         <div class="row">
                             <div class="col-md-8">
+                                {{-- NAMA PROGRAM --}}
                                 <div class="form-group mb-3">
                                     <label for="name" class="form-control-label">Nama Program</label>
                                     <input class="form-control @error('name') is-invalid @enderror"
@@ -31,6 +32,7 @@
                                     @enderror
                                 </div>
 
+                                {{-- DESKRIPSI --}}
                                 <div class="form-group mb-3">
                                     <label for="description" class="form-control-label">Deskripsi</label>
                                     <textarea class="form-control @error('description') is-invalid @enderror"
@@ -42,7 +44,7 @@
                                     @enderror
                                 </div>
 
-                                <!-- Category Selection -->
+                                {{-- KATEGORI UTAMA --}}
                                 <div class="form-group mb-3">
                                     <label for="category" class="form-control-label">Kategori Utama</label>
                                     <select class="form-control @error('category') is-invalid @enderror"
@@ -50,140 +52,102 @@
                                         name="category"
                                         required>
                                         <option value="">Pilih Kategori</option>
-                                        <option value="zakat" {{ old('category') == 'zakat' ? 'selected' : '' }}>
-                                            Zakat
-                                        </option>
-                                        <option value="infaq" {{ old('category') == 'infaq' ? 'selected' : '' }}>
-                                            Infaq
-                                        </option>
-                                        <option value="shadaqah" {{ old('category') == 'shadaqah' ? 'selected' : '' }}>
-                                            Shadaqah
-                                        </option>
-                                        <option value="pilar" {{ old('category') == 'pilar' ? 'selected' : '' }}>
-                                            Program Pilar
-                                        </option>
+                                        <option value="zakat" {{ old('category') == 'zakat' ? 'selected' : '' }}>Zakat</option>
+                                        <option value="infaq" {{ old('category') == 'infaq' ? 'selected' : '' }}>Infaq</option>
+                                        <option value="shadaqah" {{ old('category') == 'shadaqah' ? 'selected' : '' }}>Shadaqah</option>
+                                        <option value="pilar" {{ old('category') == 'pilar' ? 'selected' : '' }}>Program Pilar</option>
                                     </select>
                                     @error('category')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
 
-                                <!-- Sub-category Selection (Dynamic) -->
+                                {{-- SUBKATEGORI ZAKAT --}}
                                 <div class="subcategory-section" id="zakat-subcategory" style="display: none;">
                                     <div class="form-group mb-3">
                                         <label for="zakat_type" class="form-control-label">Jenis Zakat</label>
-                                        <select class="form-control"
-                                            id="zakat_type"
-                                            name="zakat_type">
-                                            <option value="umum" {{ old('zakat_type') == 'umum' ? 'selected' : '' }}>
-                                                Tidak Ada Jenis Khusus
-                                            </option>
-                                            <option value="fitrah" {{ old('zakat_type') == 'fitrah' ? 'selected' : '' }}>
-                                                Zakat Fitrah
-                                            </option>
-                                            <option value="mal" {{ old('zakat_type') == 'mal' ? 'selected' : '' }}>
-                                                Zakat Mal
-                                            </option>
-                                            <option value="profesi" {{ old('zakat_type') == 'profesi' ? 'selected' : '' }}>
-                                                Zakat Profesi
-                                            </option>
-                                            <option value="pertanian" {{ old('zakat_type') == 'pertanian' ? 'selected' : '' }}>
-                                                Zakat Pertanian
-                                            </option>
-                                            <option value="perdagangan" {{ old('zakat_type') == 'perdagangan' ? 'selected' : '' }}>
-                                                Zakat Perdagangan
-                                            </option>
+                                        <select class="form-control" id="zakat_type" name="zakat_type">
+                                            <option value="umum" {{ old('zakat_type') == 'umum' ? 'selected' : '' }}>Tidak Ada Jenis Khusus</option>
+                                            <option value="fitrah" {{ old('zakat_type') == 'fitrah' ? 'selected' : '' }}>Zakat Fitrah</option>
+                                            <option value="mal" {{ old('zakat_type') == 'mal' ? 'selected' : '' }}>Zakat Mal</option>
+                                            <option value="profesi" {{ old('zakat_type') == 'profesi' ? 'selected' : '' }}>Zakat Profesi</option>
+                                            <option value="pertanian" {{ old('zakat_type') == 'pertanian' ? 'selected' : '' }}>Zakat Pertanian</option>
+                                            <option value="perdagangan" {{ old('zakat_type') == 'perdagangan' ? 'selected' : '' }}>Zakat Perdagangan</option>
+                                            <option value="other" {{ old('zakat_type') == 'other' ? 'selected' : '' }}>Lainnya...</option>
                                         </select>
+                                    </div>
+                                    <div class="form-group mb-3" id="zakat_type_other_container" style="display: none;">
+                                        <label for="zakat_type_other" class="form-control-label">Jenis Zakat Lainnya</label>
+                                        <input type="text" id="zakat_type_other" name="zakat_type_other" class="form-control"
+                                            placeholder="Tulis jenis zakat lainnya" value="{{ old('zakat_type_other') }}">
                                     </div>
                                 </div>
 
+                                {{-- SUBKATEGORI INFAQ --}}
                                 <div class="subcategory-section" id="infaq-subcategory" style="display: none;">
                                     <div class="form-group mb-3">
                                         <label for="infaq_type" class="form-control-label">Jenis Infaq</label>
-                                        <select class="form-control"
-                                            id="infaq_type"
-                                            name="infaq_type">
-                                            <option value="umum" {{ old('infaq_type') == 'umum' ? 'selected' : '' }}>
-                                                Tidak Ada Jenis Khusus
-                                            </option>
-                                            <option value="masjid" {{ old('infaq_type') == 'masjid' ? 'selected' : '' }}>
-                                                Infaq Masjid
-                                            </option>
-                                            <option value="pendidikan" {{ old('infaq_type') == 'pendidikan' ? 'selected' : '' }}>
-                                                Infaq Pendidikan
-                                            </option>
-                                            <option value="kemanusiaan" {{ old('infaq_type') == 'kemanusiaan' ? 'selected' : '' }}>
-                                                Infaq Kemanusiaan
-                                            </option>
-                                            <option value="bencana" {{ old('infaq_type') == 'bencana' ? 'selected' : '' }}>
-                                                Infaq Bencana
-                                            </option>
-                                            <option value="sosial" {{ old('infaq_type') == 'sosial' ? 'selected' : '' }}>
-                                                Infaq Sosial
-                                            </option>
+                                        <select class="form-control" id="infaq_type" name="infaq_type">
+                                            <option value="umum" {{ old('infaq_type') == 'umum' ? 'selected' : '' }}>Tidak Ada Jenis Khusus</option>
+                                            <option value="masjid" {{ old('infaq_type') == 'masjid' ? 'selected' : '' }}>Infaq Masjid</option>
+                                            <option value="pendidikan" {{ old('infaq_type') == 'pendidikan' ? 'selected' : '' }}>Infaq Pendidikan</option>
+                                            <option value="kemanusiaan" {{ old('infaq_type') == 'kemanusiaan' ? 'selected' : '' }}>Infaq Kemanusiaan</option>
+                                            <option value="bencana" {{ old('infaq_type') == 'bencana' ? 'selected' : '' }}>Infaq Bencana</option>
+                                            <option value="sosial" {{ old('infaq_type') == 'sosial' ? 'selected' : '' }}>Infaq Sosial</option>
+                                            <option value="other" {{ old('infaq_type') == 'other' ? 'selected' : '' }}>Lainnya...</option>
                                         </select>
+                                    </div>
+                                    <div class="form-group mb-3" id="infaq_type_other_container" style="display: none;">
+                                        <label for="infaq_type_other" class="form-control-label">Jenis Infaq Lainnya</label>
+                                        <input type="text" id="infaq_type_other" name="infaq_type_other" class="form-control"
+                                            placeholder="Tulis jenis infaq lainnya" value="{{ old('infaq_type_other') }}">
                                     </div>
                                 </div>
 
+                                {{-- SUBKATEGORI SHADAQAH --}}
                                 <div class="subcategory-section" id="shadaqah-subcategory" style="display: none;">
                                     <div class="form-group mb-3">
                                         <label for="shadaqah_type" class="form-control-label">Jenis Shadaqah</label>
-                                        <select class="form-control"
-                                            id="shadaqah_type"
-                                            name="shadaqah_type">
-                                            <option value="umum" {{ old('shadaqah_type') == 'umum' ? 'selected' : '' }}>
-                                                Tidak Ada Jenis Khusus
-                                            </option>
-                                            <option value="rutin" {{ old('shadaqah_type') == 'rutin' ? 'selected' : '' }}>
-                                                Shadaqah Rutin
-                                            </option>
-                                            <option value="jariyah" {{ old('shadaqah_type') == 'jariyah' ? 'selected' : '' }}>
-                                                Shadaqah Jariyah
-                                            </option>
-                                            <option value="tetangga" {{ old('shadaqah_type') == 'tetangga' ? 'selected' : '' }}>
-                                                Shadaqah Tetangga
-                                            </option>
-                                            <option value="pakaian" {{ old('shadaqah_type') == 'pakaian' ? 'selected' : '' }}>
-                                                Shadaqah Pakaian
-                                            </option>
-                                            <option value="fidyah" {{ old('shadaqah_type') == 'fidyah' ? 'selected' : '' }}>
-                                                Fidyah
-                                            </option>
+                                        <select class="form-control" id="shadaqah_type" name="shadaqah_type">
+                                            <option value="umum" {{ old('shadaqah_type') == 'umum' ? 'selected' : '' }}>Tidak Ada Jenis Khusus</option>
+                                            <option value="rutin" {{ old('shadaqah_type') == 'rutin' ? 'selected' : '' }}>Shadaqah Rutin</option>
+                                            <option value="jariyah" {{ old('shadaqah_type') == 'jariyah' ? 'selected' : '' }}>Shadaqah Jariyah</option>
+                                            <option value="tetangga" {{ old('shadaqah_type') == 'tetangga' ? 'selected' : '' }}>Shadaqah Tetangga</option>
+                                            <option value="pakaian" {{ old('shadaqah_type') == 'pakaian' ? 'selected' : '' }}>Shadaqah Pakaian</option>
+                                            <option value="fidyah" {{ old('shadaqah_type') == 'fidyah' ? 'selected' : '' }}>Fidyah</option>
+                                            <option value="other" {{ old('shadaqah_type') == 'other' ? 'selected' : '' }}>Lainnya...</option>
                                         </select>
+                                    </div>
+                                    <div class="form-group mb-3" id="shadaqah_type_other_container" style="display: none;">
+                                        <label for="shadaqah_type_other" class="form-control-label">Jenis Shadaqah Lainnya</label>
+                                        <input type="text" id="shadaqah_type_other" name="shadaqah_type_other" class="form-control"
+                                            placeholder="Tulis jenis shadaqah lainnya" value="{{ old('shadaqah_type_other') }}">
                                     </div>
                                 </div>
 
+                                {{-- SUBKATEGORI PILAR --}}
                                 <div class="subcategory-section" id="pilar-subcategory" style="display: none;">
                                     <div class="form-group mb-3">
                                         <label for="pilar_category" class="form-control-label">Kategori Program Pilar</label>
-                                        <select class="form-control"
-                                            id="pilar_category"
-                                            name="pilar_category">
-                                            <option value="umum" {{ old('pilar_category') == 'umum' ? 'selected' : '' }}>
-                                                Tidak Ada Jenis Khusus
-                                            </option>
-                                            <option value="pendidikan" {{ old('pilar_category') == 'pendidikan' ? 'selected' : '' }}>
-                                                Pendidikan
-                                            </option>
-                                            <option value="kesehatan" {{ old('pilar_category') == 'kesehatan' ? 'selected' : '' }}>
-                                                Kesehatan
-                                            </option>
-                                            <option value="ekonomi" {{ old('pilar_category') == 'ekonomi' ? 'selected' : '' }}>
-                                                Ekonomi
-                                            </option>
-                                            <option value="sosial-dakwah" {{ old('pilar_category') == 'sosial-dakwah' ? 'selected' : '' }}>
-                                                Sosial & Dakwah
-                                            </option>
-                                            <option value="kemanusiaan" {{ old('pilar_category') == 'kemanusiaan' ? 'selected' : '' }}>
-                                                Kemanusiaan
-                                            </option>
-                                            <option value="lingkungan" {{ old('pilar_category') == 'lingkungan' ? 'selected' : '' }}>
-                                                Lingkungan
-                                            </option>
+                                        <select class="form-control" id="pilar_category" name="pilar_category">
+                                            <option value="umum" {{ old('pilar_category') == 'umum' ? 'selected' : '' }}>Tidak Ada Jenis Khusus</option>
+                                            <option value="pendidikan" {{ old('pilar_category') == 'pendidikan' ? 'selected' : '' }}>Pendidikan</option>
+                                            <option value="kesehatan" {{ old('pilar_category') == 'kesehatan' ? 'selected' : '' }}>Kesehatan</option>
+                                            <option value="ekonomi" {{ old('pilar_category') == 'ekonomi' ? 'selected' : '' }}>Ekonomi</option>
+                                            <option value="sosial-dakwah" {{ old('pilar_category') == 'sosial-dakwah' ? 'selected' : '' }}>Sosial & Dakwah</option>
+                                            <option value="kemanusiaan" {{ old('pilar_category') == 'kemanusiaan' ? 'selected' : '' }}>Kemanusiaan</option>
+                                            <option value="lingkungan" {{ old('pilar_category') == 'lingkungan' ? 'selected' : '' }}>Lingkungan</option>
+                                            <option value="other" {{ old('pilar_category') == 'other' ? 'selected' : '' }}>Lainnya...</option>
                                         </select>
+                                    </div>
+                                    <div class="form-group mb-3" id="pilar_type_other_container" style="display: none;">
+                                        <label for="pilar_type_other" class="form-control-label">Kategori Pilar Lainnya</label>
+                                        <input type="text" id="pilar_type_other" name="pilar_type_other" class="form-control"
+                                            placeholder="Tulis kategori pilar lainnya" value="{{ old('pilar_type_other') }}">
                                     </div>
                                 </div>
 
+                                {{-- TARGET DAN STATUS --}}
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group mb-3">
@@ -208,12 +172,8 @@
                                                 id="status"
                                                 name="status"
                                                 required>
-                                                <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>
-                                                    Active
-                                                </option>
-                                                <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>
-                                                    Inactive
-                                                </option>
+                                                <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
+                                                <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
                                             </select>
                                             @error('status')
                                             <div class="invalid-feedback">{{ $message }}</div>
@@ -223,6 +183,7 @@
                                 </div>
                             </div>
 
+                            {{-- FOTO PROGRAM --}}
                             <div class="col-md-4">
                                 <div class="form-group mb-3">
                                     <label for="photo" class="form-control-label">Foto Program</label>
@@ -248,6 +209,8 @@
                                 </div>
                             </div>
                         </div>
+
+
 
                         <div class="d-flex justify-content-between mt-4">
                             <a href="{{ route('admin.programs.index') }}" class="btn btn-secondary">
@@ -301,6 +264,40 @@
                 }
                 reader.readAsDataURL(file);
             }
+        });
+    });
+
+    // Other type functionality
+    document.addEventListener("DOMContentLoaded", function() {
+        const types = [{
+                select: 'zakat_type',
+                other: 'zakat_type_other_container'
+            },
+            {
+                select: 'infaq_type',
+                other: 'infaq_type_other_container'
+            },
+            {
+                select: 'shadaqah_type',
+                other: 'shadaqah_type_other_container'
+            },
+            {
+                select: 'pilar_category',
+                other: 'pilar_type_other_container'
+            },
+        ];
+
+        types.forEach(t => {
+            const select = document.getElementById(t.select);
+            const otherDiv = document.getElementById(t.other);
+            if (!select || !otherDiv) return;
+
+            const toggle = () => {
+                otherDiv.style.display = (select.value === 'other') ? 'block' : 'none';
+            };
+
+            select.addEventListener('change', toggle);
+            toggle(); // Jalankan saat halaman pertama kali dimuat (untuk old() data)
         });
     });
 </script>

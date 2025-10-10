@@ -43,6 +43,8 @@ Route::get('/admin', function () {
     return redirect()->route('admin.login');
 });
 
+Route::get('/payments/search', [ZakatPaymentController::class, 'search'])->name('api.payments.search');
+
 
 
 Route::get('/payment/{paymentCode}/failed', [ZakatPaymentController::class, 'guestFailure'])

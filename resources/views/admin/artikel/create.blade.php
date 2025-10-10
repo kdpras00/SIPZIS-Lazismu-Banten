@@ -1,157 +1,415 @@
 @extends('layouts.app')
 
+@section('page-title', 'Tambah Distribusi Zakat')
+
 @section('content')
-<div class="container mx-auto px-4 py-6">
-    <div class="flex items-center mb-6">
-        <a href="{{ route('admin.artikel.index') }}" class="text-gray-600 hover:text-gray-800 mr-4">
-            <i class="fas fa-arrow-left text-xl"></i>
-        </a>
-        <h1 class="text-3xl font-bold text-gray-800">Tambah Artikel Baru</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1">Tambah Distribusi Zakat</h2>
+        <p class="text-muted">Catat distribusi zakat kepada mustahik yang berhak</p>
     </div>
-
-    @include('components.alerts')
-
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <form action="{{ route('admin.artikel.store') }}" method="POST" enctype="multipart/form-data">
-            @csrf
-            
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Main Content -->
-                <div class="lg:col-span-2 space-y-6">
-                    <!-- Title -->
-                    <div>
-                        <label for="title" class="block text-sm font-medium text-gray-700 mb-2">
-                            Judul Artikel <span class="text-red-500">*</span>
-                        </label>
-                        <input type="text" id="title" name="title" 
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 @error('title') border-red-500 @enderror"
-                               placeholder="Masukkan judul artikel"
-                               value="{{ old('title') }}" required>
-                        @error('title')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Excerpt -->
-                    <div>
-                        <label for="excerpt" class="block text-sm font-medium text-gray-700 mb-2">
-                            Ringkasan (Opsional)
-                        </label>
-                        <textarea id="excerpt" name="excerpt" rows="3"
-                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 @error('excerpt') border-red-500 @enderror"
-                                  placeholder="Ringkasan singkat artikel (maksimal 500 karakter)">{{ old('excerpt') }}</textarea>
-                        @error('excerpt')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Content -->
-                    <div>
-                        <label for="content" class="block text-sm font-medium text-gray-700 mb-2">
-                            Konten Artikel <span class="text-red-500">*</span>
-                        </label>
-                        <textarea id="content" name="content" rows="15"
-                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 @error('content') border-red-500 @enderror"
-                                  placeholder="Tulis konten artikel di sini..." required>{{ old('content') }}</textarea>
-                        @error('content')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
-
-                <!-- Sidebar -->
-                <div class="lg:col-span-1 space-y-6">
-                    <!-- Category -->
-                    <div>
-                        <label for="category" class="block text-sm font-medium text-gray-700 mb-2">
-                            Kategori <span class="text-red-500">*</span>
-                        </label>
-                        <select id="category" name="category" 
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 @error('category') border-red-500 @enderror" required>
-                            <option value="">Pilih Kategori</option>
-                            <option value="zakat" {{ old('category') === 'zakat' ? 'selected' : '' }}>Zakat</option>
-                            <option value="infaq" {{ old('category') === 'infaq' ? 'selected' : '' }}>Infaq</option>
-                            <option value="sedekah" {{ old('category') === 'sedekah' ? 'selected' : '' }}>Sedekah</option>
-                        </select>
-                        @error('category')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Image Upload -->
-                    <div>
-                        <label for="image" class="block text-sm font-medium text-gray-700 mb-2">
-                            Gambar Artikel
-                        </label>
-                        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-gray-400 transition duration-200">
-                            <div class="space-y-1 text-center">
-                                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                                <div class="flex text-sm text-gray-600">
-                                    <label for="image" class="relative cursor-pointer bg-white rounded-md font-medium text-green-600 hover:text-green-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-green-500">
-                                        <span>Upload gambar</span>
-                                        <input id="image" name="image" type="file" class="sr-only" accept="image/*">
-                                    </label>
-                                    <p class="pl-1">atau drag and drop</p>
-                                </div>
-                                <p class="text-xs text-gray-500">PNG, JPG, GIF hingga 2MB</p>
-                            </div>
-                        </div>
-                        @error('image')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Preview Image -->
-                    <div id="image-preview" class="hidden">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Preview Gambar</label>
-                        <img id="preview-img" src="" alt="Preview" class="w-full h-48 object-cover rounded-lg">
-                    </div>
-
-                    <!-- Publish Status -->
-                    <div>
-                        <label class="flex items-center">
-                            <input type="checkbox" name="is_published" value="1" 
-                                   class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200"
-                                   {{ old('is_published') ? 'checked' : '' }}>
-                            <span class="ml-2 text-sm text-gray-700">Publikasikan sekarang</span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Actions -->
-            <div class="flex justify-end space-x-4 pt-6 border-t">
-                <a href="{{ route('admin.artikel.index') }}" 
-                   class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition duration-200">
-                    Batal
-                </a>
-                <button type="submit" 
-                        class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition duration-200">
-                    <i class="fas fa-save mr-2"></i>Simpan Artikel
-                </button>
-            </div>
-        </form>
+    <div>
+        <a href="{{ route('distributions.index') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Kembali
+        </a>
     </div>
 </div>
 
-<script>
-document.getElementById('image').addEventListener('change', function(event) {
-    const file = event.target.files[0];
-    const preview = document.getElementById('image-preview');
-    const previewImg = document.getElementById('preview-img');
-    
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            previewImg.src = e.target.result;
-            preview.classList.remove('hidden');
-        };
-        reader.readAsDataURL(file);
-    } else {
-        preview.classList.add('hidden');
-    }
-});
-</script>
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="bi bi-hand-thumbs-up"></i> Form Distribusi Zakat</h5>
+            </div>
+            <div class="card-body">
+                <form action="{{ route('distributions.store') }}" method="POST" id="distributionForm">
+                    @csrf
+
+                    <!-- Mustahik Selection Section -->
+                    <div class="mb-4">
+                        <h6 class="text-primary mb-3">
+                            <i class="bi bi-person-heart"></i> Informasi Mustahik
+                        </h6>
+
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="mustahik_id" class="form-label">Pilih Mustahik <span class="text-danger">*</span></label>
+                                <select class="form-select @error('mustahik_id') is-invalid @enderror"
+                                    id="mustahik_id"
+                                    name="mustahik_id"
+                                    required>
+                                    <option value="">Pilih Mustahik</option>
+                                    @foreach($allMustahik as $m)
+                                    <option value="{{ $m->id }}"
+                                        data-category="{{ $m->category }}"
+                                        data-address="{{ $m->address }}"
+                                        data-phone="{{ $m->phone }}"
+                                        {{ old('mustahik_id', $mustahik?->id) == $m->id ? 'selected' : '' }}>
+                                        {{ $m->name }} - {{ ucfirst(str_replace('_', ' ', $m->category)) }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                                @error('mustahik_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="category_filter" class="form-label">Filter Kategori</label>
+                                <select class="form-select" id="category_filter">
+                                    <option value="">Semua Kategori</option>
+                                    @foreach($categories as $category)
+                                    <option value="{{ $category }}">{{ ucfirst(str_replace('_', ' ', $category)) }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Mustahik Details Display -->
+                        <div id="mustahik-details" class="d-none">
+                            <div class="alert alert-info">
+                                <h6 class="mb-2"><i class="bi bi-info-circle"></i> Detail Mustahik</h6>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <small class="text-muted">Kategori:</small>
+                                        <div id="mustahik-category" class="fw-semibold"></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <small class="text-muted">Telepon:</small>
+                                        <div id="mustahik-phone" class="fw-semibold"></div>
+                                    </div>
+                                    <div class="col-12 mt-2">
+                                        <small class="text-muted">Alamat:</small>
+                                        <div id="mustahik-address" class="fw-semibold"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Distribution Details Section -->
+                    <div class="mb-4">
+                        <h6 class="text-primary mb-3">
+                            <i class="bi bi-gift"></i> Detail Distribusi
+                        </h6>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="distribution_type" class="form-label">Jenis Distribusi <span class="text-danger">*</span></label>
+                                <select class="form-select @error('distribution_type') is-invalid @enderror"
+                                    id="distribution_type"
+                                    name="distribution_type"
+                                    required>
+                                    <option value="">Pilih Jenis Distribusi</option>
+                                    <option value="cash" {{ old('distribution_type') == 'cash' ? 'selected' : '' }}>Tunai</option>
+                                    <option value="goods" {{ old('distribution_type') == 'goods' ? 'selected' : '' }}>Barang</option>
+                                    <option value="voucher" {{ old('distribution_type') == 'voucher' ? 'selected' : '' }}>Voucher</option>
+                                    <option value="service" {{ old('distribution_type') == 'service' ? 'selected' : '' }}>Layanan</option>
+                                </select>
+                                @error('distribution_type')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="amount" class="form-label">Jumlah <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="number"
+                                        class="form-control @error('amount') is-invalid @enderror"
+                                        id="amount"
+                                        name="amount"
+                                        value="{{ old('amount') }}"
+                                        min="0"
+                                        step="1000"
+                                        required>
+                                </div>
+                                @error('amount')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <div id="amount-warning" class="d-none">
+                                    <small class="text-danger">
+                                        <i class="bi bi-exclamation-triangle"></i>
+                                        Jumlah melebihi saldo tersedia!
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Goods Description (conditional) -->
+                        <div class="mb-3 d-none" id="goods-description-field">
+                            <label for="goods_description" class="form-label">Deskripsi Barang/Layanan</label>
+                            <textarea class="form-control @error('goods_description') is-invalid @enderror"
+                                id="goods_description"
+                                name="goods_description"
+                                rows="3"
+                                placeholder="Contoh: Beras 10kg, Minyak goreng 2L, dll.">{{ old('goods_description') }}</textarea>
+                            @error('goods_description')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="distribution_date" class="form-label">Tanggal Distribusi <span class="text-danger">*</span></label>
+                                <input type="date"
+                                    class="form-control @error('distribution_date') is-invalid @enderror"
+                                    id="distribution_date"
+                                    name="distribution_date"
+                                    value="{{ old('distribution_date', date('Y-m-d')) }}"
+                                    max="{{ date('Y-m-d') }}"
+                                    required>
+                                @error('distribution_date')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="location" class="form-label">Lokasi Distribusi</label>
+                                <input type="text"
+                                    class="form-control @error('location') is-invalid @enderror"
+                                    id="location"
+                                    name="location"
+                                    value="{{ old('location') }}"
+                                    placeholder="Contoh: Masjid Al-Ikhlas, Kantor Amil, dll.">
+                                @error('location')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Program Information Section -->
+                    <div class="mb-4">
+                        <h6 class="text-primary mb-3">
+                            <i class="bi bi-bookmark"></i> Program & Catatan
+                        </h6>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="program_name" class="form-label">Nama Program</label>
+                                <input type="text"
+                                    class="form-control @error('program_name') is-invalid @enderror"
+                                    id="program_name"
+                                    name="program_name"
+                                    value="{{ old('program_name') }}"
+                                    placeholder="Contoh: Bantuan Ramadan, Program Pendidikan, dll.">
+                                @error('program_name')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Catatan</label>
+                            <textarea class="form-control @error('notes') is-invalid @enderror"
+                                id="notes"
+                                name="notes"
+                                rows="3"
+                                placeholder="Catatan tambahan mengenai distribusi ini...">{{ old('notes') }}</textarea>
+                            @error('notes')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ route('distributions.index') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Batal
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Simpan Distribusi
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <!-- Available Balance Card -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-{{ $availableBalance > 0 ? 'success' : 'danger' }} text-white">
+                <h6 class="mb-0"><i class="bi bi-wallet2"></i> Saldo Tersedia</h6>
+            </div>
+            <div class="card-body text-center">
+                <h3 class="text-{{ $availableBalance > 0 ? 'success' : 'danger' }}" id="available-balance">
+                    Rp {{ number_format($availableBalance, 0, ',', '.') }}
+                </h3>
+                <small class="text-muted">
+                    {{ $availableBalance > 0 ? 'Dapat didistribusikan' : 'Saldo tidak mencukupi' }}
+                </small>
+            </div>
+        </div>
+
+        <!-- Guidelines Card -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h6 class="mb-0"><i class="bi bi-info-circle"></i> Panduan Distribusi</h6>
+            </div>
+            <div class="card-body">
+                <h6>Jenis Distribusi:</h6>
+                <ul class="list-unstyled small">
+                    <li><i class="bi bi-cash text-success"></i> <strong>Tunai:</strong> Bantuan dalam bentuk uang</li>
+                    <li><i class="bi bi-box text-info"></i> <strong>Barang:</strong> Sembako, pakaian, dll.</li>
+                    <li><i class="bi bi-card-text text-warning"></i> <strong>Voucher:</strong> Kupon belanja/layanan</li>
+                    <li><i class="bi bi-gear text-primary"></i> <strong>Layanan:</strong> Beasiswa, pengobatan, dll.</li>
+                </ul>
+
+                <h6 class="mt-3">Kategori Mustahik (8 Asnaf):</h6>
+                <ul class="small text-muted">
+                    <li><strong>Fakir:</strong> Tidak memiliki harta dan pekerjaan</li>
+                    <li><strong>Miskin:</strong> Memiliki harta/pekerjaan tapi tidak mencukupi</li>
+                    <li><strong>Amil:</strong> Petugas pengumpul zakat</li>
+                    <li><strong>Muallaf:</strong> Mualaf atau yang hatinya perlu diperkuat</li>
+                    <li><strong>Riqab:</strong> Memerdekakan budak/tawanan</li>
+                    <li><strong>Gharim:</strong> Orang berutang untuk kepentingan baik</li>
+                    <li><strong>Fi Sabilillah:</strong> Untuk kepentingan umum</li>
+                    <li><strong>Ibnu Sabil:</strong> Musafir kehabisan bekal</li>
+                </ul>
+
+                <div class="alert alert-warning small mt-3">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    Pastikan mustahik sudah terverifikasi sebelum distribusi.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const mustahikSelect = document.getElementById('mustahik_id');
+        const categoryFilter = document.getElementById('category_filter');
+        const distributionType = document.getElementById('distribution_type');
+        const amountInput = document.getElementById('amount');
+        const goodsDescriptionField = document.getElementById('goods-description-field');
+        const mustahikDetails = document.getElementById('mustahik-details');
+        const amountWarning = document.getElementById('amount-warning');
+        const availableBalance = {
+            {
+                $availableBalance
+            }
+        };
+
+        // Store original options for filtering
+        const originalOptions = Array.from(mustahikSelect.options).slice(1); // Exclude empty option
+
+        // Mustahik selection handler
+        mustahikSelect.addEventListener('change', function() {
+            if (this.value) {
+                const selectedOption = this.options[this.selectedIndex];
+                const category = selectedOption.dataset.category;
+                const address = selectedOption.dataset.address || '-';
+                const phone = selectedOption.dataset.phone || '-';
+
+                // Show mustahik details
+                document.getElementById('mustahik-category').textContent = category.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+                document.getElementById('mustahik-address').textContent = address;
+                document.getElementById('mustahik-phone').textContent = phone;
+                mustahikDetails.classList.remove('d-none');
+            } else {
+                mustahikDetails.classList.add('d-none');
+            }
+        });
+
+        // Category filter handler
+        categoryFilter.addEventListener('change', function() {
+            const selectedCategory = this.value;
+
+            // Clear current options (except empty option)
+            mustahikSelect.innerHTML = '<option value="">Pilih Mustahik</option>';
+
+            // Filter and add options
+            originalOptions.forEach(option => {
+                if (!selectedCategory || option.dataset.category === selectedCategory) {
+                    mustahikSelect.appendChild(option.cloneNode(true));
+                }
+            });
+
+            // Reset selection
+            mustahikSelect.value = '';
+            mustahikDetails.classList.add('d-none');
+        });
+
+        // Distribution type handler
+        distributionType.addEventListener('change', function() {
+            const goodsDescField = document.getElementById('goods_description');
+
+            if (this.value === 'goods' || this.value === 'service') {
+                goodsDescriptionField.classList.remove('d-none');
+                goodsDescField.setAttribute('required', 'required');
+            } else {
+                goodsDescriptionField.classList.add('d-none');
+                goodsDescField.removeAttribute('required');
+                goodsDescField.value = '';
+            }
+        });
+
+        // Amount validation for cash distributions
+        function validateAmount() {
+            const amount = parseFloat(amountInput.value) || 0;
+            const isCash = distributionType.value === 'cash';
+
+            if (isCash && amount > availableBalance) {
+                amountWarning.classList.remove('d-none');
+                amountInput.classList.add('is-invalid');
+            } else {
+                amountWarning.classList.add('d-none');
+                amountInput.classList.remove('is-invalid');
+            }
+        }
+
+        amountInput.addEventListener('input', validateAmount);
+        distributionType.addEventListener('change', validateAmount);
+
+        // Format amount input
+        amountInput.addEventListener('blur', function() {
+            if (this.value) {
+                const value = parseInt(this.value.replace(/[^0-9]/g, ''));
+                if (!isNaN(value)) {
+                    this.value = value;
+                }
+            }
+        });
+
+        // Form submission validation
+        document.getElementById('distributionForm').addEventListener('submit', function(e) {
+            const amount = parseFloat(amountInput.value) || 0;
+            const isCash = distributionType.value === 'cash';
+
+            if (isCash && amount > availableBalance) {
+                e.preventDefault();
+                alert('Jumlah distribusi tunai melebihi saldo tersedia!');
+                amountInput.focus();
+                return;
+            }
+
+            if ((distributionType.value === 'goods' || distributionType.value === 'service') && !document.getElementById('goods_description').value) {
+                e.preventDefault();
+                alert('Deskripsi barang/layanan wajib diisi!');
+                document.getElementById('goods_description').focus();
+                return;
+            }
+        });
+
+        // Auto-populate from URL parameters if mustahik is preselected
+        @if($mustahik)
+        mustahikSelect.value = {
+            {
+                $mustahik - > id
+            }
+        };
+        mustahikSelect.dispatchEvent(new Event('change'));
+        @endif
+
+        // Set default distribution date to today
+        const today = new Date().toISOString().split('T')[0];
+        if (!document.getElementById('distribution_date').value) {
+            document.getElementById('distribution_date').value = today;
+        }
+    });
+</script>
+@endpush

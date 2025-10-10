@@ -1728,4 +1728,47 @@ class ZakatPaymentController extends Controller
             ]);
         }
     }
+
+    public function search(Request $request)
+    {
+        $query = ZakatPayment::with(['muzakki', 'zakatType']);
+
+        if ($request->search) {
+            $query->where('payment_code', 'like', '%' . $request->search . '%')
+                ->orWhere('receipt_number', 'like', '%' . $request->search . '%')
+                ->orWhereHas('muzakki', function ($q) use ($request) {
+                    $q->where('name', 'like', '%' . $request->search . '%');
+                });
+        }
+
+        // filter tambahan
+        if ($request->zakat_type) $query->where('zakat_type_id', $request->zakat_type);
+        if ($request->payment_method) $query->where('payment_method', $request->payment_method);
+        if ($request->status) $query->where('status', $request->status);
+        if ($request->date_from && $request->date_to) {
+            $query->whereBetween('payment_date', [$request->date_from, $request->date_to]);
+        }
+
+        $payments = $query->paginate(10);
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'payments' => $payments->items(),
+                'pagination' => [
+                    'current_page' => $payments->currentPage(),
+                    'last_page' => $payments->lastPage(),
+                    'from' => $payments->firstItem(),
+                    'to' => $payments->lastItem(),
+                    'total' => $payments->total(),
+                ],
+                'statistics' => [
+                    'total_amount' => ZakatPayment::sum('paid_amount'),
+                    'total_count' => ZakatPayment::count(),
+                    'this_month' => ZakatPayment::whereMonth('payment_date', now()->month)->sum('paid_amount'),
+                    'pending' => ZakatPayment::where('status', 'pending')->count(),
+                ],
+            ]
+        ]);
+    }
 }

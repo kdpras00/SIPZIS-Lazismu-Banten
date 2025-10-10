@@ -229,7 +229,7 @@
                                     <label for="photo" class="form-control-label">Foto Program</label>
                                     <div class="card bg-gradient-dark mb-3">
                                         <div class="card-body text-center p-3">
-                                            <img id="preview" src="{{ $program->photo ? asset('storage/' . $program->photo) : asset('img/masjid.webp') }}"
+                                            <img id="preview" src="{{ $program->photo ? (filter_var($program->photo, FILTER_VALIDATE_URL) ? $program->photo : asset('storage/' . $program->photo)) : asset('img/masjid.webp') }}"
                                                 class="img-fluid rounded mb-3"
                                                 alt="Preview Foto"
                                                 style="height: 250px; object-fit: cover; width: 100%;">

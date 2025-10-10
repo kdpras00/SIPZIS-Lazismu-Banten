@@ -149,73 +149,73 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    let searchTimeout;
-    let currentPage = 1;
-    
-    // Configuration from server
-    const config = {
-        isNotMuzakki: {{ auth()->user()->role !== 'muzakki' ? 'true' : 'false' }},
-        apiRoute: '{{ route('api.payments.search') }}',
-        csrfToken: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-    };
+    document.addEventListener('DOMContentLoaded', function() {
+        let searchTimeout;
+        let currentPage = 1;
 
-    // Get CSRF token
-    const csrfToken = config.csrfToken;
-
-    // Debounced search function
-    function performSearch(page = 1) {
-        const searchData = {
-            search: document.getElementById('search-input').value,
-            zakat_type: document.getElementById('zakat-type-filter').value,
-            payment_method: document.getElementById('payment-method-filter').value,
-            status: document.getElementById('status-filter').value,
-            date_from: document.getElementById('date-from').value,
-            date_to: document.getElementById('date-to').value,
-            page: page
+        // Configuration from server
+        const config = {
+            isNotMuzakki: {!! auth()->user()->role !== 'muzakki' ? 'true' : 'false' !!},
+            apiRoute: '{!! route('api.payments.search') !!}',
+            csrfToken: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
         };
 
-        // Show loading indicator
-        document.getElementById('search-loading').classList.remove('d-none');
-        
-        // Create query string
-        const params = new URLSearchParams(searchData);
-        
-        const apiRoute = config.apiRoute;
-        
-        fetch(apiRoute + '?' + params.toString(), {
-            method: 'GET',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': csrfToken
-            }
-        })
-        .then(response => response.json())
-        .then(response => {
-            if (response.success) {
-                // Update table
-                updateTable(response.data.payments, response.data.pagination);
-                // Update statistics
-                updateStatistics(response.data.statistics);
-                // Update current page
-                currentPage = response.data.pagination.current_page;
-            }
-        })
-        .catch(error => {
-            console.error('Search error:', error);
-        })
-        .finally(() => {
-            // Hide loading indicator
-            document.getElementById('search-loading').classList.add('d-none');
-        });
-    }
+        // Get CSRF token
+        const csrfToken = config.csrfToken;
 
-    // Update table with new data
-    function updateTable(payments, pagination) {
-        let tableHtml = '';
-        
-        if (payments.length > 0) {
-            tableHtml = `
+        // Debounced search function
+        function performSearch(page = 1) {
+            const searchData = {
+                search: document.getElementById('search-input').value,
+                zakat_type: document.getElementById('zakat-type-filter').value,
+                payment_method: document.getElementById('payment-method-filter').value,
+                status: document.getElementById('status-filter').value,
+                date_from: document.getElementById('date-from').value,
+                date_to: document.getElementById('date-to').value,
+                page: page
+            };
+
+            // Show loading indicator
+            document.getElementById('search-loading').classList.remove('d-none');
+
+            // Create query string
+            const params = new URLSearchParams(searchData);
+
+            const apiRoute = config.apiRoute;
+
+            fetch(apiRoute + '?' + params.toString(), {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': csrfToken
+                    }
+                })
+                .then(response => response.json())
+                .then(response => {
+                    if (response.success) {
+                        // Update table
+                        updateTable(response.data.payments, response.data.pagination);
+                        // Update statistics
+                        updateStatistics(response.data.statistics);
+                        // Update current page
+                        currentPage = response.data.pagination.current_page;
+                    }
+                })
+                .catch(error => {
+                    console.error('Search error:', error);
+                })
+                .finally(() => {
+                    // Hide loading indicator
+                    document.getElementById('search-loading').classList.add('d-none');
+                });
+        }
+
+        // Update table with new data
+        function updateTable(payments, pagination) {
+            let tableHtml = '';
+
+            if (payments.length > 0) {
+                tableHtml = `
                 <div class="table-responsive">
                     <table class="table table-hover mb-0">
                         <thead class="bg-light">
@@ -232,45 +232,45 @@ document.addEventListener('DOMContentLoaded', function() {
                         </thead>
                         <tbody>
             `;
-            
-            payments.forEach(function(payment) {
-                const paymentDate = new Date(payment.payment_date).toLocaleDateString('id-ID', {
-                    day: '2-digit',
-                    month: 'short',
-                    year: 'numeric'
-                });
 
-                // Payment method display names
-                const paymentMethods = {
-                    'cash': 'Tunai',
-                    'transfer': 'Transfer',
-                    'check': 'Cek',
-                    'online': 'Online',
-                    'midtrans': 'Midtrans'
-                };
-                
-                // Status badge classes
-                const statusClasses = {
-                    'pending': 'bg-warning',
-                    'completed': 'bg-success',
-                    'cancelled': 'bg-danger'
-                };
+                payments.forEach(function(payment) {
+                    const paymentDate = new Date(payment.payment_date).toLocaleDateString('id-ID', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric'
+                    });
 
-                const statusTexts = {
-                    'pending': 'Menunggu',
-                    'completed': 'Selesai',
-                    'cancelled': 'Dibatalkan'
-                };
-                
-                const isNotMuzakki = config.isNotMuzakki;
-                const muzakkiCell = isNotMuzakki ? `
+                    // Payment method display names
+                    const paymentMethods = {
+                        'cash': 'Tunai',
+                        'transfer': 'Transfer',
+                        'check': 'Cek',
+                        'online': 'Online',
+                        'midtrans': 'Midtrans'
+                    };
+
+                    // Status badge classes
+                    const statusClasses = {
+                        'pending': 'bg-warning',
+                        'completed': 'bg-success',
+                        'cancelled': 'bg-danger'
+                    };
+
+                    const statusTexts = {
+                        'pending': 'Menunggu',
+                        'completed': 'Selesai',
+                        'cancelled': 'Dibatalkan'
+                    };
+
+                    const isNotMuzakki = config.isNotMuzakki;
+                    const muzakkiCell = isNotMuzakki ? `
                     <td>
                         <div class="fw-semibold">${payment.muzakki.name}</div>
                         ${payment.muzakki.phone ? '<small class="text-muted">' + payment.muzakki.phone + '</small>' : ''}
                     </td>
                 ` : '';
-                
-                tableHtml += `
+
+                    tableHtml += `
                     <tr>
                         <td>
                             <div class="fw-semibold">${payment.payment_code}</div>
@@ -319,17 +319,17 @@ document.addEventListener('DOMContentLoaded', function() {
                         </td>
                     </tr>
                 `;
-            });
-            
-            tableHtml += `
+                });
+
+                tableHtml += `
                         </tbody>
                     </table>
                 </div>
             `;
-            
-            // Add pagination if needed
-            if (pagination.last_page > 1) {
-                tableHtml += `
+
+                // Add pagination if needed
+                if (pagination.last_page > 1) {
+                    tableHtml += `
                     <div class="card-footer bg-white">
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="text-muted">
@@ -338,28 +338,28 @@ document.addEventListener('DOMContentLoaded', function() {
                             <nav>
                                 <ul class="pagination pagination-sm mb-0">
                 `;
-                
-                if (pagination.current_page > 1) {
-                    tableHtml += '<li class="page-item"><a class="page-link pagination-link" href="#" data-page="' + (pagination.current_page - 1) + '">‹</a></li>';
-                }
-                
-                for (let i = 1; i <= pagination.last_page; i++) {
-                    tableHtml += '<li class="page-item ' + (pagination.current_page == i ? 'active' : '') + '"><a class="page-link pagination-link" href="#" data-page="' + i + '">' + i + '</a></li>';
-                }
-                
-                if (pagination.current_page < pagination.last_page) {
-                    tableHtml += '<li class="page-item"><a class="page-link pagination-link" href="#" data-page="' + (pagination.current_page + 1) + '">›</a></li>';
-                }
-                
-                tableHtml += `
+
+                    if (pagination.current_page > 1) {
+                        tableHtml += '<li class="page-item"><a class="page-link pagination-link" href="#" data-page="' + (pagination.current_page - 1) + '">‹</a></li>';
+                    }
+
+                    for (let i = 1; i <= pagination.last_page; i++) {
+                        tableHtml += '<li class="page-item ' + (pagination.current_page == i ? 'active' : '') + '"><a class="page-link pagination-link" href="#" data-page="' + i + '">' + i + '</a></li>';
+                    }
+
+                    if (pagination.current_page < pagination.last_page) {
+                        tableHtml += '<li class="page-item"><a class="page-link pagination-link" href="#" data-page="' + (pagination.current_page + 1) + '">›</a></li>';
+                    }
+
+                    tableHtml += `
                                 </ul>
                             </nav>
                         </div>
                     </div>
                 `;
-            }
-        } else {
-            tableHtml = `
+                }
+            } else {
+                tableHtml = `
                 <div class="text-center py-4">
                     <i class="bi bi-inbox display-4 text-muted mb-3 d-block"></i>
                     <h5 class="text-muted">Tidak ada data pembayaran</h5>
@@ -369,69 +369,50 @@ document.addEventListener('DOMContentLoaded', function() {
                     </button>
                 </div>
             `;
+            }
+
+            document.getElementById('payments-table-container').innerHTML = tableHtml;
         }
-        
-        document.getElementById('payments-table-container').innerHTML = tableHtml;
-    }
 
-    // Update statistics
-    function updateStatistics(stats) {
-        document.getElementById('total-amount').textContent = 'Rp ' + parseInt(stats.total_amount).toLocaleString('id-ID');
-        document.getElementById('total-count').textContent = stats.total_count.toLocaleString('id-ID');
-        document.getElementById('thismonth-amount').textContent = 'Rp ' + parseInt(stats.this_month).toLocaleString('id-ID');
-        document.getElementById('pending-count').textContent = stats.pending.toLocaleString('id-ID');
-    }
+        // Update statistics
+        function updateStatistics(stats) {
+            document.getElementById('total-amount').textContent = 'Rp ' + parseInt(stats.total_amount).toLocaleString('id-ID');
+            document.getElementById('total-count').textContent = stats.total_count.toLocaleString('id-ID');
+            document.getElementById('thismonth-amount').textContent = 'Rp ' + parseInt(stats.this_month).toLocaleString('id-ID');
+            document.getElementById('pending-count').textContent = stats.pending.toLocaleString('id-ID');
+        }
 
-    // Search input with debouncing
-    document.getElementById('search-input').addEventListener('input', function() {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(function() {
+        // Search input with debouncing
+        document.getElementById('search-input').addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(function() {
+                performSearch(1);
+            }, 500); // 500ms delay
+        });
+
+        // Filter changes
+        document.getElementById('zakat-type-filter').addEventListener('change', function() {
             performSearch(1);
-        }, 500); // 500ms delay
-    });
+        });
 
-    // Filter changes
-    document.getElementById('zakat-type-filter').addEventListener('change', function() {
-        performSearch(1);
-    });
+        document.getElementById('payment-method-filter').addEventListener('change', function() {
+            performSearch(1);
+        });
 
-    document.getElementById('payment-method-filter').addEventListener('change', function() {
-        performSearch(1);
-    });
+        document.getElementById('status-filter').addEventListener('change', function() {
+            performSearch(1);
+        });
 
-    document.getElementById('status-filter').addEventListener('change', function() {
-        performSearch(1);
-    });
+        document.getElementById('date-from').addEventListener('change', function() {
+            performSearch(1);
+        });
 
-    document.getElementById('date-from').addEventListener('change', function() {
-        performSearch(1);
-    });
+        document.getElementById('date-to').addEventListener('change', function() {
+            performSearch(1);
+        });
 
-    document.getElementById('date-to').addEventListener('change', function() {
-        performSearch(1);
-    });
-
-    // Reset filters
-    document.getElementById('reset-filters').addEventListener('click', function() {
-        document.getElementById('search-input').value = '';
-        document.getElementById('zakat-type-filter').value = '';
-        document.getElementById('payment-method-filter').value = '';
-        document.getElementById('status-filter').value = '';
-        document.getElementById('date-from').value = '';
-        document.getElementById('date-to').value = '';
-        performSearch(1);
-    });
-
-    // Pagination click handler (using event delegation)
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('pagination-link')) {
-            e.preventDefault();
-            const page = e.target.dataset.page;
-            performSearch(page);
-        }
-        
-        // Clear search button (using event delegation)
-        if (e.target.id === 'clear-search' || e.target.closest('#clear-search')) {
+        // Reset filters
+        document.getElementById('reset-filters').addEventListener('click', function() {
             document.getElementById('search-input').value = '';
             document.getElementById('zakat-type-filter').value = '';
             document.getElementById('payment-method-filter').value = '';
@@ -439,8 +420,27 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('date-from').value = '';
             document.getElementById('date-to').value = '';
             performSearch(1);
-        }
+        });
+
+        // Pagination click handler (using event delegation)
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('pagination-link')) {
+                e.preventDefault();
+                const page = e.target.dataset.page;
+                performSearch(page);
+            }
+
+            // Clear search button (using event delegation)
+            if (e.target.id === 'clear-search' || e.target.closest('#clear-search')) {
+                document.getElementById('search-input').value = '';
+                document.getElementById('zakat-type-filter').value = '';
+                document.getElementById('payment-method-filter').value = '';
+                document.getElementById('status-filter').value = '';
+                document.getElementById('date-from').value = '';
+                document.getElementById('date-to').value = '';
+                performSearch(1);
+            }
+        });
     });
-});
 </script>
 @endpush
