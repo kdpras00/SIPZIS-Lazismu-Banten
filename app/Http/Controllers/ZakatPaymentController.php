@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Midtrans\Config;
 use Midtrans\Snap;
+
 use Midtrans\Notification as MidtransNotification;
 
 class ZakatPaymentController extends Controller
@@ -1526,38 +1527,127 @@ class ZakatPaymentController extends Controller
     /**
      * Show muzakki notifications (all notifications)
      */
+    // public function notifications(Request $request)
+    // {
+    //     // Ensure user is authenticated and has muzakki role
+    //     if (!Auth::check() || Auth::user()->role !== 'muzakki') {
+    //         abort(403, 'Unauthorized access');
+    //     }
+
+    //     // Get the authenticated user's muzakki profile
+    //     $muzakki = Auth::user()->muzakki;
+    //     if (!$muzakki) {
+    //         abort(404, 'Muzakki profile not found');
+    //     }
+
+    //     // Get filter parameter
+    //     $filter = $request->get('filter', 'all');
+
+    //     // Base query for notifications
+    //     $query = $muzakki->notifications()->latest('created_at');
+
+    //     // Apply filter if not 'all'
+    //     if ($filter !== 'all') {
+    //         $query->byType($filter);
+    //     }
+
+    //     // Paginate results
+    //     $notifications = $query->paginate(10)->appends(['filter' => $filter]);
+
+    //     // Get notification types with counts for filter tabs
+    //     $notificationTypes = Notification::getTypesWithCounts(null, $muzakki->id);
+
+    //     return view('muzakki.notifications', compact('notifications', 'notificationTypes', 'filter'));
+    // }
+
+    // public function notifications(Request $request)
+    // {
+    //     // Pastikan user adalah muzakki
+    //     if (!Auth::check() || Auth::user()->role !== 'muzakki') {
+    //         abort(403, 'Unauthorized access');
+    //     }
+
+    //     $muzakki = Auth::user()->muzakki;
+    //     if (!$muzakki) {
+    //         abort(404, 'Muzakki profile not found');
+    //     }
+
+    //     $filter = $request->get('filter', 'all');
+
+    //     $query = $muzakki->notifications()->latest('created_at');
+
+    //     if ($filter !== 'all') {
+    //         $query->byType($filter);
+    //     }
+
+    //     $notifications = $query->paginate(10)->appends(['filter' => $filter]);
+
+    //     // ✅ Tambahkan ini untuk menandai semua notifikasi belum dibaca menjadi dibaca
+    //     $muzakki->notifications()
+    //         ->where('is_read', false)
+    //         ->update([
+    //             'is_read' => true,
+    //             'read_at' => now(),
+    //         ]);
+
+    //     $notificationTypes = Notification::getTypesWithCounts(null, $muzakki->id);
+
+    //     return view('muzakki.notifications', compact('notifications', 'notificationTypes', 'filter'));
+    // }
+
     public function notifications(Request $request)
     {
-        // Ensure user is authenticated and has muzakki role
+        // Pastikan user adalah muzakki
         if (!Auth::check() || Auth::user()->role !== 'muzakki') {
             abort(403, 'Unauthorized access');
         }
 
-        // Get the authenticated user's muzakki profile
         $muzakki = Auth::user()->muzakki;
         if (!$muzakki) {
             abort(404, 'Muzakki profile not found');
         }
 
-        // Get filter parameter
         $filter = $request->get('filter', 'all');
 
-        // Base query for notifications
+        // 🟢 1️⃣ Tandai dulu semua notifikasi belum dibaca jadi dibaca
+        $muzakki->notifications()
+            ->where('is_read', false)
+            ->update([
+                'is_read' => true,
+                'read_at' => now(),
+            ]);
+
+        // 🟢 2️⃣ Setelah itu baru ambil notifikasi untuk ditampilkan
         $query = $muzakki->notifications()->latest('created_at');
 
-        // Apply filter if not 'all'
         if ($filter !== 'all') {
             $query->byType($filter);
         }
 
-        // Paginate results
         $notifications = $query->paginate(10)->appends(['filter' => $filter]);
 
-        // Get notification types with counts for filter tabs
+        // 🟢 3️⃣ Hitung jumlah notifikasi per tipe
         $notificationTypes = Notification::getTypesWithCounts(null, $muzakki->id);
 
         return view('muzakki.notifications', compact('notifications', 'notificationTypes', 'filter'));
     }
+
+
+    public function markNotificationsAsRead()
+    {
+        $muzakki = Auth::user()->muzakki;
+
+        if ($muzakki) {
+            $muzakki->notifications()
+                ->where('is_read', false)
+                ->update(['is_read' => true, 'read_at' => now()]);
+        }
+
+        return back()->with('success', 'Semua notifikasi telah ditandai dibaca.');
+    }
+
+
+
 
     /**
      * AJAX endpoint for muzakki notifications popup

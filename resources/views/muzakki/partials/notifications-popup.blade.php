@@ -1,5 +1,19 @@
 @if($notifications->count() > 0)
 <div class="space-y-3">
+    @if($notifications->count() > 0)
+    <form action="{{ route('muzakki.notifications.markAsRead') }}" method="POST" class="text-right mb-4">
+        @csrf
+        <button type="submit" class="text-sm text-green-600 hover:text-green-700 font-medium">
+            Tandai semua sebagai dibaca
+        </button>
+    </form>
+    <div class="space-y-3">
+        @foreach($notifications as $notification)
+        <!-- your notification item -->
+        @endforeach
+    </div>
+    @endif
+
     @foreach($notifications as $notification)
     <div class="border border-gray-200 rounded-xl p-4 hover:bg-gray-50 transition-all duration-200 transform hover:-translate-y-0.5 hover:shadow-sm">
         <div class="flex items-start">

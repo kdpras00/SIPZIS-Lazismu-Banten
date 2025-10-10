@@ -729,6 +729,9 @@ Route::middleware('auth')->group(function () {
         // Muzakki notifications
         Route::get('/notifications', [ZakatPaymentController::class, 'notifications'])->name('notifications.index');
         Route::get('/notifications/ajax', [ZakatPaymentController::class, 'ajaxNotifications'])->name('notifications.ajax');
+        Route::post('/notifications/mark-as-read', [ZakatPaymentController::class, 'markNotificationsAsRead'])
+            ->name('notifications.markAsRead');
+
 
         // Muzakki profile management
         Route::get('/profile/edit', [MuzakkiController::class, 'edit'])->name('profile.edit');
