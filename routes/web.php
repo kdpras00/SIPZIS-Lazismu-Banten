@@ -45,7 +45,7 @@ Route::get('/admin', function () {
 
 
 
-Route::get('/payment/{paymentCode}/failed', [ZakatPaymentController::class, 'guestFailed'])
+Route::get('/payment/{paymentCode}/failed', [ZakatPaymentController::class, 'guestFailure'])
     ->name('guest.payment.failed');
 
 
