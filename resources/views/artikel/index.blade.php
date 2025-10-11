@@ -51,7 +51,16 @@
                             <div class="artikel-card">
                                 <div class="artikel-card-image-container">
                                     @if($artikel->image)
-                                    <img src="{{ Storage::url($artikel->image) }}" alt="{{ $artikel->title }}" class="artikel-card-image">
+                                    @php
+                                    // Cek apakah image adalah URL penuh (CDN) menggunakan filter_var untuk validasi yang lebih andal
+                                    $rawImage = trim($artikel->image ?? '');
+                                    $isFullUrl = filter_var($rawImage, FILTER_VALIDATE_URL);
+                                    // Tentukan URL akhir
+                                    $imageUrl = $isFullUrl
+                                    ? $rawImage
+                                    : Storage::url($rawImage);
+                                    @endphp
+                                    <img src="{{ $imageUrl }}" alt="{{ $artikel->title }}" class="artikel-card-image">
                                     @else
                                     <div class="artikel-card-placeholder">
                                         <i class="fas fa-image artikel-placeholder-icon"></i>

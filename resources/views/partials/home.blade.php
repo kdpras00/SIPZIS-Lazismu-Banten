@@ -83,10 +83,19 @@
                 <div id="campaigns-slider" class="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 scrollbar-hide">
                     @foreach(\App\Models\Campaign::published()->latest()->take(10)->get() as $campaign)
                     <div class="flex-shrink-0 w-72 snap-start">
-                        <div class="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 animate-fadeInUp">
+                        <div class="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 animate-fadeInUp h-full flex flex-col">
                             @if($campaign->photo)
                             <div class="h-40 overflow-hidden">
-                                <img src="{{ asset('storage/' . $campaign->photo) }}" alt="{{ $campaign->title }}" class="w-full h-full object-cover">
+                                @php
+                                $rawImage = trim($campaign->photo ?? '');
+                                // Cek apakah image adalah URL penuh (CDN)
+                                $isFullUrl = filter_var($rawImage, FILTER_VALIDATE_URL);
+                                // Tentukan URL akhir
+                                $imageUrl = $isFullUrl
+                                ? $rawImage
+                                : asset('storage/' . $campaign->photo);
+                                @endphp
+                                <img src="{{ $imageUrl }}" alt="{{ $campaign->title }}" class="w-full h-full object-cover">
                             </div>
                             @else
                             <div class="h-40 bg-gray-200 flex items-center justify-center">
@@ -95,12 +104,12 @@
                                 </svg>
                             </div>
                             @endif
-                            <div class="p-4">
-                                <h3 class="text-base font-bold text-gray-800 mb-1 line-clamp-2">{{ $campaign->title }}</h3>
-                                <p class="text-sm text-gray-600 mb-3 line-clamp-2">{{ Str::limit(strip_tags($campaign->description), 80) }}</p>
+                            <div class="p-4 flex flex-col flex-grow">
+                                <h3 class="text-base font-bold text-gray-800 mb-1 line-clamp-2 flex-grow-0">{{ $campaign->title }}</h3>
+                                <p class="text-sm text-gray-600 mb-3 line-clamp-2 flex-grow">{{ Str::limit(strip_tags($campaign->description), 80) }}</p>
 
                                 <!-- Progress Bar -->
-                                <div class="mb-3">
+                                <div class="mb-3 flex-grow-0">
                                     <div class="flex justify-between text-xs text-gray-600 mb-1">
                                         <span>Terkumpul</span>
                                         <span>{{ 'Rp ' . number_format($campaign->collected_amount, 0, ',', '.') }}</span>
@@ -119,7 +128,7 @@
                                 </div>
 
                                 <a href="{{ route('campaigns.show', [$campaign->program_category, $campaign]) }}"
-                                    class="inline-block w-full text-center bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-1.5 px-3 rounded-lg transition-colors duration-300">
+                                    class="inline-block w-full text-center bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-1.5 px-3 rounded-lg transition-colors duration-300 flex-grow-0">
                                     Lihat Selengkapnya
                                 </a>
                             </div>
@@ -170,7 +179,16 @@
                         <div class="bg-gray-50 rounded-lg shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 animate-fadeInUp">
                             @if($news->image)
                             <div class="h-40 overflow-hidden">
-                                <img src="{{ asset('storage/' . $news->image) }}" alt="{{ $news->title }}" class="w-full h-full object-cover">
+                                @php
+                                $rawImage = trim($news->image ?? '');
+                                // Cek apakah image adalah URL penuh (CDN)
+                                $isFullUrl = filter_var($rawImage, FILTER_VALIDATE_URL);
+                                // Tentukan URL akhir
+                                $imageUrl = $isFullUrl
+                                ? $rawImage
+                                : asset('storage/' . $news->image);
+                                @endphp
+                                <img src="{{ $imageUrl }}" alt="{{ $news->title }}" class="w-full h-full object-cover">
                             </div>
                             @else
                             <div class="h-40 bg-gray-200 flex items-center justify-center">
@@ -243,7 +261,16 @@
                         <div class="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 animate-fadeInUp">
                             @if($artikel->image)
                             <div class="h-40 overflow-hidden">
-                                <img src="{{ asset('storage/' . $artikel->image) }}" alt="{{ $artikel->title }}" class="w-full h-full object-cover">
+                                @php
+                                $rawImage = trim($artikel->image ?? '');
+                                // Cek apakah image adalah URL penuh (CDN)
+                                $isFullUrl = filter_var($rawImage, FILTER_VALIDATE_URL);
+                                // Tentukan URL akhir
+                                $imageUrl = $isFullUrl
+                                ? $rawImage
+                                : asset('storage/' . $artikel->image);
+                                @endphp
+                                <img src="{{ $imageUrl }}" alt="{{ $artikel->title }}" class="w-full h-full object-cover">
                             </div>
                             @else
                             <div class="h-40 bg-gray-200 flex items-center justify-center">
@@ -627,6 +654,69 @@
         // Scroll amount (width of one card + gap)
         const scrollAmount = 304; // 288px card width + 16px gap
 
+        // Auto-slide intervals
+        let newsAutoSlideInterval;
+        let artikelAutoSlideInterval;
+
+        // Function to start auto sliding
+        function startAutoSlide() {
+            // Clear any existing intervals
+            if (newsAutoSlideInterval) clearInterval(newsAutoSlideInterval);
+            if (artikelAutoSlideInterval) clearInterval(artikelAutoSlideInterval);
+
+            // Start auto sliding for news (every 5 seconds)
+            newsAutoSlideInterval = setInterval(() => {
+                if (newsSlider) {
+                    const maxScroll = newsSlider.scrollWidth - newsSlider.clientWidth;
+                    if (newsSlider.scrollLeft >= maxScroll - 5) {
+                        // If at the end, scroll back to the beginning
+                        newsSlider.scrollTo({
+                            left: 0,
+                            behavior: 'smooth'
+                        });
+                    } else {
+                        // Otherwise, scroll to the next item
+                        newsSlider.scrollBy({
+                            left: scrollAmount,
+                            behavior: 'smooth'
+                        });
+                    }
+                }
+            }, 5000);
+
+            // Start auto sliding for articles (every 6 seconds)
+            artikelAutoSlideInterval = setInterval(() => {
+                if (artikelSlider) {
+                    const maxScroll = artikelSlider.scrollWidth - artikelSlider.clientWidth;
+                    if (artikelSlider.scrollLeft >= maxScroll - 5) {
+                        // If at the end, scroll back to the beginning
+                        artikelSlider.scrollTo({
+                            left: 0,
+                            behavior: 'smooth'
+                        });
+                    } else {
+                        // Otherwise, scroll to the next item
+                        artikelSlider.scrollBy({
+                            left: scrollAmount,
+                            behavior: 'smooth'
+                        });
+                    }
+                }
+            }, 6000);
+        }
+
+        // Function to stop auto sliding
+        function stopAutoSlide() {
+            if (newsAutoSlideInterval) {
+                clearInterval(newsAutoSlideInterval);
+                newsAutoSlideInterval = null;
+            }
+            if (artikelAutoSlideInterval) {
+                clearInterval(artikelAutoSlideInterval);
+                artikelAutoSlideInterval = null;
+            }
+        }
+
         // Campaigns navigation
         if (campaignsNext) {
             campaignsNext.addEventListener('click', () => {
@@ -653,6 +743,9 @@
                     left: scrollAmount,
                     behavior: 'smooth'
                 });
+                // Reset auto slide timer
+                stopAutoSlide();
+                startAutoSlide();
             });
         }
 
@@ -662,6 +755,9 @@
                     left: -scrollAmount,
                     behavior: 'smooth'
                 });
+                // Reset auto slide timer
+                stopAutoSlide();
+                startAutoSlide();
             });
         }
 
@@ -672,6 +768,9 @@
                     left: scrollAmount,
                     behavior: 'smooth'
                 });
+                // Reset auto slide timer
+                stopAutoSlide();
+                startAutoSlide();
             });
         }
 
@@ -681,6 +780,9 @@
                     left: -scrollAmount,
                     behavior: 'smooth'
                 });
+                // Reset auto slide timer
+                stopAutoSlide();
+                startAutoSlide();
             });
         }
 
@@ -727,5 +829,8 @@
             // Initial check
             updateNavigationButtons(artikelSlider, artikelPrev, artikelNext);
         }
+
+        // Start auto sliding after a short delay
+        setTimeout(startAutoSlide, 2000);
     });
 </script>

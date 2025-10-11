@@ -10,14 +10,30 @@
 
         <article class="bg-white rounded-xl shadow-md overflow-hidden">
             <header class="relative">
-                @if($artikel->image)
+                <!-- @if($artikel->image)
                 <img src="{{ Storage::url($artikel->image) }}" alt="{{ $artikel->title }}" class="w-full h-96 object-cover">
                 @else
                 <div class="w-full h-96 bg-gray-200 flex items-center justify-center">
                     <i class="fas fa-image text-gray-400 text-6xl"></i>
                 </div>
+                @endif -->
+                @if($artikel->image)
+                @php
+                $rawImage = trim($artikel->image ?? '');
+                // Cek apakah image adalah URL penuh (CDN)
+                $isFullUrl = filter_var($rawImage, FILTER_VALIDATE_URL);
+                // Tentukan URL akhir
+                $imageUrl = $isFullUrl
+                ? $rawImage
+                : Storage::url($artikel->image);
+                @endphp
+                <img src="{{ $imageUrl }}" alt="{{ $artikel->title }}" class="w-full h-96 object-cover">
+                @else
+                <div class="w-full h-96 bg-gray-200 flex items-center justify-center">
+                    <i class="fas fa-image text-gray-400 text-6xl"></i>
+                </div>
                 @endif
-                
+
                 <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-8">
                     <div class="flex justify-end items-center text-black mb-3">
                         <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium

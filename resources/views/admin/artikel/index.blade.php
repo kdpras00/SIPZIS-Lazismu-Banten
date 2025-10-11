@@ -30,7 +30,16 @@
                         <td class="px-6 py-4">
                             <div class="flex items-center">
                                 @if($artikel->image)
-                                <img src="{{ Storage::url($artikel->image) }}" alt="Artikel Image" class="w-12 h-12 rounded-lg object-cover mr-3">
+                                @php
+                                $rawImage = trim($artikel->image ?? '');
+                                // Cek apakah image adalah URL penuh (CDN)
+                                $isFullUrl = filter_var($rawImage, FILTER_VALIDATE_URL);
+                                // Tentukan URL akhir
+                                $imageUrl = $isFullUrl
+                                ? $rawImage
+                                : Storage::url($artikel->image);
+                                @endphp
+                                <img src="{{ $imageUrl }}" alt="Artikel Image" class="w-12 h-12 rounded-lg object-cover mr-3">
                                 @else
                                 <div class="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center mr-3">
                                     <i class="fas fa-image text-gray-400"></i>
@@ -78,8 +87,8 @@
                                 <a href="{{ route('admin.artikel.edit', $artikel) }}" class="text-indigo-600 hover:text-indigo-900 transition duration-200">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <form action="{{ route('admin.artikel.destroy', $artikel) }}" method="POST" class="inline" 
-                                      onsubmit="return confirm('Apakah Anda yakin ingin menghapus artikel ini?')">
+                                <form action="{{ route('admin.artikel.destroy', $artikel) }}" method="POST" class="inline"
+                                    onsubmit="return confirm('Apakah Anda yakin ingin menghapus artikel ini?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-red-600 hover:text-red-900 transition duration-200">

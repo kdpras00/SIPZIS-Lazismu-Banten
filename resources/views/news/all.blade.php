@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('navbar')
-    @include('partials.navbarHome')
+@include('partials.navbarHome')
 @endsection
 
 @section('content')
@@ -13,7 +13,7 @@
         <div class="absolute top-20 right-10 w-72 h-72 bg-emerald-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce animation-delay-3000"></div>
         <div class="absolute -bottom-8 left-20 w-72 h-72 bg-teal-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce animation-delay-5000"></div>
     </div>
-    
+
     <div class="relative z-10 py-20">
         <div class="container mx-auto px-4 py-16">
             <!-- Page Header -->
@@ -45,17 +45,26 @@
                         <div class="group relative bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl hover:scale-105 transition-all duration-500 border border-white/20">
                             <div class="relative">
                                 @if($item->image)
-                                    <img src="{{ Storage::url($item->image) }}" alt="{{ $item->title }}" class="w-full h-48 object-cover">
+                                @php
+                                $rawImage = trim($item->image ?? '');
+                                // Cek apakah image adalah URL penuh (CDN)
+                                $isFullUrl = filter_var($rawImage, FILTER_VALIDATE_URL);
+                                // Tentukan URL akhir
+                                $imageUrl = $isFullUrl
+                                ? $rawImage
+                                : Storage::url($item->image);
+                                @endphp
+                                <img src="{{ $imageUrl }}" alt="{{ $item->title }}" class="w-full h-48 object-cover">
                                 @else
-                                    <img src="https://via.placeholder.com/400x250" alt="{{ $item->title }}" class="w-full h-48 object-cover">
+                                <img src="https://via.placeholder.com/400x250" alt="{{ $item->title }}" class="w-full h-48 object-cover">
                                 @endif
                                 <div class="absolute top-4 left-4">
                                     @php
-                                        $categoryColors = [
-                                            'zakat' => 'from-green-500 to-green-700',
-                                            'infaq' => 'from-blue-500 to-blue-700',
-                                            'sedekah' => 'from-purple-500 to-purple-700'
-                                        ];
+                                    $categoryColors = [
+                                    'zakat' => 'from-green-500 to-green-700',
+                                    'infaq' => 'from-blue-500 to-blue-700',
+                                    'sedekah' => 'from-purple-500 to-purple-700'
+                                    ];
                                     @endphp
                                     <span class="inline-block bg-gradient-to-r {{ $categoryColors[$item->category] ?? 'from-gray-500 to-gray-700' }} text-white text-xs px-4 py-2 rounded-full uppercase font-bold tracking-wide shadow-lg">
                                         {{ $item->category_label }}
@@ -68,7 +77,7 @@
                                 <div class="flex items-center justify-between">
                                     <span class="text-gray-500 text-xs">{{ $item->formatted_date }}</span>
                                     <a href="{{ route('news.show', $item->slug) }}" class="text-green-600 hover:text-green-800 text-sm font-bold flex items-center group">
-                                        Baca Selengkapnya 
+                                        Baca Selengkapnya
                                         <svg class="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                                         </svg>
@@ -102,35 +111,38 @@
 </div>
 
 <style>
-@keyframes blob {
-    0% {
-        transform: translate(0px, 0px) scale(1);
-    }
-    33% {
-        transform: translate(30px, -50px) scale(1.1);
-    }
-    66% {
-        transform: translate(-20px, 20px) scale(0.9);
-    }
-    100% {
-        transform: translate(0px, 0px) scale(1);
-    }
-}
+    @keyframes blob {
+        0% {
+            transform: translate(0px, 0px) scale(1);
+        }
 
-.animate-blob {
-    animation: blob 7s infinite;
-}
+        33% {
+            transform: translate(30px, -50px) scale(1.1);
+        }
 
-.animation-delay-1000 {
-    animation-delay: 1s;
-}
+        66% {
+            transform: translate(-20px, 20px) scale(0.9);
+        }
 
-.animation-delay-3000 {
-    animation-delay: 3s;
-}
+        100% {
+            transform: translate(0px, 0px) scale(1);
+        }
+    }
 
-.animation-delay-5000 {
-    animation-delay: 5s;
-}
+    .animate-blob {
+        animation: blob 7s infinite;
+    }
+
+    .animation-delay-1000 {
+        animation-delay: 1s;
+    }
+
+    .animation-delay-3000 {
+        animation-delay: 3s;
+    }
+
+    .animation-delay-5000 {
+        animation-delay: 5s;
+    }
 </style>
 @endsection

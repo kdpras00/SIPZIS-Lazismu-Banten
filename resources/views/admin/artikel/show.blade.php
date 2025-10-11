@@ -15,13 +15,22 @@
         <!-- Article Header -->
         <div class="relative">
             @if($artikel->image)
-            <img src="{{ Storage::url($artikel->image) }}" alt="Article Image" class="w-full h-96 object-cover">
+            @php
+            $rawImage = trim($artikel->image ?? '');
+            // Cek apakah image adalah URL penuh (CDN)
+            $isFullUrl = filter_var($rawImage, FILTER_VALIDATE_URL);
+            // Tentukan URL akhir
+            $imageUrl = $isFullUrl
+            ? $rawImage
+            : Storage::url($artikel->image);
+            @endphp
+            <img src="{{ $imageUrl }}" alt="Article Image" class="w-full h-96 object-cover">
             @else
             <div class="w-full h-96 bg-gray-200 flex items-center justify-center">
                 <i class="fas fa-image text-gray-400 text-6xl"></i>
             </div>
             @endif
-            
+
             <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
                 <h1 class="text-3xl font-bold text-white mb-2">{{ $artikel->title }}</h1>
                 <div class="flex flex-wrap items-center text-white/90">
@@ -52,13 +61,13 @@
                         {{ $artikel->is_published ? 'Published' : 'Draft' }}
                     </span>
                 </div>
-                
+
                 <div class="flex space-x-2">
                     <a href="{{ route('admin.artikel.edit', $artikel) }}" class="btn btn-outline-primary">
                         <i class="fas fa-edit mr-2"></i>Edit
                     </a>
-                    <form action="{{ route('admin.artikel.destroy', $artikel) }}" method="POST" 
-                          onsubmit="return confirm('Apakah Anda yakin ingin menghapus artikel ini? Tindakan ini tidak dapat dibatalkan!')">
+                    <form action="{{ route('admin.artikel.destroy', $artikel) }}" method="POST"
+                        onsubmit="return confirm('Apakah Anda yakin ingin menghapus artikel ini? Tindakan ini tidak dapat dibatalkan!')">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-outline-danger">
