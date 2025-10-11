@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('navbar')
-    @include('partials.navbarHome')
+@include('partials.navbarHome')
 @endsection
 
 @section('content')
@@ -12,7 +12,7 @@
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
         <div class="blob blob-3"></div>
-        
+
         <div class="artikel-content">
             <div class="container mx-auto px-4 py-16">
                 <!-- Enhanced Page Header -->
@@ -51,34 +51,34 @@
                             <div class="artikel-card">
                                 <div class="artikel-card-image-container">
                                     @if($artikel->image)
-                                        <img src="{{ Storage::url($artikel->image) }}" alt="{{ $artikel->title }}" class="artikel-card-image">
+                                    <img src="{{ Storage::url($artikel->image) }}" alt="{{ $artikel->title }}" class="artikel-card-image">
                                     @else
-                                        <div class="artikel-card-placeholder">
-                                            <i class="fas fa-image artikel-placeholder-icon"></i>
-                                        </div>
+                                    <div class="artikel-card-placeholder">
+                                        <i class="fas fa-image artikel-placeholder-icon"></i>
+                                    </div>
                                     @endif
                                     <div class="artikel-card-category">
                                         @php
-                                            $categoryColors = [
-                                                'zakat' => 'category-zakat',
-                                                'infaq' => 'category-infaq',
-                                                'sedekah' => 'category-sedekah'
-                                            ];
-                                            $textColors = [
-                                                'zakat' => 'text-zakat',
-                                                'infaq' => 'text-infaq',
-                                                'sedekah' => 'text-sedekah'
-                                            ];
-                                            $bgColors = [
-                                                'zakat' => 'bg-zakat',
-                                                'infaq' => 'bg-infaq',
-                                                'sedekah' => 'bg-sedekah'
-                                            ];
-                                            $hoverColors = [
-                                                'zakat' => 'hover-zakat',
-                                                'infaq' => 'hover-infaq',
-                                                'sedekah' => 'hover-sedekah'
-                                            ];
+                                        $categoryColors = [
+                                        'zakat' => 'category-zakat',
+                                        'infaq' => 'category-infaq',
+                                        'sedekah' => 'category-sedekah'
+                                        ];
+                                        $textColors = [
+                                        'zakat' => 'text-zakat',
+                                        'infaq' => 'text-infaq',
+                                        'sedekah' => 'text-sedekah'
+                                        ];
+                                        $bgColors = [
+                                        'zakat' => 'bg-zakat',
+                                        'infaq' => 'bg-infaq',
+                                        'sedekah' => 'bg-sedekah'
+                                        ];
+                                        $hoverColors = [
+                                        'zakat' => 'hover-zakat',
+                                        'infaq' => 'hover-infaq',
+                                        'sedekah' => 'hover-sedekah'
+                                        ];
                                         @endphp
                                         <span class="artikel-category-badge {{ $categoryColors[$artikel->category] ?? 'category-default' }}">
                                             {{ $artikel->category_label }}
@@ -102,7 +102,7 @@
                                             <span class="artikel-author-name">{{ $artikel->author->name }}</span>
                                         </div>
                                         <a href="{{ route('artikel.show', $artikel->slug) }}" class="artikel-read-more {{ $textColors[$artikel->category] ?? 'text-default' }} {{ $hoverColors[$artikel->category] ?? 'hover-default' }}">
-                                            Baca Selengkapnya 
+                                            Baca Selengkapnya
                                             <svg class="artikel-read-more-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                                             </svg>
@@ -142,7 +142,7 @@
         min-height: 100vh;
         overflow: hidden;
     }
-    
+
     .artikel-bg {
         position: relative;
         background: linear-gradient(to bottom right, #f0fdf4, #ecfdf5, #f0fdfa);
@@ -152,20 +152,31 @@
         min-height: 100vh;
         overflow: hidden;
     }
-    
+
     .artikel-bg-overlay {
         position: absolute;
         inset: 0;
         background: linear-gradient(to bottom right, rgba(22, 163, 74, 0.4), rgba(5, 150, 105, 0.3), rgba(13, 148, 136, 0.4));
     }
-    
+
     @keyframes blob {
-        0% { transform: translate(0px, 0px) scale(1); }
-        33% { transform: translate(30px, -50px) scale(1.1); }
-        66% { transform: translate(-20px, 20px) scale(0.9); }
-        100% { transform: translate(0px, 0px) scale(1); }
+        0% {
+            transform: translate(0px, 0px) scale(1);
+        }
+
+        33% {
+            transform: translate(30px, -50px) scale(1.1);
+        }
+
+        66% {
+            transform: translate(-20px, 20px) scale(0.9);
+        }
+
+        100% {
+            transform: translate(0px, 0px) scale(1);
+        }
     }
-    
+
     .blob {
         position: absolute;
         border-radius: 50%;
@@ -174,7 +185,7 @@
         opacity: 0.2;
         animation: blob 7s infinite;
     }
-    
+
     .blob-1 {
         top: 2.5rem;
         left: 2.5rem;
@@ -183,7 +194,7 @@
         background-color: #86efac;
         animation-delay: 1s;
     }
-    
+
     .blob-2 {
         top: 5rem;
         right: 2.5rem;
@@ -192,7 +203,7 @@
         background-color: #6ee7b7;
         animation-delay: 3s;
     }
-    
+
     .blob-3 {
         bottom: -2rem;
         left: 5rem;
@@ -201,26 +212,26 @@
         background-color: #5eead4;
         animation-delay: 5s;
     }
-    
+
     .artikel-content {
         position: relative;
         z-index: 10;
         padding: 5rem 0;
     }
-    
+
     .artikel-title {
         font-size: 3rem;
         font-weight: 900;
         margin-bottom: 1.5rem;
         position: relative;
     }
-    
+
     @media (min-width: 768px) {
         .artikel-title {
             font-size: 4.5rem;
         }
     }
-    
+
     .artikel-title-text {
         background: linear-gradient(to right, #ffffff, #dcfce7, #d1fae5);
         -webkit-background-clip: text;
@@ -228,7 +239,7 @@
         background-clip: text;
         text-shadow: 0 25px 25px rgba(0, 0, 0, 0.15);
     }
-    
+
     .title-pulse {
         position: absolute;
         top: -0.5rem;
@@ -239,12 +250,19 @@
         border-radius: 50%;
         animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
-    
+
     @keyframes pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: .5; }
+
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: .5;
+        }
     }
-    
+
     .artikel-subtitle {
         font-size: 1.5rem;
         font-weight: 300;
@@ -252,48 +270,65 @@
         margin-bottom: 1.5rem;
         line-height: 1.6;
     }
-    
+
     @media (min-width: 768px) {
         .artikel-subtitle {
             font-size: 1.875rem;
         }
     }
-    
+
     .artikel-description {
         font-size: 1.25rem;
         font-weight: 500;
         color: #d1fae5;
         margin-bottom: 2rem;
     }
-    
+
     @media (min-width: 768px) {
         .artikel-description {
             font-size: 1.5rem;
         }
     }
-    
+
     .artikel-indicators {
         display: flex;
         justify-content: center;
         gap: 0.5rem;
     }
-    
+
     .indicator {
         width: 0.5rem;
         height: 0.5rem;
         border-radius: 50%;
         animation: bounce 1s infinite;
     }
-    
-    .indicator-1 { background-color: #4ade80; }
-    .indicator-2 { background-color: #34d399; animation-delay: 0.1s; }
-    .indicator-3 { background-color: #2dd4bf; animation-delay: 0.2s; }
-    
-    @keyframes bounce {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-0.5rem); }
+
+    .indicator-1 {
+        background-color: #4ade80;
     }
-    
+
+    .indicator-2 {
+        background-color: #34d399;
+        animation-delay: 0.1s;
+    }
+
+    .indicator-3 {
+        background-color: #2dd4bf;
+        animation-delay: 0.2s;
+    }
+
+    @keyframes bounce {
+
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-0.5rem);
+        }
+    }
+
     .artikel-main {
         position: relative;
         background-color: rgba(255, 255, 255, 0.95);
@@ -304,32 +339,32 @@
         margin-bottom: 3rem;
         border: 1px solid rgba(255, 255, 255, 0.2);
     }
-    
+
     .artikel-main-overlay {
         position: absolute;
         inset: 0;
         background: linear-gradient(to right, rgba(240, 253, 244, 0.5), rgba(236, 253, 245, 0.5), rgba(240, 253, 250, 0.5));
         border-radius: 1.5rem;
     }
-    
+
     .artikel-main-content {
         position: relative;
         z-index: 10;
     }
-    
+
     .artikel-section-title {
         font-size: 2.25rem;
         font-weight: 900;
         color: #166534;
         margin-bottom: 1rem;
     }
-    
+
     @media (min-width: 768px) {
         .artikel-section-title {
             font-size: 3rem;
         }
     }
-    
+
     .artikel-section-description {
         font-size: 1.125rem;
         color: #166534;
@@ -337,7 +372,7 @@
         margin-left: auto;
         margin-right: auto;
     }
-    
+
     .artikel-section-divider {
         width: 6rem;
         height: 0.25rem;
@@ -345,25 +380,25 @@
         border-radius: 9999px;
         margin: 1rem auto 0;
     }
-    
+
     .artikel-grid {
         display: grid;
         grid-template-columns: repeat(1, 1fr);
         gap: 2rem;
     }
-    
+
     @media (min-width: 768px) {
         .artikel-grid {
             grid-template-columns: repeat(2, 1fr);
         }
     }
-    
+
     @media (min-width: 1024px) {
         .artikel-grid {
             grid-template-columns: repeat(3, 1fr);
         }
     }
-    
+
     .artikel-card {
         position: relative;
         background-color: rgba(255, 255, 255, 0.95);
@@ -374,22 +409,22 @@
         transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         border: 1px solid rgba(255, 255, 255, 0.2);
     }
-    
+
     .artikel-card:hover {
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         transform: scale(1.05);
     }
-    
+
     .artikel-card-image-container {
         position: relative;
     }
-    
+
     .artikel-card-image {
         width: 100%;
         height: 12rem;
         object-fit: cover;
     }
-    
+
     .artikel-card-placeholder {
         width: 100%;
         height: 12rem;
@@ -398,18 +433,18 @@
         align-items: center;
         justify-content: center;
     }
-    
+
     .artikel-placeholder-icon {
         font-size: 2.25rem;
         color: #9ca3af;
     }
-    
+
     .artikel-card-category {
         position: absolute;
         top: 1rem;
         left: 1rem;
     }
-    
+
     .artikel-category-badge {
         display: inline-block;
         background: linear-gradient(to right, var(--category-from), var(--category-to));
@@ -422,31 +457,31 @@
         letter-spacing: 0.05em;
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     }
-    
+
     .category-zakat {
         --category-from: #16a34a;
         --category-to: #15803d;
     }
-    
+
     .category-infaq {
         --category-from: #2563eb;
         --category-to: #1d4ed8;
     }
-    
+
     .category-sedekah {
         --category-from: #9333ea;
         --category-to: #7e22ce;
     }
-    
+
     .category-default {
         --category-from: #6b7280;
         --category-to: #374151;
     }
-    
+
     .artikel-card-content {
         padding: 1.5rem;
     }
-    
+
     .artikel-card-title {
         font-size: 1.25rem;
         font-weight: 900;
@@ -454,35 +489,35 @@
         margin-bottom: 0.75rem;
         line-height: 1.375;
     }
-    
+
     .artikel-card-title-link {
         color: inherit;
         text-decoration: none;
         transition: color 0.2s;
     }
-    
+
     .artikel-card-title-link:hover {
         color: #16a34a;
     }
-    
+
     .artikel-card-excerpt {
         color: #4b5563;
         font-size: 0.875rem;
         margin-bottom: 1rem;
         line-height: 1.625;
     }
-    
+
     .artikel-card-footer {
         display: flex;
         align-items: center;
         justify-content: space-between;
     }
-    
+
     .artikel-card-author {
         display: flex;
         align-items: center;
     }
-    
+
     .artikel-author-avatar {
         width: 2rem;
         height: 2rem;
@@ -493,17 +528,17 @@
         justify-content: center;
         margin-right: 0.5rem;
     }
-    
+
     .artikel-author-icon {
         font-size: 0.875rem;
         color: #6b7280;
     }
-    
+
     .artikel-author-name {
         font-size: 0.875rem;
         color: #4b5563;
     }
-    
+
     .artikel-read-more {
         font-size: 0.875rem;
         font-weight: 700;
@@ -512,70 +547,92 @@
         text-decoration: none;
         transition: color 0.2s;
     }
-    
-    .text-zakat { color: #16a34a; }
-    .text-infaq { color: #2563eb; }
-    .text-sedekah { color: #9333ea; }
-    .text-default { color: #4b5563; }
-    
-    .hover-zakat:hover { color: #166534; }
-    .hover-infaq:hover { color: #1e40af; }
-    .hover-sedekah:hover { color: #7e22ce; }
-    .hover-default:hover { color: #1f2937; }
-    
+
+    .text-zakat {
+        color: #16a34a;
+    }
+
+    .text-infaq {
+        color: #2563eb;
+    }
+
+    .text-sedekah {
+        color: #9333ea;
+    }
+
+    .text-default {
+        color: #4b5563;
+    }
+
+    .hover-zakat:hover {
+        color: #166534;
+    }
+
+    .hover-infaq:hover {
+        color: #1e40af;
+    }
+
+    .hover-sedekah:hover {
+        color: #7e22ce;
+    }
+
+    .hover-default:hover {
+        color: #1f2937;
+    }
+
     .artikel-read-more-icon {
         width: 1rem;
         height: 1rem;
         margin-left: 0.25rem;
         transition: transform 0.2s;
     }
-    
+
     .artikel-read-more:hover .artikel-read-more-icon {
         transform: translateX(0.25rem);
     }
-    
+
     .artikel-pagination {
         margin-top: 3rem;
         display: flex;
         justify-content: center;
     }
-    
+
     .artikel-empty {
         grid-column: 1 / -1;
         text-align: center;
         padding: 3rem 0;
     }
-    
+
     .artikel-empty-icon {
         color: #9ca3af;
         margin-bottom: 1rem;
     }
-    
+
     .artikel-empty-svg {
         width: 4rem;
         height: 4rem;
         margin-left: auto;
         margin-right: auto;
     }
-    
+
     .artikel-empty-title {
         font-size: 1.25rem;
         font-weight: 600;
         color: #4b5563;
         margin-bottom: 0.5rem;
     }
-    
+
     .artikel-empty-description {
         color: #6b7280;
     }
-    
+
     .line-clamp-2 {
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
     }
-    
+
     .line-clamp-3 {
         display: -webkit-box;
         -webkit-line-clamp: 3;
