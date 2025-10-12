@@ -32,6 +32,22 @@
             <!-- Profile/Login Section - Right Side -->
             <div class="hidden md:flex items-center space-x-2">
                 @auth
+                <!-- Show different navigation based on user role -->
+                @if(Auth::user()->role === 'admin' || Auth::user()->role === 'staff')
+                <!-- Admin/Staff Navigation -->
+                <div class="flex items-center space-x-4">
+                    <a href="{{ route('dashboard') }}" class="text-white hover:text-green-200 transition duration-300 font-medium">
+                        Dashboard Admin
+                    </a>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="bg-white text-green-800 px-4 py-2 rounded-full font-medium hover:bg-green-100 transition duration-300">
+                            Logout
+                        </button>
+                    </form>
+                </div>
+                @else
+                <!-- Muzakki Navigation -->
                 <!-- Notification Icon -->
                 @if(Auth::user()->muzakki)
                 @php
@@ -93,6 +109,7 @@
                         </form>
                     </div>
                 </div>
+                @endif
                 @else
                 <!-- Login/Register Buttons -->
                 <div class="flex items-center space-x-4">

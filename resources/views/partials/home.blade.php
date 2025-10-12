@@ -322,8 +322,8 @@
         <div class="bg-emerald-600 text-white p-3 font-bold text-center">
             Asisten Zakat Virtual 🤖
         </div>
-        <div id="chat-messages" class="flex-1 p-3 overflow-y-auto space-y-2 text-sm text-gray-800">
-            <div class="text-center text-gray-400 text-xs">Mulai percakapan...</div>
+        <div id="chat-messages" class="flex-1 p-3 overflow-y-auto flex flex-col text-sm text-gray-800 chat-messages-container">
+            <div class="text-center text-gray-400 text-xs animate-fadeInUp">Mulai percakapan...</div>
         </div>
         <div class="p-3 border-t border-gray-200 flex">
             <input id="chat-input" type="text" placeholder="Ketik pesan..."
@@ -339,8 +339,6 @@
         💬
     </button>
 </div>
-
-
 
 <!-- Custom CSS for Animations -->
 <style>
@@ -368,7 +366,7 @@
     @keyframes fadeInUp {
         0% {
             opacity: 0;
-            transform: translateY(30px);
+            transform: translateY(20px);
         }
 
         100% {
@@ -378,39 +376,11 @@
     }
 
     .animate-fadeInDown {
-        animation: fadeInDown 1s ease-out;
+        animation: fadeInDown 0.3s ease-out forwards;
     }
 
     .animate-fadeInUp {
-        animation: fadeInUp 1s ease-out;
-    }
-
-    .delay-500 {
-        animation-delay: 0.5s;
-        animation-fill-mode: both;
-    }
-
-    .delay-700 {
-        animation-delay: 0.7s;
-        animation-fill-mode: both;
-    }
-
-    .delay-1000 {
-        animation-delay: 1s;
-        animation-fill-mode: both;
-    }
-
-    .delay-1200 {
-        animation-delay: 1.2s;
-        animation-fill-mode: both;
-    }
-
-    .delay-2000 {
-        animation-delay: 2s;
-    }
-
-    .delay-3000 {
-        animation-delay: 3s;
+        animation: fadeInUp 0.3s ease-out forwards;
     }
 
     /* Gradient text effect */
@@ -435,9 +405,7 @@
     /* Floating chat icon */
     .fixed.bottom-6.right-6 {
         right: 1.5rem !important;
-        /* 24px */
         bottom: 1.5rem !important;
-        /* 24px */
     }
 
     #chatbot-popup {
@@ -445,58 +413,112 @@
         max-width: 90vw;
     }
 
-    #chat-container {
-        max-height: 100px;
-        /* atau tinggi sesuai tampilan */
-        overflow-y: auto;
-    }
-
-    #chat-container {
-        max-height: 400px;
+    .chat-messages-container {
+        max-height: 350px;
         overflow-y: auto;
         scroll-behavior: smooth;
     }
+
+    /* Custom scrollbar for chat */
+    .chat-messages-container::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .chat-messages-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    .chat-messages-container::-webkit-scrollbar-thumb {
+        background: #c5c5c5;
+        border-radius: 10px;
+    }
+
+    .chat-messages-container::-webkit-scrollbar-thumb:hover {
+        background: #a0a0a0;
+    }
+
+    /* Chat message bubbles */
+    .message-user {
+        align-self: flex-end;
+        background-color: #10B981;
+        color: white;
+        border-bottom-right-radius: 18px;
+        border-bottom-left-radius: 18px;
+        border-top-left-radius: 18px;
+        border-top-right-radius: 4px;
+    }
+
+    .message-bot {
+        align-self: flex-start;
+        background-color: #F3F4F6;
+        color: #1F2937;
+        border-bottom-right-radius: 18px;
+        border-bottom-left-radius: 18px;
+        border-top-right-radius: 18px;
+        border-top-left-radius: 4px;
+    }
+
+    .message-bubble {
+        max-width: 85%;
+        padding: 10px 14px;
+        margin-bottom: 12px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        animation: fadeInUp 0.3s ease-out forwards;
+    }
 </style>
 
-<!-- JavaScript for Slider Functionality -->
+<!-- JavaScript for Chatbot Functionality -->
 <script src="https://js.puter.com/v2/"></script>
 
 <script>
     // Chatbot functionality
-
     document.addEventListener("DOMContentLoaded", () => {
-        const toggleBtn = document.getElementById("chatbot-toggle");
-        const popup = document.getElementById("chatbot-popup");
         const sendBtn = document.getElementById("send-btn");
         const input = document.getElementById("chat-input");
         const messages = document.getElementById("chat-messages");
         const chatbotBtn = document.getElementById('chatbot-button');
         const chatbotPopup = document.getElementById('chatbot-popup');
+        let isFirstOpen = true;
 
+        // Improved scroll to bottom function with delay for better rendering
+        function scrollToBottom() {
+            setTimeout(() => {
+                messages.scrollTop = messages.scrollHeight;
+            }, 100);
+        }
 
         chatbotBtn.addEventListener('click', () => {
             chatbotPopup.classList.toggle('hidden');
-            // Clear welcome message when first opening chat
-            if (chatbotPopup.classList.contains('hidden') === false && messages.children.length === 1) {
+            // Show welcome message only on first open
+            if (chatbotPopup.classList.contains('hidden') === false && isFirstOpen) {
                 messages.innerHTML = '';
                 appendMessage('<p>Selamat datang di Asisten Zakat Virtual! 👋</p><p>Saya dapat membantu Anda dengan pertanyaan seputar zakat, cara pembayaran, program yang tersedia, dan informasi lainnya.</p><p>Apa yang ingin Anda tanyakan hari ini?</p>', "bot");
+                isFirstOpen = false;
+            }
+            // Focus input when chat is opened
+            if (chatbotPopup.classList.contains('hidden') === false) {
+                setTimeout(() => input.focus(), 300);
             }
         });
 
         // Function to append messages in HTML format
         function appendMessage(htmlContent, sender) {
             const div = document.createElement("div");
-            div.classList.add("p-2", "rounded-lg", "max-w-[80%]");
+            div.classList.add("message-bubble", "animate-fadeInUp");
+
             if (sender === "user") {
-                div.classList.add("bg-emerald-100", "self-end", "ml-auto");
+                div.classList.add("message-user");
             } else {
-                div.classList.add("bg-gray-100");
+                div.classList.add("message-bot");
             }
 
             // Set the HTML content properly
             div.innerHTML = htmlContent;
             messages.appendChild(div);
-            messages.scrollTop = messages.scrollHeight;
+
+            // Auto-scroll to bottom with improved behavior
+            scrollToBottom();
         }
 
         // Format response to HTML
@@ -509,7 +531,7 @@
                 // Handle bullet points
                 if (paragraph.trim().startsWith('- ') || paragraph.trim().startsWith('* ')) {
                     const lines = paragraph.split('\n');
-                    html += '<ul>';
+                    html += '<ul class="list-disc pl-5 space-y-1">';
                     lines.forEach(line => {
                         const cleanLine = line.trim().replace(/^[*-]\s*/, '');
                         if (cleanLine) {
@@ -519,7 +541,7 @@
                     html += '</ul>';
                 } else {
                     // Regular paragraph
-                    html += `<p>${paragraph.trim()}</p>`;
+                    html += `<p class="mb-2">${paragraph.trim()}</p>`;
                 }
             });
 
@@ -538,9 +560,12 @@
             // Show typing indicator
             const loadingMsg = document.createElement("div");
             loadingMsg.id = "typing-indicator";
-            loadingMsg.innerHTML = '<div class="p-2 rounded-lg bg-gray-100 max-w-[80%]"><p class="text-gray-400 italic text-xs">Mengetik...</p></div>';
+            loadingMsg.classList.add("message-bubble", "message-bot");
+            loadingMsg.innerHTML = '<p class="text-gray-400 italic text-xs">Mengetik...</p>';
             messages.appendChild(loadingMsg);
-            messages.scrollTop = messages.scrollHeight;
+
+            // Scroll to show typing indicator
+            scrollToBottom();
 
             try {
                 // Check if we should use custom responses for common zakat questions
@@ -548,10 +573,10 @@
 
                 if (userText.toLowerCase().includes('zakat') && userText.toLowerCase().includes('apa')) {
                     replyHtml = `
-                        <p>Zakat adalah rukun Islam kelima yang wajib dilaksanakan oleh setiap Muslim yang memenuhi syarat.</p>
-                        <p>Zakat berasal dari bahasa Arab yang berarti "bersih" atau "tumbuh". Zakat merupakan bentuk ibadah sekaligus sistem ekonomi dalam Islam yang bertujuan untuk membersihkan harta dan menyejahterakan umat.</p>
-                        <p><strong>Syarat wajib zakat:</strong></p>
-                        <ul>
+                        <p class="mb-2">Zakat adalah rukun Islam kelima yang wajib dilaksanakan oleh setiap Muslim yang memenuhi syarat.</p>
+                        <p class="mb-2">Zakat berasal dari bahasa Arab yang berarti "bersih" atau "tumbuh". Zakat merupakan bentuk ibadah sekaligus sistem ekonomi dalam Islam yang bertujuan untuk membersihkan harta dan menyejahterakan umat.</p>
+                        <p class="mb-2"><strong>Syarat wajib zakat:</strong></p>
+                        <ul class="list-disc pl-5 space-y-1">
                             <li>Muslim</li>
                             <li>Baligh (dewasa)</li>
                             <li>Merdeka (bukan budak)</li>
@@ -561,20 +586,20 @@
                     `;
                 } else if (userText.toLowerCase().includes('bayar') || userText.toLowerCase().includes('cara')) {
                     replyHtml = `
-                        <p>Untuk membayar zakat melalui platform kami, Anda dapat mengikuti langkah-langkah berikut:</p>
-                        <ul>
+                        <p class="mb-2">Untuk membayar zakat melalui platform kami, Anda dapat mengikuti langkah-langkah berikut:</p>
+                        <ul class="list-disc pl-5 space-y-1">
                             <li>Klik tombol "BAYAR ZAKAT SEKARANG" di halaman utama</li>
                             <li>Pilih jenis zakat yang ingin Anda bayarkan</li>
                             <li>Isi formulir dengan data diri dan nominal zakat</li>
                             <li>Pilih metode pembayaran yang tersedia</li>
                             <li>Konfirmasi pembayaran dan simpan bukti transfer</li>
                         </ul>
-                        <p>Pembayaran zakat bisa dilakukan kapan saja sepanjang tahun. Namun, banyak umat Muslim yang memilih membayarnya saat bulan Ramadhan karena keutamaannya.</p>
+                        <p class="mt-2">Pembayaran zakat bisa dilakukan kapan saja sepanjang tahun. Namun, banyak umat Muslim yang memilih membayarnya saat bulan Ramadhan karena keutamaannya.</p>
                     `;
                 } else if (userText.toLowerCase().includes('jenis') && (userText.toLowerCase().includes('zakat') || userText.toLowerCase().includes('macam'))) {
                     replyHtml = `
-                        <p>Ada beberapa jenis zakat yang wajib dan sunnah dibayarkan:</p>
-                        <ul>
+                        <p class="mb-2">Ada beberapa jenis zakat yang wajib dan sunnah dibayarkan:</p>
+                        <ul class="list-disc pl-5 space-y-1">
                             <li><strong>Zakat Mal</strong> - Zakat atas harta yang dimiliki</li>
                             <li><strong>Zakat Fitrah</strong> - Zakat yang wajib dibayar saat Ramadhan</li>
                             <li><strong>Zakat Profesi</strong> - Zakat atas penghasilan/profesi</li>
@@ -583,20 +608,20 @@
                             <li><strong>Zakat Pertanian</strong> - Zakat atas hasil pertanian</li>
                             <li><strong>Zakat Peternakan</strong> - Zakat atas hewan ternak</li>
                         </ul>
-                        <p>Untuk memudahkan perhitungan, Anda dapat menggunakan Kalkulator Zakat yang tersedia di platform kami.</p>
+                        <p class="mt-2">Untuk memudahkan perhitungan, Anda dapat menggunakan Kalkulator Zakat yang tersedia di platform kami.</p>
                     `;
                 } else if (userText.toLowerCase().includes('manfaat') || userText.toLowerCase().includes('guna')) {
                     replyHtml = `
-                        <p>Zakat memiliki manfaat besar bagi kedua belah pihak:</p>
-                        <p><strong>Bagi Muzakki (Pembayar Zakat):</strong></p>
-                        <ul>
+                        <p class="mb-2">Zakat memiliki manfaat besar bagi kedua belah pihak:</p>
+                        <p class="mb-2"><strong>Bagi Muzakki (Pembayar Zakat):</strong></p>
+                        <ul class="list-disc pl-5 space-y-1">
                             <li>Membersihkan harta dari kotoran dan sifat kikir</li>
                             <li>Mendapatkan pahala dan ridha Allah SWT</li>
                             <li>Melatih sikap peduli terhadap sesama</li>
                             <li>Mendapat perlindungan dari bencana dan musibah</li>
                         </ul>
-                        <p><strong>Bagi Mustahik (Penerima Zakat):</strong></p>
-                        <ul>
+                        <p class="mt-2"><strong>Bagi Mustahik (Penerima Zakat):</strong></p>
+                        <ul class="list-disc pl-5 space-y-1">
                             <li>Memenuhi kebutuhan dasar hidup</li>
                             <li>Meningkatkan taraf hidup dan kesejahteraan</li>
                             <li>Mendapat kesempatan untuk berkembang secara ekonomi</li>
@@ -613,18 +638,30 @@
                     replyHtml = formatResponseToHtml(reply);
                 }
 
-                // Remove typing indicator
-                document.getElementById("typing-indicator").remove();
+                // Remove typing indicator safely
+                const typingIndicator = document.getElementById("typing-indicator");
+                if (typingIndicator) {
+                    typingIndicator.remove();
+                }
 
                 // Display bot response
                 appendMessage(replyHtml, "bot");
+
+                // Focus input after bot response
+                setTimeout(() => input.focus(), 300);
             } catch (err) {
-                // Remove typing indicator
-                document.getElementById("typing-indicator").remove();
+                // Remove typing indicator safely
+                const typingIndicator = document.getElementById("typing-indicator");
+                if (typingIndicator) {
+                    typingIndicator.remove();
+                }
 
                 // Display error message
                 appendMessage('<p>⚠️ Terjadi kesalahan saat memproses pesan Anda. Silakan coba lagi nanti.</p>', "bot");
                 console.error(err);
+
+                // Focus input after error
+                setTimeout(() => input.focus(), 300);
             }
         }
 
@@ -632,205 +669,15 @@
         input.addEventListener("keydown", e => {
             if (e.key === "Enter") sendMessage();
         });
-    });
 
-    // Slider
-    document.addEventListener('DOMContentLoaded', function() {
-        // Campaigns Slider
-        const campaignsSlider = document.getElementById('campaigns-slider');
-        const campaignsPrev = document.getElementById('campaigns-prev');
-        const campaignsNext = document.getElementById('campaigns-next');
+        // Focus input when chat container is clicked
+        document.querySelector('.p-3.border-t').addEventListener('click', () => {
+            input.focus();
+        });
 
-        // News Slider
-        const newsSlider = document.getElementById('news-slider');
-        const newsPrev = document.getElementById('news-prev');
-        const newsNext = document.getElementById('news-next');
-
-        // Artikel Slider
-        const artikelSlider = document.getElementById('artikel-slider');
-        const artikelPrev = document.getElementById('artikel-prev');
-        const artikelNext = document.getElementById('artikel-next');
-
-        // Scroll amount (width of one card + gap)
-        const scrollAmount = 304; // 288px card width + 16px gap
-
-        // Auto-slide intervals
-        let newsAutoSlideInterval;
-        let artikelAutoSlideInterval;
-
-        // Function to start auto sliding
-        function startAutoSlide() {
-            // Clear any existing intervals
-            if (newsAutoSlideInterval) clearInterval(newsAutoSlideInterval);
-            if (artikelAutoSlideInterval) clearInterval(artikelAutoSlideInterval);
-
-            // Start auto sliding for news (every 5 seconds)
-            newsAutoSlideInterval = setInterval(() => {
-                if (newsSlider) {
-                    const maxScroll = newsSlider.scrollWidth - newsSlider.clientWidth;
-                    if (newsSlider.scrollLeft >= maxScroll - 5) {
-                        // If at the end, scroll back to the beginning
-                        newsSlider.scrollTo({
-                            left: 0,
-                            behavior: 'smooth'
-                        });
-                    } else {
-                        // Otherwise, scroll to the next item
-                        newsSlider.scrollBy({
-                            left: scrollAmount,
-                            behavior: 'smooth'
-                        });
-                    }
-                }
-            }, 5000);
-
-            // Start auto sliding for articles (every 6 seconds)
-            artikelAutoSlideInterval = setInterval(() => {
-                if (artikelSlider) {
-                    const maxScroll = artikelSlider.scrollWidth - artikelSlider.clientWidth;
-                    if (artikelSlider.scrollLeft >= maxScroll - 5) {
-                        // If at the end, scroll back to the beginning
-                        artikelSlider.scrollTo({
-                            left: 0,
-                            behavior: 'smooth'
-                        });
-                    } else {
-                        // Otherwise, scroll to the next item
-                        artikelSlider.scrollBy({
-                            left: scrollAmount,
-                            behavior: 'smooth'
-                        });
-                    }
-                }
-            }, 6000);
-        }
-
-        // Function to stop auto sliding
-        function stopAutoSlide() {
-            if (newsAutoSlideInterval) {
-                clearInterval(newsAutoSlideInterval);
-                newsAutoSlideInterval = null;
-            }
-            if (artikelAutoSlideInterval) {
-                clearInterval(artikelAutoSlideInterval);
-                artikelAutoSlideInterval = null;
-            }
-        }
-
-        // Campaigns navigation
-        if (campaignsNext) {
-            campaignsNext.addEventListener('click', () => {
-                campaignsSlider.scrollBy({
-                    left: scrollAmount,
-                    behavior: 'smooth'
-                });
-            });
-        }
-
-        if (campaignsPrev) {
-            campaignsPrev.addEventListener('click', () => {
-                campaignsSlider.scrollBy({
-                    left: -scrollAmount,
-                    behavior: 'smooth'
-                });
-            });
-        }
-
-        // News navigation
-        if (newsNext) {
-            newsNext.addEventListener('click', () => {
-                newsSlider.scrollBy({
-                    left: scrollAmount,
-                    behavior: 'smooth'
-                });
-                // Reset auto slide timer
-                stopAutoSlide();
-                startAutoSlide();
-            });
-        }
-
-        if (newsPrev) {
-            newsPrev.addEventListener('click', () => {
-                newsSlider.scrollBy({
-                    left: -scrollAmount,
-                    behavior: 'smooth'
-                });
-                // Reset auto slide timer
-                stopAutoSlide();
-                startAutoSlide();
-            });
-        }
-
-        // Artikel navigation
-        if (artikelNext) {
-            artikelNext.addEventListener('click', () => {
-                artikelSlider.scrollBy({
-                    left: scrollAmount,
-                    behavior: 'smooth'
-                });
-                // Reset auto slide timer
-                stopAutoSlide();
-                startAutoSlide();
-            });
-        }
-
-        if (artikelPrev) {
-            artikelPrev.addEventListener('click', () => {
-                artikelSlider.scrollBy({
-                    left: -scrollAmount,
-                    behavior: 'smooth'
-                });
-                // Reset auto slide timer
-                stopAutoSlide();
-                startAutoSlide();
-            });
-        }
-
-        // Hide navigation buttons when at start/end
-        function updateNavigationButtons(slider, prevBtn, nextBtn) {
-            if (slider.scrollLeft <= 0) {
-                prevBtn.classList.add('opacity-0');
-                prevBtn.classList.remove('opacity-100');
-            } else {
-                prevBtn.classList.add('opacity-100');
-                prevBtn.classList.remove('opacity-0');
-            }
-
-            if (slider.scrollLeft + slider.clientWidth >= slider.scrollWidth - 5) {
-                nextBtn.classList.add('opacity-0');
-                nextBtn.classList.remove('opacity-100');
-            } else {
-                nextBtn.classList.add('opacity-100');
-                nextBtn.classList.remove('opacity-0');
-            }
-        }
-
-        // Add scroll listeners to update button visibility
-        if (campaignsSlider) {
-            campaignsSlider.addEventListener('scroll', () => {
-                updateNavigationButtons(campaignsSlider, campaignsPrev, campaignsNext);
-            });
-            // Initial check
-            updateNavigationButtons(campaignsSlider, campaignsPrev, campaignsNext);
-        }
-
-        if (newsSlider) {
-            newsSlider.addEventListener('scroll', () => {
-                updateNavigationButtons(newsSlider, newsPrev, newsNext);
-            });
-            // Initial check
-            updateNavigationButtons(newsSlider, newsPrev, newsNext);
-        }
-
-        if (artikelSlider) {
-            artikelSlider.addEventListener('scroll', () => {
-                updateNavigationButtons(artikelSlider, artikelPrev, artikelNext);
-            });
-            // Initial check
-            updateNavigationButtons(artikelSlider, artikelPrev, artikelNext);
-        }
-
-        // Start auto sliding after a short delay
-        setTimeout(startAutoSlide, 2000);
+        // Ensure input remains focused when user interacts with chat
+        messages.addEventListener('click', () => {
+            input.focus();
+        });
     });
 </script>

@@ -47,6 +47,7 @@ class AuthController extends Controller
 
             $request->session()->regenerate();
 
+            // Redirect muzakki users to home page
             return redirect()->intended('/');
         }
 
@@ -80,7 +81,13 @@ class AuthController extends Controller
 
             $request->session()->regenerate();
 
-            return redirect()->intended('/dashboard');
+            // Redirect to appropriate dashboard based on role
+            if ($user->role === 'admin') {
+                return redirect()->route('dashboard');
+            } else {
+                // For staff, you might want a different dashboard
+                return redirect()->route('dashboard');
+            }
         }
 
         return back()->withErrors([

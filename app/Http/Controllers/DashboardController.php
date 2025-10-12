@@ -20,11 +20,19 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
+        // Ensure only admin/staff can access admin dashboard
+        if ($user->role === 'admin' || $user->role === 'staff') {
+            return $this->adminDashboard();
+        }
+
+        // Ensure only muzakki can access muzakki dashboard
         if ($user->role === 'muzakki') {
             return $this->muzakkiDashboard();
         }
 
-        return $this->adminDashboard();
+        // If user has no recognized role, redirect to appropriate page
+        Auth::logout();
+        return redirect('/');
     }
 
     private function adminDashboard()

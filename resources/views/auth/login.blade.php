@@ -17,7 +17,7 @@
                 <!-- Email Input -->
                 <div>
                     <input id="email" type="email"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent @error('email') border-red-500 @enderror"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent @error('email') border-red-500 @enderror"
                         name="email" value="{{ old('email') }}"
                         placeholder="Email"
                         required autocomplete="email" autofocus>
@@ -30,7 +30,7 @@
                 <div>
                     <div class="relative">
                         <input id="password" type="password"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent @error('password') border-red-500 @enderror pr-12"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent @error('password') border-red-500 @enderror pr-12"
                             name="password"
                             placeholder="Password"
                             required autocomplete="current-password">
@@ -45,7 +45,7 @@
 
                 <!-- Submit Button -->
                 <button type="submit"
-                    class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200">
+                    class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200">
                     Masuk
                 </button>
             </form>
@@ -85,7 +85,7 @@
             <!-- Register Link -->
             <p class="text-center text-sm text-gray-600 mt-6">
                 Belum punya akun?
-                <a href="{{ route('register') }}" class="text-purple-600 hover:text-purple-700 font-medium">
+                <a href="{{ route('register') }}" class="text-green-600 hover:text-green-700 font-medium">
                     Daftar
                 </a>
             </p>

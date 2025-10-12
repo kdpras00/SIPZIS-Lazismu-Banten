@@ -32,6 +32,11 @@ use App\Http\Controllers\PaymentController;
 
 // Public routes
 Route::get('/', function () {
+    // Redirect authenticated admin/staff users to dashboard
+    if (Auth::check() && (Auth::user()->role === 'admin' || Auth::user()->role === 'staff')) {
+        return redirect()->route('dashboard');
+    }
+
     return view('pages.home');
 })->name('home');
 
