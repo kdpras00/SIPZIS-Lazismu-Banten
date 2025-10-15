@@ -161,26 +161,26 @@ class AuthController extends Controller
     }
 
 
+
     public function logout(Request $request)
     {
-        // Store the referrer URL before logout
-        $referrer = $request->headers->get('referer');
-
-        // Get the authenticated user before logging out
+        // Ambil data user sebelum logout
         $user = Auth::user();
 
-        // Perform logout
+        // Logout pengguna
         Auth::logout();
 
-        // Invalidate the session and regenerate the CSRF token
+        // Invalidate session dan regenerate token CSRF
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        // Check if the referrer contains admin paths
-        if ($referrer && (strpos($referrer, '/admin') !== false || strpos($referrer, '/dashboard') !== false)) {
+        // Tentukan redirect berdasarkan role
+        if ($user && ($user->role === 'admin' || $user->role === 'staff')) {
+            // Jika admin atau staff, arahkan ke halaman login admin
             return redirect('/admin/login')->with('success', 'Anda telah berhasil logout.');
         } else {
-            return redirect('/')->with('success', 'Anda telah berhasil logout.');
+            // Jika muzakki (user umum), arahkan ke halaman login umum
+            return redirect('/login')->with('success', 'Anda telah berhasil logout.');
         }
     }
 }

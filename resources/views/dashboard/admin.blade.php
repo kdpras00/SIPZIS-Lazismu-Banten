@@ -461,7 +461,7 @@
                             </h4>
                         </div>
                         <a href="{{ route('payments.index') }}"
-                            class="btn btn-sm bg-white bg-opacity-20 text-white border-0">
+                            class="btn btn-sm btn-gradient-green">
                             Lihat Semua
                         </a>
                     </div>
@@ -502,7 +502,7 @@
                             </h4>
                         </div>
                         <a href="{{ route('distributions.index') }}"
-                            class="btn btn-sm bg-white bg-opacity-20 text-white border-0">
+                            class="btn btn-sm btn-gradient-blue">
                             Lihat Semua
                         </a>
                     </div>
@@ -512,7 +512,7 @@
                             <div>
                                 <h6 class="text-white-custom fw-semibold mb-1">{{ $distribution->mustahik->name }}</h6>
                                 <div class="d-flex align-items-center gap-2">
-                                    <span class="bg-white bg-opacity-20 text-green-200 px-2 py-1 rounded-pill small">
+                                    <span class="category-pill">
                                         {{ ucfirst($distribution->mustahik->category) }}
                                     </span>
                                     <p class="text-green-200 small mb-0">{{ $distribution->distribution_type }}</p>
@@ -709,4 +709,23 @@
         }
     });
 </script>
+<style>
+    .category-pill {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.75em;
+        font-weight: 600;
+        line-height: 1;
+        color: #ffffff;
+        /* Teks putih agar kontras */
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: baseline;
+        border-radius: 50rem;
+        /* Efek rounded-pill */
+        background-color: rgba(255, 255, 255, 0.25);
+        /* Background putih transparan yang lebih solid */
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+</style>
 @endpush

@@ -225,18 +225,22 @@ class Notification extends Model
 
     public static function createAccountNotification($user, $eventType)
     {
+        // Ambil profil muzakki yang terhubung dengan user
+        $muzakki = $user->muzakki;
+
         $messages = [
-            'profile' => 'Lengkapi profil Anda untuk mempercepat proses donasi.',
+            'profile' => 'Selamat datang! Lengkapi profil Anda untuk mempermudah transaksi donasi.',
             'password' => 'Kata sandi Anda berhasil diubah.'
         ];
 
         $titles = [
-            'profile' => '🧍 Lengkapi Profil',
+            'profile' => '👋 Selamat Datang',
             'password' => '🔒 Perubahan Kata Sandi'
         ];
 
         return self::create([
             'user_id' => $user->id,
+            'muzakki_id' => $muzakki ? $muzakki->id : null, // <-- INI PERBAIKANNYA
             'type' => 'account',
             'title' => $titles[$eventType],
             'message' => $messages[$eventType],
@@ -245,7 +249,6 @@ class Notification extends Model
             ]
         ]);
     }
-
     public static function createReminderNotification($muzakki, $reminderType)
     {
         $messages = [
