@@ -1,12 +1,12 @@
 @extends('layouts.main')
 
 @section('content')
-<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12">
+<div class="min-h-screen flex items-center justify-center bg-green-900 py-12">
     <div class="w-full max-w-md px-6">
         <div class="bg-white rounded-lg shadow-md p-8">
             <!-- Back Button & Title -->
             <div class="mb-8">
-                <a href="{{ route('login') }}" class="inline-flex items-center text-purple-600 hover:text-purple-700 mb-4">
+                <a href="{{ route('login') }}" class="inline-flex items-center text-green-600 hover:text-green-700 mb-4">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                     </svg>
@@ -24,7 +24,7 @@
                         Nama Lengkap <span class="text-red-500">*</span>
                     </label>
                     <input id="name" type="text"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent @error('name') border-red-500 @enderror"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent @error('name') border-red-500 @enderror"
                         name="name" value="{{ old('name') }}"
                         placeholder="John Doe"
                         required autocomplete="name" autofocus>
@@ -39,7 +39,7 @@
                         Email <span class="text-red-500">*</span>
                     </label>
                     <input id="email" type="email"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent @error('email') border-red-500 @enderror"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent @error('email') border-red-500 @enderror"
                         name="email" value="{{ old('email') }}"
                         placeholder="johndoe@example.com"
                         required autocomplete="email">
@@ -54,11 +54,11 @@
                         No. Telepon
                     </label>
                     <div class="flex gap-2">
-                        <select class="px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        <select class="px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
                             <option value="+62">🇮🇩 +62</option>
                         </select>
                         <input id="phone" type="tel"
-                            class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent @error('phone') border-red-500 @enderror"
+                            class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent @error('phone') border-red-500 @enderror"
                             name="phone" value="{{ old('phone') }}"
                             placeholder="81234567890">
                     </div>
@@ -74,7 +74,7 @@
                     </label>
                     <div class="relative">
                         <input id="password" type="password"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent @error('password') border-red-500 @enderror pr-12"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent @error('password') border-red-500 @enderror pr-12"
                             name="password"
                             placeholder="Masukkan kata sandi"
                             required autocomplete="new-password">
@@ -108,7 +108,7 @@
                     </label>
                     <div class="relative">
                         <input id="password_confirmation" type="password"
-                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent pr-12"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent pr-12"
                             name="password_confirmation"
                             placeholder="Masukkan ulang kata sandi"
                             required autocomplete="new-password">
@@ -130,7 +130,7 @@
 
                 <!-- Submit Button -->
                 <button type="submit"
-                    class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200 mt-6">
+                    class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200 mt-6">
                     Daftar
                 </button>
             </form>
@@ -138,7 +138,7 @@
             <!-- Login Link -->
             <p class="text-center text-sm text-gray-600 mt-6">
                 Sudah punya akun?
-                <a href="{{ route('login') }}" class="text-purple-600 hover:text-purple-700 font-medium">
+                <a href="{{ route('login') }}" class="text-green-600 hover:text-green-700 font-medium">
                     Masuk
                 </a>
             </p>

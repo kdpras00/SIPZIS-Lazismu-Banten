@@ -97,7 +97,10 @@ class AuthController extends Controller
 
     public function showRegister()
     {
-        return view('auth.register');
+        // Get email from session if available (for pre-filling)
+        $prefillEmail = session('registered_email', '');
+
+        return view('auth.register', compact('prefillEmail'));
     }
 
     public function register(Request $request)
@@ -141,9 +144,11 @@ class AuthController extends Controller
                 ]
             );
 
-            Auth::login($user);
+            // Store the registered email in session for pre-filling on next registration
+            session(['registered_email' => $request->email]);
 
-            return redirect('/')->with('success', 'Registrasi berhasil! Selamat datang di Sistem Zakat.');
+            // Redirect to login page with success message instead of auto-login
+            return redirect()->route('login')->with('success', 'Registrasi berhasil! Silakan login dengan akun Anda.');
         } catch (\Exception $e) {
             if (isset($user)) {
                 $user->delete();
@@ -161,8 +166,13 @@ class AuthController extends Controller
         // Store the referrer URL before logout
         $referrer = $request->headers->get('referer');
 
+        // Get the authenticated user before logging out
+        $user = Auth::user();
+
+        // Perform logout
         Auth::logout();
 
+        // Invalidate the session and regenerate the CSRF token
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
