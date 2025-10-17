@@ -866,8 +866,26 @@ class ZakatPaymentController extends Controller
             $paidAmount = is_numeric($request->paid_amount) ? (float)$request->paid_amount : 0;
 
             // Prepare payment data - REMOVED zakat_type_id since it's no longer in the table
+            // Generate a unique payment code with retry mechanism to handle race conditions
+            $maxRetries = 5;
+            $retryCount = 0;
+            $paymentCode = null;
+
+            do {
+                $paymentCode = ZakatPayment::generatePaymentCode();
+                // Add a small random component to reduce collision probability
+                if ($retryCount > 0) {
+                    $paymentCode = rtrim($paymentCode, '0') . rand(0, 9);
+                }
+                $retryCount++;
+            } while (ZakatPayment::where('payment_code', $paymentCode)->exists() && $retryCount < $maxRetries);
+
+            if (ZakatPayment::where('payment_code', $paymentCode)->exists()) {
+                throw new \Exception('Unable to generate unique payment code after ' . $maxRetries . ' attempts');
+            }
+
             $paymentData = [
-                'payment_code'     => ZakatPayment::generatePaymentCode(), // Use the correct method name
+                'payment_code'     => $paymentCode, // Use the unique payment code
                 'muzakki_id'       => $muzakki->id,
                 'zakat_amount'     => null, // Make it nullable as per migration
                 'paid_amount'      => $paidAmount,

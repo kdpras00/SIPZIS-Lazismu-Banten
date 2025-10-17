@@ -61,36 +61,94 @@ class ZakatPayment extends Model
     public static function generatePaymentCode()
     {
         $year = date('Y');
-        $lastPayment = self::where('payment_code', 'like', "ZKT-{$year}-%")
-            ->orderBy('payment_code', 'desc')
-            ->first();
 
-        if ($lastPayment) {
-            $lastNumber = (int) substr($lastPayment->payment_code, -3);
-            $newNumber = $lastNumber + 1;
-        } else {
-            $newNumber = 1;
+        // Try up to 10 times to generate a unique code
+        for ($i = 0; $i < 10; $i++) {
+            // Generate base code
+            $lastPayment = self::where('payment_code', 'like', "ZKT-{$year}-%")
+                ->orderBy('id', 'desc')
+                ->first();
+
+            if ($lastPayment) {
+                // Extract the number part and increment it
+                $lastCode = $lastPayment->payment_code;
+                $parts = explode('-', $lastCode);
+                if (count($parts) >= 3) {
+                    $lastNumber = (int) $parts[2];
+                    $newNumber = $lastNumber + 1;
+                } else {
+                    // Fallback if format is unexpected
+                    $lastNumber = (int) substr($lastCode, -3);
+                    $newNumber = $lastNumber + 1;
+                }
+            } else {
+                $newNumber = 1;
+            }
+
+            // Add a small random component to reduce collision probability
+            if ($i > 0) {
+                $newNumber = $newNumber * 10 + rand(0, 9);
+            }
+
+            // Ensure we don't exceed reasonable limits
+            $newNumber = $newNumber % 10000;
+
+            $paymentCode = "ZKT-{$year}-" . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
+
+            // Check if this code already exists
+            if (!self::where('payment_code', $paymentCode)->exists()) {
+                return $paymentCode;
+            }
         }
 
-        return "ZKT-{$year}-" . str_pad($newNumber, 3, '0', STR_PAD_LEFT);
+        // If we still can't generate a unique code, use timestamp
+        return "ZKT-{$year}-" . substr(time(), -6);
     }
 
     public static function generateReceiptNumber()
     {
         $year = date('Y');
         $month = date('m');
-        $lastReceipt = self::where('receipt_number', 'like', "RCP-{$year}{$month}-%")
-            ->orderBy('receipt_number', 'desc')
-            ->first();
 
-        if ($lastReceipt) {
-            $lastNumber = (int) substr($lastReceipt->receipt_number, -4);
-            $newNumber = $lastNumber + 1;
-        } else {
-            $newNumber = 1;
+        // Try up to 10 times to generate a unique receipt number
+        for ($i = 0; $i < 10; $i++) {
+            $lastReceipt = self::where('receipt_number', 'like', "RCP-{$year}{$month}-%")
+                ->orderBy('id', 'desc')
+                ->first();
+
+            if ($lastReceipt) {
+                $lastCode = $lastReceipt->receipt_number;
+                $parts = explode('-', $lastCode);
+                if (count($parts) >= 3) {
+                    $lastNumber = (int) $parts[2];
+                    $newNumber = $lastNumber + 1;
+                } else {
+                    // Fallback if format is unexpected
+                    $lastNumber = (int) substr($lastCode, -4);
+                    $newNumber = $lastNumber + 1;
+                }
+            } else {
+                $newNumber = 1;
+            }
+
+            // Add a small random component to reduce collision probability
+            if ($i > 0) {
+                $newNumber = $newNumber * 10 + rand(0, 9);
+            }
+
+            // Ensure we don't exceed reasonable limits
+            $newNumber = $newNumber % 100000;
+
+            $receiptNumber = "RCP-{$year}{$month}-" . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+
+            // Check if this receipt number already exists
+            if (!self::where('receipt_number', $receiptNumber)->exists()) {
+                return $receiptNumber;
+            }
         }
 
-        return "RCP-{$year}{$month}-" . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+        // If we still can't generate a unique number, use timestamp
+        return "RCP-{$year}{$month}-" . substr(time(), -8);
     }
 
     public function getFormattedAmountAttribute()
