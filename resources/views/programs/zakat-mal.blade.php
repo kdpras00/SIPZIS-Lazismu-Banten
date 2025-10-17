@@ -49,7 +49,12 @@
                         <!-- Program Image -->
                         <div class="lg:col-span-1">
                             <div class="rounded-2xl overflow-hidden shadow-lg">
-                                <img src="{{ asset('img/program/zakat-mal.jpg') }}" alt="Zakat Mal" class="w-full h-64 object-cover">
+                                @php
+                                // Get the program model to access the image URL
+                                $program = \App\Models\Program::byCategory('zakat-mal')->first();
+                                $imageUrl = $program ? $program->image_url : asset('img/program/zakat-mal.jpg');
+                                @endphp
+                                <img src="{{ $imageUrl }}" alt="Zakat Mal" class="w-full h-64 object-cover">
                             </div>
 
                             <!-- Collected Amount Card -->

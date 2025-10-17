@@ -49,7 +49,10 @@
                         <!-- Program Image -->
                         <div class="lg:col-span-1">
                             <div class="rounded-2xl overflow-hidden shadow-lg">
-                                <img src="{{ asset('img/program/shadaqah-tetangga.jpg') }}" alt="Shadaqah Tetangga" class="w-full h-64 object-cover">
+                                <x-program-image 
+                                    category="shadaqah-tetangga" 
+                                    alt="Shadaqah Tetangga" 
+                                    class="w-full h-64 object-cover" />
                             </div>
 
                             <!-- Collected Amount Card -->

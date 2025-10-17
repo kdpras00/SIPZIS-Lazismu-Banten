@@ -812,7 +812,117 @@ class ZakatPaymentController extends Controller
             $loggedInMuzakki = Auth::user()->muzakki;
         }
 
-        return view('payments.guest-create', compact('zakatTypes', 'programCategory', 'campaign', 'amount', 'loggedInMuzakki'));
+        // Create display variables with appropriate defaults
+        $displayTitle = 'Donasi Umum';
+        $displaySubtitle = 'Bersama Kita Wujudkan Kebaikan';
+        $textColor = 'text-emerald-800';
+
+        // If we have a campaign, set the display variables based on it
+        if ($campaign) {
+            // Mapping kategori → subtitle default
+            $categoryMap = [
+                'pendidikan'    => 'Mencerahkan Masa Depan dalam Membangun Negeri',
+                'kesehatan'     => 'Mewujudkan Kehidupan yang Lebih Sehat untuk Semua',
+                'ekonomi'       => 'Memberdayakan Masyarakat secara Ekonomi',
+                'sosial-dakwah' => 'Membangun Masyarakat yang Berkualitas',
+                'kemanusiaan'   => 'Menyejahterakan Umat Manusia Tanpa Diskriminasi',
+                'lingkungan'    => 'Menjaga Lingkungan untuk Generasi Mendatang',
+                'zakat'         => 'Menyalurkan Zakat dengan Amanah dan Transparan',
+                'infaq'         => 'Bersedekah untuk Keberkahan Bersama',
+                'shadaqah'      => 'Membuka Pintu Rezeki dengan Shadaqah',
+                'umum'          => 'Bersama Kita Wujudkan Kebaikan',
+            ];
+
+            // Tentukan subtitle dan warna berdasarkan kategori
+            $displaySubtitle = $categoryMap[$campaign->program_category] ?? 'Bersama Kita Wujudkan Kebaikan';
+            $textColor = match ($campaign->program_category) {
+                'pendidikan' => 'text-blue-800',
+                'kesehatan' => 'text-red-800',
+                'ekonomi' => 'text-amber-800',
+                'sosial-dakwah' => 'text-green-800',
+                'kemanusiaan' => 'text-purple-800',
+                'lingkungan' => 'text-cyan-800',
+                'zakat' => 'text-orange-800',
+                'infaq' => 'text-blue-800',
+                'shadaqah' => 'text-green-800',
+                default => 'text-emerald-800',
+            };
+
+            $displayTitle = $campaign->title;
+        }
+        // If no campaign but category is provided, set display variables based on category
+        else if ($programCategory && $programCategory !== 'umum') {
+            // Mapping kategori → title, subtitle, and color
+            $categoryTitleMap = [
+                'zakat-mal' => 'Zakat Mal',
+                'zakat-fitrah' => 'Zakat Fitrah',
+                'zakat-profesi' => 'Zakat Profesi',
+                'zakat-perdagangan' => 'Zakat Perdagangan',
+                'zakat-pertanian' => 'Zakat Pertanian',
+                'zakat-ternak' => 'Zakat Ternak',
+                'infaq-masjid' => 'Infaq Masjid',
+                'infaq-pendidikan' => 'Infaq Pendidikan',
+                'infaq-kemanusiaan' => 'Infaq Kemanusiaan',
+                'shadaqah-rutin' => 'Shadaqah Rutin',
+                'shadaqah-jariyah' => 'Shadaqah Jariyah',
+                'fidyah' => 'Fidyah',
+                'pendidikan' => 'Donasi Pendidikan',
+                'kesehatan' => 'Donasi Kesehatan',
+                'ekonomi' => 'Donasi Ekonomi',
+                'sosial-dakwah' => 'Donasi Sosial Dakwah',
+                'kemanusiaan' => 'Donasi Kemanusiaan',
+                'lingkungan' => 'Donasi Lingkungan',
+            ];
+
+            $categorySubtitleMap = [
+                'zakat-mal' => 'Zakat harta yang telah mencapai nisab dan haul selama satu tahun',
+                'zakat-fitrah' => 'Zakat wajib yang dikeluarkan menjelang Hari Raya Idul Fitri',
+                'zakat-profesi' => 'Zakat atas penghasilan atau pendapatan yang diperoleh',
+                'zakat-perdagangan' => 'Zakat atas harta dagangan yang mencapai nisab',
+                'zakat-pertanian' => 'Zakat atas hasil pertanian dan perkebunan',
+                'zakat-ternak' => 'Zakat atas hewan ternak yang mencapai syarat',
+                'infaq-masjid' => 'Infaq untuk pemeliharaan dan pengembangan masjid',
+                'infaq-pendidikan' => 'Infaq untuk pengembangan pendidikan dan beasiswa',
+                'infaq-kemanusiaan' => 'Infaq untuk membantu sesama yang membutuhkan',
+                'shadaqah-rutin' => 'Shadaqah rutin untuk keberkahan dan kesejahteraan',
+                'shadaqah-jariyah' => 'Shadaqah jariyah yang manfaatnya berkelanjutan',
+                'fidyah' => 'Fidyah untuk mengganti kewajiban ibadah yang tidak dilaksanakan',
+                'pendidikan' => 'Mencerahkan Masa Depan dalam Membangun Negeri',
+                'kesehatan' => 'Mewujudkan Kehidupan yang Lebih Sehat untuk Semua',
+                'ekonomi' => 'Memberdayakan Masyarakat secara Ekonomi',
+                'sosial-dakwah' => 'Membangun Masyarakat yang Berkualitas',
+                'kemanusiaan' => 'Menyejahterakan Umat Manusia Tanpa Diskriminasi',
+                'lingkungan' => 'Menjaga Lingkungan untuk Generasi Mendatang',
+            ];
+
+            $categoryColorMap = [
+                'zakat-mal' => 'text-orange-800',
+                'zakat-fitrah' => 'text-orange-800',
+                'zakat-profesi' => 'text-orange-800',
+                'zakat-perdagangan' => 'text-orange-800',
+                'zakat-pertanian' => 'text-orange-800',
+                'zakat-ternak' => 'text-orange-800',
+                'infaq-masjid' => 'text-blue-800',
+                'infaq-pendidikan' => 'text-blue-800',
+                'infaq-kemanusiaan' => 'text-blue-800',
+                'shadaqah-rutin' => 'text-green-800',
+                'shadaqah-jariyah' => 'text-green-800',
+                'fidyah' => 'text-green-800',
+                'pendidikan' => 'text-blue-800',
+                'kesehatan' => 'text-red-800',
+                'ekonomi' => 'text-amber-800',
+                'sosial-dakwah' => 'text-green-800',
+                'kemanusiaan' => 'text-purple-800',
+                'lingkungan' => 'text-cyan-800',
+            ];
+
+            // Set display variables based on category
+            $displayTitle = $categoryTitleMap[$programCategory] ?? 'Donasi Umum';
+            $displaySubtitle = $categorySubtitleMap[$programCategory] ?? 'Bersama Kita Wujudkan Kebaikan';
+            $textColor = $categoryColorMap[$programCategory] ?? 'text-emerald-800';
+        }
+
+        return view('payments.guest-create', compact('zakatTypes', 'programCategory', 'campaign', 'amount', 'loggedInMuzakki', 'displayTitle', 'displaySubtitle', 'textColor'));
     }
 
     public function guestStore(Request $request)

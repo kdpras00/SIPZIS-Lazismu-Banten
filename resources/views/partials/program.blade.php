@@ -50,12 +50,37 @@
                         <div class="relative z-10">
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 @foreach($zakatPrograms as $program)
-                                <!-- {{ $program->name }} -->
-                                <a href="{{ route('program.' . str_replace(' ', '-', strtolower($program->name))) }}" class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden block">
+                                <!-- {{ $program->name }} Category -->
+                                @php
+                                // Handle special cases for zakat categories that don't follow the standard pattern
+                                $routeName = 'program.' . $program->category;
+
+                                // Handle zakat-fidyah case - it should route to program.fidyah, not program.zakat-fidyah
+                                if ($program->category === 'zakat-fidyah') {
+                                $routeName = 'program.fidyah';
+                                }
+
+                                // Handle any other cases where the category might have "zakat-" prefix already
+                                // Remove duplicate "zakat-" prefix if it exists
+                                if (strpos($program->category, 'zakat-zakat-') === 0) {
+                                $correctCategory = substr($program->category, 6); // Remove "zakat-" prefix
+                                $routeName = 'program.' . $correctCategory;
+
+                                // Special case for zakat-fidyah
+                                if ($correctCategory === 'zakat-fidyah') {
+                                $routeName = 'program.fidyah';
+                                }
+                                }
+                                @endphp
+                                <a href="{{ route($routeName) }}" class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden block">
                                     <div class="relative h-48 overflow-hidden">
-                                        <div class="absolute inset-0 bg-cover bg-center" data-bg-url="{{ $program->photo ?? 'https://via.placeholder.com/400x300/cccccc/ffffff?text=' . urlencode($program->name) }}"></div>
+                                        @php
+                                        // Use our new image_url accessor to handle both CDN and local images
+                                        $imageUrl = $program->image_url ?? 'https://via.placeholder.com/400x300/cccccc/ffffff?text=' . urlencode($program->name);
+                                        @endphp
+                                        <div class="absolute inset-0 bg-cover bg-center" data-bg-url="{{ $imageUrl }}"></div>
                                         <div class="absolute top-4 left-4">
-                                            <span class="inline-block bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full">Zakat</span>
+                                            <span class="inline-block bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full">Program Zakat</span>
                                         </div>
                                     </div>
 
@@ -66,12 +91,10 @@
                                         <div class="space-y-2">
                                             <div class="flex justify-between text-sm">
                                                 <span class="text-gray-500">Donasi Terkumpul</span>
-                                                <!-- <span class="text-amber-600 font-bold">{{ $program->formatted_total_collected }}</span> -->
                                                 <span class="text-amber-600 font-bold">{{ $program->formatted_total_collected }}</span>
-
                                             </div>
                                             <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                                                <div class="bg-orange-500 h-full rounded-full progress-bar" data-width="{{ $program->progress_percentage }}"></div>
+                                                <div class="bg-amber-500 h-full rounded-full progress-bar" data-width="{{ $program->progress_percentage }}"></div>
                                             </div>
                                             <div class="flex justify-between items-center">
                                                 <span class="text-gray-500 text-xs">Target: {{ $program->formatted_total_target }}</span>
@@ -93,9 +116,17 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 @foreach($infaqPrograms as $program)
                                 <!-- {{ $program->name }} -->
-                                <a href="{{ route('program.' . str_replace(' ', '-', strtolower($program->name))) }}" class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden block">
+                                @php
+                                // Handle special cases for infaq categories
+                                $routeName = 'program.' . $program->category;
+                                @endphp
+                                <a href="{{ route($routeName) }}" class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden block">
                                     <div class="relative h-48 overflow-hidden">
-                                        <div class="absolute inset-0 bg-cover bg-center" data-bg-url="{{ $program->photo ?? 'https://via.placeholder.com/400x300/cccccc/ffffff?text=' . urlencode($program->name) }}"></div>
+                                        @php
+                                        // Use our new image_url accessor to handle both CDN and local images
+                                        $imageUrl = $program->image_url ?? 'https://via.placeholder.com/400x300/cccccc/ffffff?text=' . urlencode($program->name);
+                                        @endphp
+                                        <div class="absolute inset-0 bg-cover bg-center" data-bg-url="{{ $imageUrl }}"></div>
                                         <div class="absolute top-4 left-4">
                                             <span class="inline-block bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">Infaq</span>
                                         </div>
@@ -133,9 +164,17 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 @foreach($shadaqahPrograms as $program)
                                 <!-- {{ $program->name }} -->
-                                <a href="{{ route('program.' . str_replace(' ', '-', strtolower($program->name))) }}" class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden block">
+                                @php
+                                // Handle special cases for shadaqah categories
+                                $routeName = 'program.' . $program->category;
+                                @endphp
+                                <a href="{{ route($routeName) }}" class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden block">
                                     <div class="relative h-48 overflow-hidden">
-                                        <div class="absolute inset-0 bg-cover bg-center" data-bg-url="{{ $program->photo ?? 'https://via.placeholder.com/400x300/cccccc/ffffff?text=' . urlencode($program->name) }}"></div>
+                                        @php
+                                        // Use our new image_url accessor to handle both CDN and local images
+                                        $imageUrl = $program->image_url ?? 'https://via.placeholder.com/400x300/cccccc/ffffff?text=' . urlencode($program->name);
+                                        @endphp
+                                        <div class="absolute inset-0 bg-cover bg-center" data-bg-url="{{ $imageUrl }}"></div>
                                         <div class="absolute top-4 left-4">
                                             <span class="inline-block bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full">Shadaqah</span>
                                         </div>
@@ -175,7 +214,11 @@
                                 <!-- {{ $program->name }} Category -->
                                 <a href="{{ route('program.' . $program->category . '.donasi') }}" class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden block">
                                     <div class="relative h-48 overflow-hidden">
-                                        <div class="absolute inset-0 bg-cover bg-center" data-bg-url="{{ $program->photo ?? 'https://via.placeholder.com/400x300/cccccc/ffffff?text=' . urlencode($program->name) }}"></div>
+                                        @php
+                                        // Use our new image_url accessor to handle both CDN and local images
+                                        $imageUrl = $program->image_url ?? 'https://via.placeholder.com/400x300/cccccc/ffffff?text=' . urlencode($program->name);
+                                        @endphp
+                                        <div class="absolute inset-0 bg-cover bg-center" data-bg-url="{{ $imageUrl }}"></div>
                                         <div class="absolute top-4 left-4">
                                             <span class="inline-block bg-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full">Program Pilar</span>
                                         </div>

@@ -11,6 +11,31 @@ use Illuminate\Support\Facades\Storage;
 class CampaignController extends Controller
 {
     /**
+     * Display a listing of all campaigns without category filtering.
+     */
+    public function all()
+    {
+        $campaigns = Campaign::published()
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Calculate total collected and target amounts
+        $totalCollected = 0;
+        $totalTarget = 0;
+
+        foreach ($campaigns as $campaign) {
+            // Calculate collected amount for each campaign
+            $collected = $campaign->zakatPayments()->sum('paid_amount');
+            // Add to campaign object as a custom attribute for the view
+            $campaign->display_collected_amount = $collected;
+            $totalCollected += $collected;
+            $totalTarget += $campaign->target_amount;
+        }
+
+        return view('campaigns.all', compact('campaigns', 'totalCollected', 'totalTarget'));
+    }
+
+    /**
      * Display a listing of campaigns by program category.
      */
     public function index($category)
@@ -22,7 +47,7 @@ class CampaignController extends Controller
 
         // Update collected amounts dynamically
         foreach ($campaigns as $campaign) {
-            $campaign->collected_amount = $campaign->zakatPayments()->sum('paid_amount');
+            $campaign->display_collected_amount = $campaign->zakatPayments()->sum('paid_amount');
         }
 
         // Get program for this category
@@ -36,7 +61,7 @@ class CampaignController extends Controller
         } else {
             // Fallback to direct calculation if program doesn't exist
             $totalCollected = $campaigns->sum(function ($campaign) {
-                return $campaign->collected_amount;
+                return $campaign->display_collected_amount ?? $campaign->collected_amount;
             });
             $totalTarget = $campaigns->sum('target_amount');
         }
@@ -53,7 +78,7 @@ class CampaignController extends Controller
     {
         // Load related payments for this campaign and update collected amount
         $campaign->load('zakatPayments.muzakki');
-        $campaign->collected_amount = $campaign->zakatPayments()->sum('paid_amount');
+        $campaign->display_collected_amount = $campaign->zakatPayments()->sum('paid_amount');
 
         // Get program for this category
         $program = Program::byCategory($category)->first();
@@ -123,7 +148,7 @@ class CampaignController extends Controller
 
         // Update collected amounts dynamically
         foreach ($campaigns as $campaign) {
-            $campaign->collected_amount = $campaign->zakatPayments()->sum('paid_amount');
+            $campaign->display_collected_amount = $campaign->zakatPayments()->sum('paid_amount');
         }
 
         return view('admin.campaigns.index', compact('campaigns'));

@@ -47,7 +47,10 @@
                         <!-- Program Image -->
                         <div class="lg:col-span-1">
                             <div class="rounded-2xl overflow-hidden shadow-lg">
-                                <img src="{{ asset('img/program/kemanusiaan.jpg') }}" alt="Program Kemanusiaan" class="w-full h-64 object-cover">
+                                <x-program-image 
+                                    category="kemanusiaan" 
+                                    alt="Program Kemanusiaan" 
+                                    class="w-full h-64 object-cover" />
                             </div>
 
                             <!-- Collected Amount Card -->

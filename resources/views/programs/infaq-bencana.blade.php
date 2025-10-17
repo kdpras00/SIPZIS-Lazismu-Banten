@@ -49,7 +49,10 @@
                         <!-- Program Image -->
                         <div class="lg:col-span-1">
                             <div class="rounded-2xl overflow-hidden shadow-lg">
-                                <img src="{{ asset('img/program/infaq-bencana.jpg') }}" alt="Infaq Bencana Alam" class="w-full h-64 object-cover">
+                                <x-program-image 
+                                    category="infaq-bencana" 
+                                    alt="Infaq Bencana Alam" 
+                                    class="w-full h-64 object-cover" />
                             </div>
 
                             <!-- Collected Amount Card -->

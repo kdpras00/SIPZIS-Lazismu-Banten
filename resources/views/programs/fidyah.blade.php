@@ -49,7 +49,10 @@
                         <!-- Program Image -->
                         <div class="lg:col-span-1">
                             <div class="rounded-2xl overflow-hidden shadow-lg">
-                                <img src="{{ asset('img/program/fidyah.jpg') }}" alt="Fidyah" class="w-full h-64 object-cover">
+                                <x-program-image 
+                                    category="fidyah" 
+                                    alt="Fidyah" 
+                                    class="w-full h-64 object-cover" />
                             </div>
 
                             <!-- Collected Amount Card -->
@@ -118,7 +121,7 @@
 
                             <!-- Call to Action -->
                             <div class="text-center mt-8">
-                                <a href="{{ route('guest.payment.create', ['category' => 'fidyah', 'amount' => 15000]) }}"
+                                <a href="{{ route('guest.payment.create', ['category' => 'fidyah']) }}"
                                     class="inline-flex items-center bg-gradient-to-r from-amber-600 to-orange-600 text-white px-8 py-4 rounded-xl hover:from-amber-700 hover:to-orange-700 transition-all duration-300 font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105">
                                     <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 24 24">
                                         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z" />

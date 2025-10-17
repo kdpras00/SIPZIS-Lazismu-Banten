@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class Program extends Model
 {
@@ -48,6 +49,26 @@ class Program extends Model
     // ========================
     // 🧮 Accessors (Computed Fields)
     // ========================
+
+    /**
+     * Get the full URL for the program photo.
+     * Supports both CDN URLs and local storage paths.
+     */
+    public function getImageUrlAttribute()
+    {
+        // If photo is empty, return a default image
+        if (empty($this->photo)) {
+            return asset('img/masjid.webp');
+        }
+
+        // Check if photo is a full URL (CDN)
+        if (filter_var($this->photo, FILTER_VALIDATE_URL)) {
+            return $this->photo;
+        }
+
+        // Otherwise, assume it's a local file path
+        return Storage::url($this->photo);
+    }
 
     // Total dana terkumpul dari semua campaign yang published
     public function getTotalCollectedAttribute()

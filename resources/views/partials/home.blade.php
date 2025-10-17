@@ -30,13 +30,13 @@
         <!-- Action Buttons -->
         <div class="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fadeInUp delay-1000">
             <a href="{{ route('calculator.index') }}"
-                class="group bg-white hover:bg-green-600 text-green-800 hover:text-white font-bold py-4 px-8 rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex items-center gap-3 min-w-[250px]"> <svg class="w-6 h-6 transition-transform group-hover:rotate-12" fill="currentColor" viewBox="0 0 24 24">
+                class="group bg-white hover:bg-green-600 text-green-800 hover:text-green-700 font-bold py-4 px-8 rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex items-center gap-3 min-w-[250px]"> <svg class="w-6 h-6 transition-transform group-hover:rotate-12" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 2v16h10V4H7zm2 2h6v2H9V6zm0 4h6v2H9v-2zm0 4h6v2H9v-2z" />
                 </svg>
                 <span class="font-semibold tracking-wide">KALKULATOR ZAKAT</span>
             </a>
             <a href="{{ route('guest.payment.create') }}"
-                class="group bg-white hover:bg-green-600 text-green-800 hover:text-white font-bold py-4 px-8 rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex items-center gap-3 min-w-[250px]">
+                class="group bg-white hover:bg-green-600 text-green-800 hover:text-green-700 font-bold py-4 px-8 rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex items-center gap-3 min-w-[250px]">
                 <svg class="w-6 h-6 transition-transform group-hover:rotate-12" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 2L3.09 8.26L12 22L20.91 8.26L12 2Z" />
                 </svg>
@@ -141,7 +141,7 @@
 
         <div class="text-center mt-10">
             <a href="{{ route('campaigns.index', 'all') }}"
-                class="inline-block bg-white border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white font-bold py-2.5 px-6 rounded-full transition-all duration-300 transform hover:scale-105 text-sm">
+                class="inline-block bg-white border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-green-700 font-bold py-2.5 px-6 rounded-full transition-all duration-300 transform hover:scale-105 text-sm">
                 Lihat Semua Campaign
             </a>
         </div>
@@ -313,14 +313,13 @@
 </div>
 
 <!-- CHATBOT FLOATING BUTTON + POPUP -->
-<!-- Container Utama -->
 <div id="chatbot-container" class="fixed bottom-6 right-6 z-50 flex flex-col items-end space-y-3">
 
     <!-- Popup Chat (Awalnya disembunyikan) -->
     <div id="chatbot-popup"
         class="hidden flex-col bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl w-80 max-h-[500px] border border-emerald-200 overflow-hidden">
         <div class="bg-emerald-600 text-white p-3 font-bold text-center">
-            Asisten Zakat Virtual 🤖
+            Asisten Zakat
         </div>
         <div id="chat-messages" class="flex-1 p-3 overflow-y-auto flex flex-col text-sm text-gray-800 chat-messages-container">
             <div class="text-center text-gray-400 text-xs animate-fadeInUp">Mulai percakapan...</div>
@@ -329,7 +328,7 @@
             <input id="chat-input" type="text" placeholder="Ketik pesan..."
                 class="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
             <button id="send-btn"
-                class="ml-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition">Kirim</button>
+                class="ml-2 bg-emerald-600 text-white px-3 py-2 rounded-lg hover:bg-emerald-700 transition">Kirim</button>
         </div>
     </div>
 
@@ -339,6 +338,7 @@
         💬
     </button>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
 <!-- Custom CSS for Animations -->
 <style>
@@ -469,215 +469,238 @@
 </style>
 
 <!-- JavaScript for Chatbot Functionality -->
-<script src="https://js.puter.com/v2/"></script>
-
 <script>
     // Chatbot functionality
     document.addEventListener("DOMContentLoaded", () => {
-        const sendBtn = document.getElementById("send-btn");
-        const input = document.getElementById("chat-input");
-        const messages = document.getElementById("chat-messages");
-        const chatbotBtn = document.getElementById('chatbot-button');
-        const chatbotPopup = document.getElementById('chatbot-popup');
-        let isFirstOpen = true;
+        // Check if puter is available, if not, wait for it
+        function initializeChatbot() {
+            const sendBtn = document.getElementById("send-btn");
+            const input = document.getElementById("chat-input");
+            const messages = document.getElementById("chat-messages");
+            const chatbotBtn = document.getElementById('chatbot-button');
+            const chatbotPopup = document.getElementById('chatbot-popup');
 
-        // Improved scroll to bottom function with delay for better rendering
-        function scrollToBottom() {
-            setTimeout(() => {
-                messages.scrollTop = messages.scrollHeight;
-            }, 100);
-        }
-
-        chatbotBtn.addEventListener('click', () => {
-            chatbotPopup.classList.toggle('hidden');
-            // Show welcome message only on first open
-            if (chatbotPopup.classList.contains('hidden') === false && isFirstOpen) {
-                messages.innerHTML = '';
-                appendMessage('<p>Selamat datang di Asisten Zakat Virtual! 👋</p><p>Saya dapat membantu Anda dengan pertanyaan seputar zakat, cara pembayaran, program yang tersedia, dan informasi lainnya.</p><p>Apa yang ingin Anda tanyakan hari ini?</p>', "bot");
-                isFirstOpen = false;
-            }
-            // Focus input when chat is opened
-            if (chatbotPopup.classList.contains('hidden') === false) {
-                setTimeout(() => input.focus(), 300);
-            }
-        });
-
-        // Function to append messages in HTML format
-        function appendMessage(htmlContent, sender) {
-            const div = document.createElement("div");
-            div.classList.add("message-bubble", "animate-fadeInUp");
-
-            if (sender === "user") {
-                div.classList.add("message-user");
-            } else {
-                div.classList.add("message-bot");
+            // If any required element is missing, exit
+            if (!sendBtn || !input || !messages || !chatbotBtn || !chatbotPopup) {
+                console.error('Chatbot elements not found');
+                return;
             }
 
-            // Set the HTML content properly
-            div.innerHTML = htmlContent;
-            messages.appendChild(div);
+            let isFirstOpen = true;
 
-            // Auto-scroll to bottom with improved behavior
-            scrollToBottom();
-        }
+            // Improved scroll to bottom function with delay for better rendering
+            function scrollToBottom() {
+                setTimeout(() => {
+                    messages.scrollTop = messages.scrollHeight;
+                }, 100);
+            }
 
-        // Format response to HTML
-        function formatResponseToHtml(text) {
-            // Convert line breaks to paragraphs
-            const paragraphs = text.split('\n\n').filter(p => p.trim() !== '');
-            let html = '';
+            chatbotBtn.addEventListener('click', () => {
+                // Toggle tampilan chatbot (muncul/sembunyi)
+                const isHidden = chatbotPopup.classList.toggle('hidden');
 
-            paragraphs.forEach(paragraph => {
-                // Handle bullet points
-                if (paragraph.trim().startsWith('- ') || paragraph.trim().startsWith('* ')) {
-                    const lines = paragraph.split('\n');
-                    html += '<ul class="list-disc pl-5 space-y-1">';
-                    lines.forEach(line => {
-                        const cleanLine = line.trim().replace(/^[*-]\s*/, '');
-                        if (cleanLine) {
-                            html += `<li>${cleanLine}</li>`;
-                        }
-                    });
-                    html += '</ul>';
+                if (!isHidden) {
+                    // Chatbot baru dibuka
+                    if (isFirstOpen) {
+                        messages.innerHTML = '';
+                        appendMessage(
+                            `
+                <p>Selamat datang di <strong>Asisten Zakat Virtual</strong>! 👋</p>
+                <p>Saya siap membantu Anda dengan pertanyaan seputar <em>zakat</em>, cara pembayaran, program yang tersedia, dan informasi lainnya.</p>
+                <p>Apa yang ingin Anda tanyakan hari ini?</p>
+                `,
+                            "bot"
+                        );
+                        isFirstOpen = false;
+                    }
+
+                    // Fokuskan ke input setelah chatbot muncul
+                    setTimeout(() => input.focus(), 500);
+
+                    // ❌ Tidak scroll otomatis ke bawah
+                    // Jadi pesan selamat datang tetap kelihatan penuh
                 } else {
-                    // Regular paragraph
-                    html += `<p class="mb-2">${paragraph.trim()}</p>`;
+                    // Chatbot ditutup → bisa tambahkan efek jika mau
+                    input.blur(); // opsional, supaya keyboard tertutup di mobile
                 }
             });
 
-            return html;
-        }
 
-        // Send message handler
-        async function sendMessage() {
-            const userText = input.value.trim();
-            if (!userText) return;
+            // Function to append messages in HTML format
+            function appendMessage(htmlContent, sender) {
+                const div = document.createElement("div");
+                div.classList.add("message-bubble", "animate-fadeInUp");
 
-            // Display user message
-            appendMessage(`<p>${userText}</p>`, "user");
-            input.value = "";
-
-            // Show typing indicator
-            const loadingMsg = document.createElement("div");
-            loadingMsg.id = "typing-indicator";
-            loadingMsg.classList.add("message-bubble", "message-bot");
-            loadingMsg.innerHTML = '<p class="text-gray-400 italic text-xs">Mengetik...</p>';
-            messages.appendChild(loadingMsg);
-
-            // Scroll to show typing indicator
-            scrollToBottom();
-
-            try {
-                // Check if we should use custom responses for common zakat questions
-                let replyHtml = '';
-
-                if (userText.toLowerCase().includes('zakat') && userText.toLowerCase().includes('apa')) {
-                    replyHtml = `
-                        <p class="mb-2">Zakat adalah rukun Islam kelima yang wajib dilaksanakan oleh setiap Muslim yang memenuhi syarat.</p>
-                        <p class="mb-2">Zakat berasal dari bahasa Arab yang berarti "bersih" atau "tumbuh". Zakat merupakan bentuk ibadah sekaligus sistem ekonomi dalam Islam yang bertujuan untuk membersihkan harta dan menyejahterakan umat.</p>
-                        <p class="mb-2"><strong>Syarat wajib zakat:</strong></p>
-                        <ul class="list-disc pl-5 space-y-1">
-                            <li>Muslim</li>
-                            <li>Baligh (dewasa)</li>
-                            <li>Merdeka (bukan budak)</li>
-                            <li>Kaya (melebihi nisab)</li>
-                            <li>Memiliki harta selama satu tahun (haul)</li>
-                        </ul>
-                    `;
-                } else if (userText.toLowerCase().includes('bayar') || userText.toLowerCase().includes('cara')) {
-                    replyHtml = `
-                        <p class="mb-2">Untuk membayar zakat melalui platform kami, Anda dapat mengikuti langkah-langkah berikut:</p>
-                        <ul class="list-disc pl-5 space-y-1">
-                            <li>Klik tombol "BAYAR ZAKAT SEKARANG" di halaman utama</li>
-                            <li>Pilih jenis zakat yang ingin Anda bayarkan</li>
-                            <li>Isi formulir dengan data diri dan nominal zakat</li>
-                            <li>Pilih metode pembayaran yang tersedia</li>
-                            <li>Konfirmasi pembayaran dan simpan bukti transfer</li>
-                        </ul>
-                        <p class="mt-2">Pembayaran zakat bisa dilakukan kapan saja sepanjang tahun. Namun, banyak umat Muslim yang memilih membayarnya saat bulan Ramadhan karena keutamaannya.</p>
-                    `;
-                } else if (userText.toLowerCase().includes('jenis') && (userText.toLowerCase().includes('zakat') || userText.toLowerCase().includes('macam'))) {
-                    replyHtml = `
-                        <p class="mb-2">Ada beberapa jenis zakat yang wajib dan sunnah dibayarkan:</p>
-                        <ul class="list-disc pl-5 space-y-1">
-                            <li><strong>Zakat Mal</strong> - Zakat atas harta yang dimiliki</li>
-                            <li><strong>Zakat Fitrah</strong> - Zakat yang wajib dibayar saat Ramadhan</li>
-                            <li><strong>Zakat Profesi</strong> - Zakat atas penghasilan/profesi</li>
-                            <li><strong>Zakat Emas/Perak</strong> - Zakat atas kepemilikan logam mulia</li>
-                            <li><strong>Zakat Perniagaan</strong> - Zakat atas aset perdagangan</li>
-                            <li><strong>Zakat Pertanian</strong> - Zakat atas hasil pertanian</li>
-                            <li><strong>Zakat Peternakan</strong> - Zakat atas hewan ternak</li>
-                        </ul>
-                        <p class="mt-2">Untuk memudahkan perhitungan, Anda dapat menggunakan Kalkulator Zakat yang tersedia di platform kami.</p>
-                    `;
-                } else if (userText.toLowerCase().includes('manfaat') || userText.toLowerCase().includes('guna')) {
-                    replyHtml = `
-                        <p class="mb-2">Zakat memiliki manfaat besar bagi kedua belah pihak:</p>
-                        <p class="mb-2"><strong>Bagi Muzakki (Pembayar Zakat):</strong></p>
-                        <ul class="list-disc pl-5 space-y-1">
-                            <li>Membersihkan harta dari kotoran dan sifat kikir</li>
-                            <li>Mendapatkan pahala dan ridha Allah SWT</li>
-                            <li>Melatih sikap peduli terhadap sesama</li>
-                            <li>Mendapat perlindungan dari bencana dan musibah</li>
-                        </ul>
-                        <p class="mt-2"><strong>Bagi Mustahik (Penerima Zakat):</strong></p>
-                        <ul class="list-disc pl-5 space-y-1">
-                            <li>Memenuhi kebutuhan dasar hidup</li>
-                            <li>Meningkatkan taraf hidup dan kesejahteraan</li>
-                            <li>Mendapat kesempatan untuk berkembang secara ekonomi</li>
-                            <li>Merasakan kepedulian dan kasih sayang dari sesama Muslim</li>
-                        </ul>
-                    `;
+                if (sender === "user") {
+                    div.classList.add("message-user");
                 } else {
-                    // For other questions, use the AI API
-                    const response = await puter.ai.chat(userText, {
-                        model: "claude-sonnet-4-5"
-                    });
-
-                    const reply = response.message.content[0].text;
-                    replyHtml = formatResponseToHtml(reply);
+                    div.classList.add("message-bot");
                 }
 
-                // Remove typing indicator safely
-                const typingIndicator = document.getElementById("typing-indicator");
-                if (typingIndicator) {
-                    typingIndicator.remove();
-                }
+                // Set the HTML content properly
+                div.innerHTML = htmlContent;
+                messages.appendChild(div);
 
-                // Display bot response
-                appendMessage(replyHtml, "bot");
-
-                // Focus input after bot response
-                setTimeout(() => input.focus(), 300);
-            } catch (err) {
-                // Remove typing indicator safely
-                const typingIndicator = document.getElementById("typing-indicator");
-                if (typingIndicator) {
-                    typingIndicator.remove();
-                }
-
-                // Display error message
-                appendMessage('<p>⚠️ Terjadi kesalahan saat memproses pesan Anda. Silakan coba lagi nanti.</p>', "bot");
-                console.error(err);
-
-                // Focus input after error
-                setTimeout(() => input.focus(), 300);
+                // Auto-scroll to bottom with improved behavior
+                scrollToBottom();
             }
+
+            // Format response to HTML
+            function formatResponseToHtml(text) {
+                // Gunakan Marked.js untuk render Markdown jadi HTML
+                let html = marked.parse(text);
+
+                // Tambahkan styling agar tetap terlihat rapi
+                html = html.replace(/<h1>/g, '<h1 class="text-lg font-bold mb-2">')
+                    .replace(/<h2>/g, '<h2 class="text-base font-semibold mb-1">')
+                    .replace(/<ul>/g, '<ul class="list-disc pl-5 space-y-1">')
+                    .replace(/<p>/g, '<p class="mb-2 leading-relaxed">');
+                return html;
+            }
+
+
+
+            // Send message handler
+            async function sendMessage() {
+                const userText = input.value.trim();
+                if (!userText) return;
+
+                // Display user message
+                appendMessage(`<p>${userText}</p>`, "user");
+                input.value = "";
+
+                // Show typing indicator
+                const loadingMsg = document.createElement("div");
+                loadingMsg.id = "typing-indicator";
+                loadingMsg.classList.add("message-bubble", "message-bot");
+                loadingMsg.innerHTML = '<p class="text-gray-400 italic text-xs">Mengetik...</p>';
+                messages.appendChild(loadingMsg);
+
+                // Scroll to show typing indicator
+                scrollToBottom();
+
+                try {
+                    // Check if we should use custom responses for common zakat questions
+                    let replyHtml = '';
+
+                    if (userText.toLowerCase().includes('zakat') && userText.toLowerCase().includes('apa')) {
+                        replyHtml = `
+                            <p class="mb-2">Zakat adalah rukun Islam kelima yang wajib dilaksanakan oleh setiap Muslim yang memenuhi syarat.</p>
+                            <p class="mb-2">Zakat berasal dari bahasa Arab yang berarti "bersih" atau "tumbuh". Zakat merupakan bentuk ibadah sekaligus sistem ekonomi dalam Islam yang bertujuan untuk membersihkan harta dan menyejahterakan umat.</p>
+                            <p class="mb-2"><strong>Syarat wajib zakat:</strong></p>
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>Muslim</li>
+                                <li>Baligh (dewasa)</li>
+                                <li>Merdeka (bukan budak)</li>
+                                <li>Kaya (melebihi nisab)</li>
+                                <li>Memiliki harta selama satu tahun (haul)</li>
+                            </ul>
+                        `;
+                    } else if (userText.toLowerCase().includes('bayar') || userText.toLowerCase().includes('cara')) {
+                        replyHtml = `
+                            <p class="mb-2">Untuk membayar zakat melalui platform kami, Anda dapat mengikuti langkah-langkah berikut:</p>
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>Klik tombol "BAYAR ZAKAT SEKARANG" di halaman utama</li>
+                                <li>Pilih jenis zakat yang ingin Anda bayarkan</li>
+                                <li>Isi formulir dengan data diri dan nominal zakat</li>
+                                <li>Pilih metode pembayaran yang tersedia</li>
+                                <li>Konfirmasi pembayaran dan simpan bukti transfer</li>
+                            </ul>
+                            <p class="mt-2">Pembayaran zakat bisa dilakukan kapan saja sepanjang tahun. Namun, banyak umat Muslim yang memilih membayarnya saat bulan Ramadhan karena keutamaannya.</p>
+                        `;
+                    } else if (userText.toLowerCase().includes('jenis') && (userText.toLowerCase().includes('zakat') || userText.toLowerCase().includes('macam'))) {
+                        replyHtml = `
+                            <p class="mb-2">Ada beberapa jenis zakat yang wajib dan sunnah dibayarkan:</p>
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li><strong>Zakat Mal</strong> - Zakat atas harta yang dimiliki</li>
+                                <li><strong>Zakat Fitrah</strong> - Zakat yang wajib dibayar saat Ramadhan</li>
+                                <li><strong>Zakat Profesi</strong> - Zakat atas penghasilan/profesi</li>
+                                <li><strong>Zakat Emas/Perak</strong> - Zakat atas kepemilikan logam mulia</li>
+                                <li><strong>Zakat Perniagaan</strong> - Zakat atas aset perdagangan</li>
+                                <li><strong>Zakat Pertanian</strong> - Zakat atas hasil pertanian</li>
+                                <li><strong>Zakat Peternakan</strong> - Zakat atas hewan ternak</li>
+                            </ul>
+                            <p class="mt-2">Untuk memudahkan perhitungan, Anda dapat menggunakan Kalkulator Zakat yang tersedia di platform kami.</p>
+                        `;
+                    } else if (userText.toLowerCase().includes('manfaat') || userText.toLowerCase().includes('guna')) {
+                        replyHtml = `
+                            <p class="mb-2">Zakat memiliki manfaat besar bagi kedua belah pihak:</p>
+                            <p class="mb-2"><strong>Bagi Muzakki (Pembayar Zakat):</strong></p>
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>Membersihkan harta dari kotoran dan sifat kikir</li>
+                                <li>Mendapatkan pahala dan ridha Allah SWT</li>
+                                <li>Melatih sikap peduli terhadap sesama</li>
+                                <li>Mendapat perlindungan dari bencana dan musibah</li>
+                            </ul>
+                            <p class="mt-2"><strong>Bagi Mustahik (Penerima Zakat):</strong></p>
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>Memenuhi kebutuhan dasar hidup</li>
+                                <li>Meningkatkan taraf hidup dan kesejahteraan</li>
+                                <li>Mendapat kesempatan untuk berkembang secara ekonomi</li>
+                                <li>Merasakan kepedulian dan kasih sayang dari sesama Muslim</li>
+                            </ul>
+                        `;
+                    } else {
+                        // For other questions, use the AI API if puter is available
+                        if (typeof puter !== 'undefined') {
+                            const response = await puter.ai.chat(userText, {
+                                model: "claude-sonnet-4-5"
+                            });
+
+                            appendMessage(formatResponseToHtml(response.message.content[0].text), "bot");
+
+                        } else {
+                            // Fallback response if puter is not available
+                            replyHtml = '<p>Maaf, saat ini saya tidak dapat mengakses AI. Namun Anda masih bisa bertanya tentang zakat, cara pembayaran, atau program yang tersedia.</p>';
+                            appendMessage(replyHtml, "bot");
+
+                        }
+                    }
+
+                    // Remove typing indicator safely
+                    const typingIndicator = document.getElementById("typing-indicator");
+                    if (typingIndicator) {
+                        typingIndicator.remove();
+                    }
+
+                    if (replyHtml.trim() !== '') {
+                        appendMessage(replyHtml, "bot");
+                    }
+                    // Focus input after bot response
+                    setTimeout(() => input.focus(), 300);
+                } catch (err) {
+                    // Remove typing indicator safely
+                    const typingIndicator = document.getElementById("typing-indicator");
+                    if (typingIndicator) {
+                        typingIndicator.remove();
+                    }
+
+                    // Display error message
+                    appendMessage('<p>⚠️ Terjadi kesalahan saat memproses pesan Anda. Silakan coba lagi nanti.</p>', "bot");
+                    console.error(err);
+
+                    // Focus input after error
+                    setTimeout(() => input.focus(), 300);
+                }
+            }
+
+            sendBtn.addEventListener("click", sendMessage);
+            input.addEventListener("keydown", e => {
+                if (e.key === "Enter") sendMessage();
+            });
+
+            // Focus input when chat container is clicked
+            document.querySelector('.p-3.border-t').addEventListener('click', () => {
+                input.focus();
+            });
+
+            // Ensure input remains focused when user interacts with chat
+            messages.addEventListener('click', () => {
+                input.focus();
+            });
         }
 
-        sendBtn.addEventListener("click", sendMessage);
-        input.addEventListener("keydown", e => {
-            if (e.key === "Enter") sendMessage();
-        });
-
-        // Focus input when chat container is clicked
-        document.querySelector('.p-3.border-t').addEventListener('click', () => {
-            input.focus();
-        });
-
-        // Ensure input remains focused when user interacts with chat
-        messages.addEventListener('click', () => {
-            input.focus();
-        });
+        // Initialize chatbot immediately
+        initializeChatbot();
     });
 </script>

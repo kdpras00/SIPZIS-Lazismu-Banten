@@ -1,23 +1,24 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\ZakatPaymentController;
-use App\Http\Controllers\MuzakkiController;
-use App\Http\Controllers\ProgramController;
-use App\Http\Controllers\CampaignController;
-use App\Http\Controllers\ZakatCalculatorController;
-use App\Http\Controllers\NewsController;
-use App\Http\Controllers\ArtikelController;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\ZakatPaymentController;
+use App\Http\Controllers\ChatbotController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\DonationController;
+use App\Http\Controllers\CampaignController;
+use App\Http\Controllers\NewsController;
+use App\Http\Controllers\ZakatCalculatorController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MuzakkiController;
 use App\Http\Controllers\MustahikController;
 use App\Http\Controllers\ZakatDistributionController;
 use App\Http\Controllers\ReportsController;
-use App\Http\Controllers\ChatbotController;
-use Barryvdh\DomPDF\Facade\Pdf;
-use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ArtikelController;
+use App\Http\Controllers\ProgramController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,14 +32,10 @@ use App\Http\Controllers\PaymentController;
 */
 
 // Public routes
-Route::get('/', function () {
-    // Redirect authenticated admin/staff users to dashboard
-    if (Auth::check() && (Auth::user()->role === 'admin' || Auth::user()->role === 'staff')) {
-        return redirect()->route('dashboard');
-    }
+Route::get('/', [HomeController::class, 'index'])
+    ->name('home');
 
-    return view('pages.home');
-})->name('home');
+
 
 // Chatbot route
 Route::post('/chatbot', [ChatbotController::class, 'ask'])->name('chatbot.ask');
@@ -50,6 +47,10 @@ Route::get('/admin', function () {
 
 Route::get('/payments/search', [ZakatPaymentController::class, 'search'])->name('api.payments.search');
 
+
+
+
+Route::get('/donasi/{slug}', [DonationController::class, 'show'])->name('donasi.show');
 
 
 Route::get('/payment/{paymentCode}/failed', [ZakatPaymentController::class, 'guestFailure'])
@@ -375,6 +376,7 @@ Route::get('/program/shadaqah-pakaian', function () {
 })->name('program.shadaqah-pakaian');
 
 // Campaign routes
+Route::get('/campaigns/all', [CampaignController::class, 'all'])->name('campaigns.all');
 Route::get('/campaigns/{category}', [CampaignController::class, 'index'])->name('campaigns.index');
 Route::get('/campaigns/{category}/{campaign}', [CampaignController::class, 'show'])->name('campaigns.show');
 
@@ -660,3 +662,26 @@ Route::post('/firebase-login', function (Request $request) {
         ], 500);
     }
 })->name('firebase.login');
+
+// Test route to verify image URL functionality
+Route::get('/test-image-url', function () {
+    // Create a test program with a CDN URL
+    $program = new \App\Models\Program();
+    $program->photo = 'https://example.com/cdn-image.jpg';
+
+    // Create another test program with a local path
+    $localProgram = new \App\Models\Program();
+    $localProgram->photo = 'programs/local-image.jpg';
+
+    // Create a program with no photo
+    $noPhotoProgram = new \App\Models\Program();
+    $noPhotoProgram->photo = '';
+
+    return response()->json([
+        'cdn_image_url' => $program->image_url,
+        'local_image_url' => $localProgram->image_url,
+        'no_photo_url' => $noPhotoProgram->image_url,
+        'expected_cdn' => 'https://example.com/cdn-image.jpg',
+        'expected_local' => Storage::url('programs/local-image.jpg'),
+    ]);
+});

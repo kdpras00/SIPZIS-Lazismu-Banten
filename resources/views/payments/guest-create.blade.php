@@ -19,89 +19,24 @@
                 {{-- Program Information Header --}}
                 <div class="flex items-start sm:items-center gap-4 border-b border-gray-200 pb-6 mb-6">
                     @php
-                    $categories = [
-                    // Program pilar categories
-                    'pendidikan' => ['title' => 'Pilar Pendidikan', 'subtitle' => 'Mencerahkan Masa Depan dalam Membangun Negeri', 'image' => asset('img/program/pendidikan.jpg'), 'text_color' => 'text-blue-800'],
-                    'kesehatan' => ['title' => 'Pilar Kesehatan', 'subtitle' => 'Mewujudkan Kehidupan yang Lebih Sehat untuk Semua', 'image' => asset('img/program/kesehatan.jpg'), 'text_color' => 'text-red-800'],
-                    'ekonomi' => ['title' => 'Pilar Ekonomi', 'subtitle' => 'Memberdayakan Masyarakat secara Ekonomi', 'image' => asset('img/program/ekonomi.jpg'), 'text_color' => 'text-amber-800'],
-                    'sosial-dakwah' => ['title' => 'Pilar Sosial & Dakwah', 'subtitle' => 'Membangun Masyarakat yang Berkualitas', 'image' => asset('img/program/sosial-dakwah.jpg'), 'text_color' => 'text-green-800'],
-                    'kemanusiaan' => ['title' => 'Pilar Kemanusiaan', 'subtitle' => 'Menyejahterakan Umat Manusia Tanpa Diskriminasi', 'image' => asset('img/program/kemanusiaan.jpg'), 'text_color' => 'text-purple-800'],
-                    'lingkungan' => ['title' => 'Pilar Lingkungan', 'subtitle' => 'Menjaga Lingkungan untuk Generasi Mendatang', 'image' => asset('img/program/lingkungan.jpg'), 'text_color' => 'text-cyan-800'],
-
-                    // Zakat categories
-                    'zakat-mal' => ['title' => 'Zakat Mal', 'subtitle' => 'Zakat harta yang telah mencapai nisab dan haul', 'image' => asset('img/zakat.jpg'), 'text_color' => 'text-orange-800'],
-                    'zakat-profesi' => ['title' => 'Zakat Profesi', 'subtitle' => 'Zakat penghasilan atau pendapatan', 'image' => asset('img/zakat.jpg'), 'text_color' => 'text-orange-800'],
-                    'zakat-fitrah' => ['title' => 'Zakat Fitrah', 'subtitle' => 'Zakat yang wajib dikeluarkan menjelang Idul Fitri', 'image' => asset('img/zakat.jpg'), 'text_color' => 'text-orange-800'],
-
-                    // Infaq categories
-                    'infaq-masjid' => ['title' => 'Infaq Masjid', 'subtitle' => 'Infaq untuk pembangunan dan pemeliharaan masjid', 'image' => asset('img/infaq.jpg'), 'text_color' => 'text-blue-800'],
-                    'infaq-pendidikan' => ['title' => 'Infaq Pendidikan', 'subtitle' => 'Infaq untuk mendukung program pendidikan', 'image' => asset('img/infaq.jpg'), 'text_color' => 'text-blue-800'],
-                    'infaq-kemanusiaan' => ['title' => 'Infaq Kemanusiaan', 'subtitle' => 'Infaq untuk membantu sesama yang membutuhkan', 'image' => asset('img/infaq.jpg'), 'text_color' => 'text-blue-800'],
-
-                    // Shadaqah categories
-                    'shadaqah-rutin' => ['title' => 'Shadaqah Rutin', 'subtitle' => 'Shadaqah yang diberikan secara berkala', 'image' => asset('img/infaq.jpg'), 'text_color' => 'text-green-800'],
-                    'shadaqah-jariyah' => ['title' => 'Shadaqah Jariyah', 'subtitle' => 'Shadaqah yang manfaatnya berlangsung lama', 'image' => asset('img/infaq.jpg'), 'text_color' => 'text-green-800'],
-                    'fidyah' => ['title' => 'Fidyah', 'subtitle' => 'Tebusan karena tidak menjalankan kewajiban agama', 'image' => asset('img/infaq.jpg'), 'text_color' => 'text-green-800'],
-
-                    // Generic categories
-                    'umum' => ['title' => 'Program Umum', 'subtitle' => 'Membangun Masyarakat yang Lebih Baik', 'image' => asset('img/masjid.webp'), 'text_color' => 'text-emerald-800'],
-                    'zakat' => ['title' => 'Zakat', 'subtitle' => 'Penyaluran Zakat yang Tepat Sasaran', 'image' => asset('img/zakat.jpg'), 'text_color' => 'text-orange-800'],
-                    'infaq' => ['title' => 'Infaq', 'subtitle' => 'Infaq untuk Kebaikan Bersama', 'image' => asset('img/infaq.jpg'), 'text_color' => 'text-blue-800']
-                    ];
-
-                    // Determine display title - use campaign title if available, otherwise use category title
-                    if (isset($campaign) && $campaign) {
-                    $displayTitle = $campaign->title;
-                    $displaySubtitle = $categories[$programCategory]['subtitle'] ?? 'Donasi untuk campaign ini';
-                    $categoryDetails = $categories[$programCategory] ?? $categories['umum'];
-                    } else {
-                    $categoryDetails = $categories[$programCategory] ?? $categories['umum'];
-                    $displayTitle = $categoryDetails['title'];
-                    $displaySubtitle = $categoryDetails['subtitle'];
-                    }
-
-                    // Check if this is a program with specific type
-                    $programTypeId = request()->query('program_type_id', '');
-                    if ($programTypeId) {
-                    $programType = App\Models\ProgramType::find($programTypeId);
-                    if ($programType) {
-                    $displayTitle = $programType->name;
-                    $displaySubtitle = $programType->description;
-                    }
-                    }
-
-                    // Check if this is a zakat donation with specific type
-                    $zakatType = request()->query('type', '');
-                    if ($programCategory === 'zakat' && $zakatType) {
-                    if ($zakatType === 'profesi') {
-                    $displayTitle = 'Zakat Profesi';
-                    $displaySubtitle = 'Zakat penghasilan atau pendapatan';
-                    } elseif ($zakatType === 'harta') {
-                    $displayTitle = 'Zakat Harta';
-                    $displaySubtitle = 'Zakat atas harta yang dimiliki';
-                    }
-                    }
-
-                    // Check if this is a program with specific type
-                    $programTypeId = request()->query('program_type_id', '');
-                    if ($programTypeId) {
-                    $programType = App\Models\ProgramType::find($programTypeId);
-                    if ($programType) {
-                    $displayTitle = $programType->name;
-                    $displaySubtitle = $programType->description;
-                    }
-                    }
+                    // Get program image based on category
+                    $program = \App\Models\Program::byCategory($programCategory)->first();
+                    // Use our new image_url accessor to handle both CDN and local images
+                    $imageUrl = $program ? $program->image_url : asset('img/masjid.webp');
                     @endphp
+                    <img src="{{ $imageUrl }}"
+                        alt="Program {{ $displayTitle }}"
+                        class="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg shadow-md flex-shrink-0">
 
-                    <img src="{{ $categoryDetails['image'] }}" alt="Program {{ $displayTitle }}" class="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg shadow-md flex-shrink-0">
                     <div>
                         <p class="text-sm text-gray-600 mb-1">Anda akan berdonasi untuk:</p>
-                        <h2 class="text-lg sm:text-xl font-bold {{ $categoryDetails['text_color'] }} leading-tight">
+                        <h2 class="text-lg sm:text-xl font-bold {{ $textColor }} leading-tight">
                             {{ $displayTitle }}
                         </h2>
                         <p class="text-sm text-gray-600 mt-1">{{ $displaySubtitle }}</p>
                     </div>
                 </div>
+
 
                 {{-- Pastikan form action dan method sesuai dengan route Anda --}}
                 <form id="donation-form" class="space-y-6" autocomplete="off">

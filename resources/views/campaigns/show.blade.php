@@ -23,7 +23,23 @@
         <div class="bg-white rounded-2xl shadow-sm overflow-hidden mb-4">
             <!-- Campaign Image -->
             <div class="relative">
-                <img src="{{ $campaign->photo ? asset('storage/' . $campaign->photo) : $categoryDetails['image'] }}"
+                @php
+                // Handle both CDN URLs and local storage paths for campaign images
+                $imageUrl = '';
+                if ($campaign->photo) {
+                // Check if photo is a full URL (CDN)
+                if (filter_var($campaign->photo, FILTER_VALIDATE_URL)) {
+                $imageUrl = $campaign->photo;
+                } else {
+                // Assume it's a local storage path
+                $imageUrl = asset('storage/' . $campaign->photo);
+                }
+                } else {
+                // Use default category image if no photo is set
+                $imageUrl = $categoryDetails['image'];
+                }
+                @endphp
+                <img src="{{ $imageUrl }}"
                     alt="{{ $campaign->title }}"
                     class="w-full h-64 object-cover">
 
@@ -110,62 +126,32 @@
                 </div>
 
                 <!-- Donation Button -->
-                <button
-                    onclick="window.location.href='{{ route('guest.payment.create') }}?campaign={{ $campaign->id }}&category={{ $category }}'"
+                <button id="donateButton"
                     class="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-3.5 rounded-xl font-semibold text-base shadow-md hover:shadow-lg transition-colors duration-300 hover:from-green-700 hover:to-green-800">
                     Donasikan
                 </button>
 
-            </div>
-        </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        // Set progress bar widths with animation
+                        const progressBars = document.querySelectorAll('.progress-bar');
+                        progressBars.forEach(bar => {
+                            const width = bar.getAttribute('data-width');
+                            setTimeout(() => {
+                                bar.style.width = width + '%';
+                                bar.style.transition = 'width 1s ease-out';
+                            }, 100);
+                        });
 
-        <!-- Recent Donations -->
-        @if($campaign->zakatPayments->count() > 0)
-        <div class="bg-white rounded-2xl shadow-sm p-5">
-            <h2 class="text-base font-semibold text-gray-900 mb-4">
-                Donasi ({{ $campaign->zakatPayments->count() }})
-            </h2>
-
-            <div class="space-y-3">
-                @foreach($campaign->zakatPayments->take(10) as $payment)
-                <div class="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center">
-                            <span class="text-green-800 font-semibold text-sm">
-                                {{ substr($payment->muzakki->name, 0, 1) }}
-                            </span>
-                        </div>
-                        <div>
-                            <div class="font-medium text-gray-900 text-sm">
-                                {{ $payment->muzakki->name }}
-                            </div>
-                            <div class="text-xs text-gray-500">
-                                {{ $payment->created_at->diffForHumans() }}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="text-sm font-semibold text-gray-900">
-                        Rp {{ number_format($payment->paid_amount, 0, ',', '.') }}
-                    </div>
-                </div>
-                @endforeach
-            </div>
-        </div>
-        @endif
-    </div>
-</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Set progress bar widths with animation
-        const progressBars = document.querySelectorAll('.progress-bar');
-        progressBars.forEach(bar => {
-            const width = bar.getAttribute('data-width');
-            setTimeout(() => {
-                bar.style.width = width + '%';
-                bar.style.transition = 'width 1s ease-out';
-            }, 100);
-        });
-    });
-</script>
-@endsection
+                        // Handle donation button click
+                        const donateButton = document.getElementById('donateButton');
+                        if (donateButton) {
+                            donateButton.addEventListener('click', function() {
+                                const campaignId = '{{ $campaign->id }}';
+                                const category = '{{ $category }}';
+                                window.location.href = "{{ route('guest.payment.create') }}?campaign=" + campaignId + "&category=" + category;
+                            });
+                        }
+                    });
+                </script>
+                @endsection
