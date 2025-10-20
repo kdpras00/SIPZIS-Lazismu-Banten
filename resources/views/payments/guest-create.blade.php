@@ -19,10 +19,16 @@
                 {{-- Program Information Header --}}
                 <div class="flex items-start sm:items-center gap-4 border-b border-gray-200 pb-6 mb-6">
                     @php
+                    // Get program image based on category or specific program
+                    if (isset($program)) {
+                    // Use the specific program's image
+                    $imageUrl = $program->image_url;
+                    } else {
                     // Get program image based on category
-                    $program = \App\Models\Program::byCategory($programCategory)->first();
+                    $categoryProgram = \App\Models\Program::byCategory($programCategory)->first();
                     // Use our new image_url accessor to handle both CDN and local images
-                    $imageUrl = $program ? $program->image_url : asset('img/masjid.webp');
+                    $imageUrl = $categoryProgram ? $categoryProgram->image_url : asset('img/masjid.webp');
+                    }
                     @endphp
                     <img src="{{ $imageUrl }}"
                         alt="Program {{ $displayTitle }}"
@@ -44,6 +50,9 @@
 
                     {{-- PERBAIKAN 1: Tambahkan hidden input yang dibutuhkan backend --}}
                     <input type="hidden" name="program_category" value="{{ $programCategory }}" autocomplete="off">
+                    @if(isset($program))
+                    <input type="hidden" name="program_id" value="{{ $program->id }}" autocomplete="off">
+                    @endif
                     <input type="hidden" name="zakat_type_id" value="{{ request()->query('type') === 'profesi' ? 3 : (request()->query('type') === 'harta' ? 1 : (request()->query('type') === 'mal' ? 2 : '')) }}" autocomplete="off">
                     <input type="hidden" name="program_type_id" id="program_type_id" value="{{ request()->query('program_type_id') }}" autocomplete="off">
                     <input type="hidden" name="zakat_amount" id="zakat_amount" value="0" autocomplete="off">

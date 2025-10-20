@@ -120,7 +120,8 @@ class CampaignController extends Controller
             'status'
         ]);
 
-        $data['collected_amount'] = $request->collected_amount ?? 0;
+        // Set collected_amount to 0 for new campaigns
+        $data['collected_amount'] = 0;
 
         // Associate with program if exists
         $program = Program::byCategory($request->program_category)->first();
@@ -174,7 +175,6 @@ class CampaignController extends Controller
             'program_category' => 'required|string|max:50',
             'program_id' => 'nullable|exists:programs,id',
             'target_amount' => 'required|numeric|min:0',
-            'collected_amount' => 'required|numeric|min:0',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'status' => 'required|in:draft,published,completed,cancelled'
         ]);
@@ -185,9 +185,11 @@ class CampaignController extends Controller
             'program_category',
             'program_id',
             'target_amount',
-            'collected_amount',
             'status'
         ]);
+
+        // Set collected_amount to 0 for new campaigns
+        $data['collected_amount'] = 0;
 
         if ($request->hasFile('photo')) {
             $data['photo'] = $request->file('photo')->store('campaigns', 'public');
@@ -221,7 +223,7 @@ class CampaignController extends Controller
             'program_category' => 'required|string|max:50',
             'program_id' => 'nullable|exists:programs,id',
             'target_amount' => 'required|numeric|min:0',
-            'collected_amount' => 'required|numeric|min:0',
+            // Remove collected_amount from validation as it should be readonly
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'status' => 'required|in:draft,published,completed,cancelled'
         ]);
@@ -232,9 +234,11 @@ class CampaignController extends Controller
             'program_category',
             'program_id',
             'target_amount',
-            'collected_amount',
             'status'
         ]);
+
+        // Ensure collected_amount remains unchanged (readonly)
+        // $data['collected_amount'] = $campaign->collected_amount;
 
         if ($request->hasFile('photo')) {
             // Delete old photo if exists

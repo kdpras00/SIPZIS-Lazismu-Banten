@@ -55,18 +55,18 @@
                     <div class="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border border-white/20 transition-all duration-300 hover:shadow-3xl hover:-translate-y-1">
                         <!-- Campaign Image -->
                         <div class="h-48 overflow-hidden">
-                            <img src="{{ $campaign->photo ? asset('storage/' . $campaign->photo) : $categoryDetails['image'] }}"
+                            <img src="{{ $campaign->image_url }}"
                                 alt="{{ $campaign->title }}"
                                 class="w-full h-full object-cover">
                         </div>
 
                         <!-- Campaign Content -->
                         <div class="p-6">
-                            <h3 class="text-xl font-bold {{ $categoryDetails['text_color'] }} mb-3 line-clamp-2">
+                            <h3 class="text-xl font-bold {{ $categoryDetails['text_color'] }} mb-3 text-ellipsis overflow-hidden whitespace-nowrap md:whitespace-normal md:line-clamp-2">
                                 {{ $campaign->title }}
                             </h3>
 
-                            <p class="text-gray-600 text-sm mb-4 line-clamp-3">
+                            <p class="text-gray-600 text-sm mb-4 overflow-hidden text-ellipsis" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">
                                 {{ Str::limit($campaign->description, 100) }}
                             </p>
 
@@ -136,20 +136,6 @@
 
     .animation-delay-5000 {
         animation-delay: 5s;
-    }
-
-    .line-clamp-2 {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-
-    .line-clamp-3 {
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
     }
 </style>
 @endsection

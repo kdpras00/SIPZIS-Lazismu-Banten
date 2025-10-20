@@ -129,10 +129,11 @@
                                                 type="number"
                                                 id="collected_amount"
                                                 name="collected_amount"
-                                                value="{{ old('collected_amount', 0) }}"
+                                                value="0"
                                                 min="0"
                                                 step="0.01"
-                                                required>
+                                                readonly>
+                                            <small class="form-text text-muted">Nilai ini akan bertambah otomatis saat ada donasi.</small>
                                             @error('collected_amount')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -165,7 +166,7 @@
                                     </div>
 
                                     <!-- Progress Preview Card -->
-                                    <div class="card bg-gradient-success mb-3">
+                                    <!-- <div class="card bg-gradient-success mb-3">
                                         <div class="card-body text-center p-3">
                                             <h6 class="text-white">Preview Progress</h6>
                                             <div class="d-flex align-items-center justify-content-center mb-2">
@@ -189,7 +190,7 @@
                                                 <span id="targetPreview">Rp 0</span>
                                             </small>
                                         </div>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                         </div>
@@ -247,7 +248,7 @@
 
     // Attach event listeners to amount fields
     document.getElementById('target_amount').addEventListener('input', calculateProgress);
-    document.getElementById('collected_amount').addEventListener('input', calculateProgress);
+    // Note: collected_amount is readonly, so we don't need to listen for changes
 
     // Initial calculation
     document.addEventListener('DOMContentLoaded', function() {

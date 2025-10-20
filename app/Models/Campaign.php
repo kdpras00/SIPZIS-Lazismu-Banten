@@ -39,6 +39,22 @@ class Campaign extends Model
     }
 
     // Accessors
+    public function getImageUrlAttribute()
+    {
+        // If photo is empty, return a default image
+        if (empty($this->photo)) {
+            return asset('img/masjid.webp');
+        }
+
+        // Check if photo is a full URL (CDN)
+        if (filter_var($this->photo, FILTER_VALIDATE_URL)) {
+            return $this->photo;
+        }
+
+        // For local storage paths, use asset() helper
+        return asset('storage/' . ltrim($this->photo, '/'));
+    }
+
     public function getCollectedAmountAttribute($value)
     {
         // Calculate collected amount dynamically from related payments

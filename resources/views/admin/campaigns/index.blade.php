@@ -38,7 +38,7 @@
                                     <td class="align-middle">
                                         <div class="d-flex px-2 py-1">
                                             <div class="d-flex flex-column justify-content-center me-3">
-                                                <img src="{{ $campaign->photo ? asset('storage/' . $campaign->photo) : asset('img/masjid.webp') }}"
+                                                <img src="{{ $campaign->image_url }}"
                                                     class="avatar avatar-lg me-3" alt="{{ $campaign->title }}"
                                                     style="width: 80px; height: 80px; object-fit: cover;">
                                             </div>
@@ -80,15 +80,16 @@
                                     </td>
                                     <td class="align-middle text-center text-sm">
                                         @if($campaign->status == 'published')
-                                        <span class="badge badge-sm" style="background-color: #6c757d; color: #fff;">Published</span>
+                                        <span class="badge bg-secondary">Published</span>
                                         @elseif($campaign->status == 'draft')
-                                        <span class="badge badge-sm bg-gradient-secondary">Draft</span>
+                                        <span class="badge bg-warning text-dark">Draft</span>
                                         @elseif($campaign->status == 'completed')
-                                        <span class="badge badge-sm bg-gradient-info">Completed</span>
-                                        @else
-                                        <span class="badge badge-sm bg-gradient-danger">Cancelled</span>
+                                        <span class="badge bg-success">Completed</span>
+                                        @elseif($campaign->status == 'cancelled')
+                                        <span class="badge bg-danger">Cancelled</span>
                                         @endif
                                     </td>
+
                                     <td class="align-middle text-center">
                                         <div class="d-flex justify-content-center gap-2">
                                             <a href="{{ route('admin.campaigns.edit', $campaign) }}"

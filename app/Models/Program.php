@@ -16,6 +16,7 @@ class Program extends Model
         'status',
         'photo',
         'image_url',
+        'slug',
     ];
 
     protected $casts = [
@@ -139,6 +140,17 @@ class Program extends Model
         return min(100, ($this->total_collected / $this->total_target) * 100);
     }
 
+    // Ensure slug is always available
+    public function getSlugAttribute($value)
+    {
+        // If slug is not set, generate it from the name
+        if (!$value) {
+            return Str::slug($this->name);
+        }
+
+        return $value;
+    }
+
     // ========================
     // 🔍 Scopes
     // ========================
@@ -157,7 +169,10 @@ class Program extends Model
         parent::boot();
 
         static::creating(function ($program) {
-            $program->slug = Str::slug($program->name);
+            // Generate slug if not provided
+            if (empty($program->slug)) {
+                $program->slug = Str::slug($program->name);
+            }
         });
 
         // When a program is created

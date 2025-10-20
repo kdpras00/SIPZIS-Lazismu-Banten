@@ -52,27 +52,11 @@
                                 @foreach($zakatPrograms as $program)
                                 <!-- {{ $program->name }} Category -->
                                 @php
-                                // Handle special cases for zakat categories that don't follow the standard pattern
-                                $routeName = 'program.' . $program->category;
-
-                                // Handle zakat-fidyah case - it should route to program.fidyah, not program.zakat-fidyah
-                                if ($program->category === 'zakat-fidyah') {
-                                $routeName = 'program.fidyah';
-                                }
-
-                                // Handle any other cases where the category might have "zakat-" prefix already
-                                // Remove duplicate "zakat-" prefix if it exists
-                                if (strpos($program->category, 'zakat-zakat-') === 0) {
-                                $correctCategory = substr($program->category, 6); // Remove "zakat-" prefix
-                                $routeName = 'program.' . $correctCategory;
-
-                                // Special case for zakat-fidyah
-                                if ($correctCategory === 'zakat-fidyah') {
-                                $routeName = 'program.fidyah';
-                                }
-                                }
+                                // Create route to individual program page
+                                $routeName = 'program.show';
+                                $routeParams = $program->slug;
                                 @endphp
-                                <a href="{{ route($routeName) }}" class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden block">
+                                <a href="{{ route($routeName, $routeParams) }}" class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden block">
                                     <div class="relative h-48 overflow-hidden">
                                         @php
                                         // Use our new image_url accessor to handle both CDN and local images
@@ -117,10 +101,11 @@
                                 @foreach($infaqPrograms as $program)
                                 <!-- {{ $program->name }} -->
                                 @php
-                                // Handle special cases for infaq categories
-                                $routeName = 'program.' . $program->category;
+                                // Create route to individual program page
+                                $routeName = 'program.show';
+                                $routeParams = $program->slug;
                                 @endphp
-                                <a href="{{ route($routeName) }}" class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden block">
+                                <a href="{{ route($routeName, $routeParams) }}" class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden block">
                                     <div class="relative h-48 overflow-hidden">
                                         @php
                                         // Use our new image_url accessor to handle both CDN and local images
@@ -165,10 +150,11 @@
                                 @foreach($shadaqahPrograms as $program)
                                 <!-- {{ $program->name }} -->
                                 @php
-                                // Handle special cases for shadaqah categories
-                                $routeName = 'program.' . $program->category;
+                                // Create route to individual program page
+                                $routeName = 'program.show';
+                                $routeParams = $program->slug;
                                 @endphp
-                                <a href="{{ route($routeName) }}" class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden block">
+                                <a href="{{ route($routeName, $routeParams) }}" class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden block">
                                     <div class="relative h-48 overflow-hidden">
                                         @php
                                         // Use our new image_url accessor to handle both CDN and local images
@@ -212,7 +198,12 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 @foreach($pilarPrograms as $program)
                                 <!-- {{ $program->name }} Category -->
-                                <a href="{{ route('program.' . $program->category . '.donasi') }}" class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden block">
+                                @php
+                                // Create route to individual program page
+                                $routeName = 'program.show';
+                                $routeParams = $program->slug;
+                                @endphp
+                                <a href="{{ route($routeName, $routeParams) }}" class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden block">
                                     <div class="relative h-48 overflow-hidden">
                                         @php
                                         // Use our new image_url accessor to handle both CDN and local images

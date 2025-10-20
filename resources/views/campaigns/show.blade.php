@@ -22,36 +22,10 @@
         <!-- Campaign Card -->
         <div class="bg-white rounded-2xl shadow-sm overflow-hidden mb-4">
             <!-- Campaign Image -->
-            <div class="relative">
-                @php
-                // Handle both CDN URLs and local storage paths for campaign images
-                $imageUrl = '';
-                if ($campaign->photo) {
-                // Check if photo is a full URL (CDN)
-                if (filter_var($campaign->photo, FILTER_VALIDATE_URL)) {
-                $imageUrl = $campaign->photo;
-                } else {
-                // Assume it's a local storage path
-                $imageUrl = asset('storage/' . $campaign->photo);
-                }
-                } else {
-                // Use default category image if no photo is set
-                $imageUrl = $categoryDetails['image'];
-                }
-                @endphp
-                <img src="{{ $imageUrl }}"
+            <div class="h-48 overflow-hidden">
+                <img src="{{ $campaign->image_url }}"
                     alt="{{ $campaign->title }}"
-                    class="w-full h-64 object-cover">
-
-                <!-- Organization Badge -->
-                <!-- <div class="absolute top-4 left-4 bg-white rounded-full px-4 py-2 shadow-md flex items-center gap-2">
-                    <div class="w-6 h-6 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
-                        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z" />
-                        </svg>
-                    </div>
-                    <span class="text-sm font-semibold text-gray-700">SIPZIS</span>
-                </div> -->
+                    class="w-full h-full object-cover">
             </div>
 
             <!-- Campaign Content -->

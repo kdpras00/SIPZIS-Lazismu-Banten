@@ -6,6 +6,7 @@ use App\Models\ZakatPayment;
 use App\Models\Muzakki;
 use App\Models\ZakatType;
 use App\Models\Campaign;
+use App\Models\Program;
 use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -701,6 +702,12 @@ class ZakatPaymentController extends Controller
             DB::rollback();
             return back()->withInput()->with('error', 'Terjadi kesalahan dalam memproses pembayaran.');
         }
+
+        $campaign->collected_amount += $request->paid_amount;
+        if ($campaign->collected_amount >= $campaign->target_amount) {
+            $campaign->status = 'completed';
+        }
+        $campaign->save();
     }
 
     /**
@@ -797,8 +804,18 @@ class ZakatPaymentController extends Controller
     {
         $zakatTypes = ZakatType::active()->get();
         $programCategory = $request->query('category', 'umum');
+        $programId = $request->query('program_id'); // Added program_id parameter
         $campaignId = $request->query('campaign'); // Changed from 'campaign_id' to 'campaign'
         $amount = $request->query('amount'); // Get amount from query parameter
+
+        // If program ID is provided, get the specific program
+        $program = null;
+        if ($programId) {
+            $program = Program::find($programId);
+            if ($program) {
+                $programCategory = $program->category;
+            }
+        }
 
         // If campaign ID is provided, get the specific campaign
         $campaign = null;
@@ -817,8 +834,26 @@ class ZakatPaymentController extends Controller
         $displaySubtitle = 'Bersama Kita Wujudkan Kebaikan';
         $textColor = 'text-emerald-800';
 
+        // If we have a program, set the display variables based on it
+        if ($program) {
+            $displayTitle = $program->name;
+            $displaySubtitle = $program->description ?? 'Bersama Kita Wujudkan Kebaikan';
+            // Set text color based on category
+            $textColor = match ($program->category) {
+                'zakat-mal', 'zakat-fitrah', 'zakat-profesi', 'zakat-perdagangan', 'zakat-pertanian', 'zakat-ternak' => 'text-orange-800',
+                'infaq-masjid', 'infaq-pendidikan', 'infaq-kemanusiaan', 'infaq-bencana', 'infaq-sosial' => 'text-blue-800',
+                'shadaqah-rutin', 'shadaqah-jariyah', 'shadaqah-tetangga', 'shadaqah-pakaian', 'fidyah' => 'text-green-800',
+                'pendidikan' => 'text-blue-800',
+                'kesehatan' => 'text-red-800',
+                'ekonomi' => 'text-amber-800',
+                'sosial-dakwah' => 'text-green-800',
+                'kemanusiaan' => 'text-purple-800',
+                'lingkungan' => 'text-cyan-800',
+                default => 'text-emerald-800',
+            };
+        }
         // If we have a campaign, set the display variables based on it
-        if ($campaign) {
+        else if ($campaign) {
             // Mapping kategori → subtitle default
             $categoryMap = [
                 'pendidikan'    => 'Mencerahkan Masa Depan dalam Membangun Negeri',
@@ -922,7 +957,7 @@ class ZakatPaymentController extends Controller
             $textColor = $categoryColorMap[$programCategory] ?? 'text-emerald-800';
         }
 
-        return view('payments.guest-create', compact('zakatTypes', 'programCategory', 'campaign', 'amount', 'loggedInMuzakki', 'displayTitle', 'displaySubtitle', 'textColor'));
+        return view('payments.guest-create', compact('zakatTypes', 'programCategory', 'program', 'campaign', 'amount', 'loggedInMuzakki', 'displayTitle', 'displaySubtitle', 'textColor'));
     }
 
     public function guestStore(Request $request)
@@ -1006,6 +1041,16 @@ class ZakatPaymentController extends Controller
                 'is_guest_payment' => true,
                 'receipt_number'   => ZakatPayment::generateReceiptNumber(), // Use the existing method
             ];
+
+            // If program_id is provided, set it in the payment data
+            if ($request->filled('program_id')) {
+                $paymentData['program_id'] = $request->program_id;
+                // Also set the program_category from the program
+                $program = Program::find($request->program_id);
+                if ($program) {
+                    $paymentData['program_category'] = $program->category;
+                }
+            }
 
             // Only set program_type_id if it's provided and valid
             if ($request->filled('program_type_id')) {

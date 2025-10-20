@@ -55,12 +55,8 @@ Route::get('/donasi/{slug}', [DonationController::class, 'show'])->name('donasi.
 Route::get('/payment/{paymentCode}/failed', [ZakatPaymentController::class, 'guestFailure'])
     ->name('guest.payment.failed');
 
-
-
-Route::get('/guest/payment/check-status/{paymentCode}', [ZakatPaymentController::class, 'checkStatus'])->name('guest.payment.checkStatus');
-
-// Route::get('/program/{slug}', [ProgramController::class, 'show'])->name('program.show');
-
+// Uncommented to enable individual program display
+Route::get('/program/{slug}', [ProgramController::class, 'show'])->name('program.show');
 
 Route::get('/program', [HomeController::class, 'program'])->name('program');
 

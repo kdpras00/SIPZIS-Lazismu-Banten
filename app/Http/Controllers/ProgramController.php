@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Program;
 use App\Models\ProgramType;
+use App\Models\ZakatType;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -62,6 +63,7 @@ class ProgramController extends Controller
 
         $data = $request->only(['name', 'description', 'target_amount', 'status']);
         $data['category'] = $this->resolveCategory($request->all());
+        $data['slug'] = Str::slug($data['name']);
 
         // Cek duplikasi nama + kategori
         if (Program::where('name', $data['name'])->where('category', $data['category'])->exists()) {
@@ -100,6 +102,7 @@ class ProgramController extends Controller
                 'target_amount' => $programData['target_amount'] ?? 0,
                 'status' => $programData['status'],
                 'category' => $this->resolveCategory($programData),
+                'slug' => Str::slug($programData['name']),
             ];
 
             // Cek duplikasi
@@ -158,6 +161,7 @@ class ProgramController extends Controller
 
         $data = $request->only(['name', 'description', 'target_amount', 'status']);
         $data['category'] = $this->resolveCategory($request->all());
+        $data['slug'] = Str::slug($data['name']);
 
         // Upload foto baru dan hapus yang lama
         if ($request->hasFile('photo')) {
@@ -186,6 +190,24 @@ class ProgramController extends Controller
 
         return redirect()->route('admin.programs.index')
             ->with('success', 'Program berhasil dihapus.');
+    }
+
+    /**
+     * Display the specified program.
+     */
+    public function show($slug)
+    {
+        $program = Program::where('slug', $slug)->active()->firstOrFail();
+
+        $zakatTypes = ZakatType::active()->get();
+        $collectedAmount = $program->total_collected;
+        $totalTarget = $program->total_target;
+        $category = $program->category;
+
+        // Always use the individual program view for the show method
+        $viewName = 'programs.show';
+
+        return view($viewName, compact('program', 'zakatTypes', 'collectedAmount', 'totalTarget', 'category'));
     }
 
     /**
