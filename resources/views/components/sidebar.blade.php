@@ -112,9 +112,7 @@ $currentRoute = Route::currentRouteName();
         <li class="nav-item">
             <a href="javascript:void(0)"
                 class="nav-link d-flex align-items-center {{ str_starts_with($currentRoute, 'reports.') ? 'active' : '' }}"
-                data-bs-toggle="collapse"
-                data-bs-target="#reportsSubmenu"
-                aria-expanded="{{ str_starts_with($currentRoute, 'reports.') ? 'true' : 'false' }}"
+                aria-expanded="true"
                 aria-controls="reportsSubmenu"
                 id="reportsDropdown">
                 <i class="bi bi-file-earmark-text me-2"></i>
@@ -122,9 +120,7 @@ $currentRoute = Route::currentRouteName();
                 <i class="bi bi-chevron-down ms-auto"></i>
             </a>
 
-            <ul class="collapse {{ str_starts_with($currentRoute, 'reports.') ? 'show' : '' }}"
-                id="reportsSubmenu">
-
+            <ul class="collapse show" id="reportsSubmenu">
                 <li class="nav-item">
                     <a href="{{ route('reports.incoming') }}"
                         class="nav-link {{ $currentRoute === 'reports.incoming' ? 'active' : '' }}">
@@ -343,26 +339,31 @@ $currentRoute = Route::currentRouteName();
             sidebar.classList.toggle('show');
         });
 
-        // Handle reports dropdown - let Bootstrap handle the collapse, just update the chevron
+        // Handle reports dropdown - keep it always open
         if (reportsDropdown && reportsSubmenu) {
+            // Prevent the default click behavior
             reportsDropdown.addEventListener('click', function(e) {
-                // Let Bootstrap handle the collapse functionality
-                // Just update the chevron rotation based on the actual state
-                setTimeout(function() {
-                    const isExpanded = reportsSubmenu.classList.contains('show');
-                    reportsDropdown.setAttribute('aria-expanded', isExpanded);
+                e.preventDefault();
+                // Keep the submenu always shown
+                reportsSubmenu.classList.add('show');
+                reportsDropdown.setAttribute('aria-expanded', 'true');
 
-                    // Rotate the chevron icon
-                    const chevron = reportsDropdown.querySelector('.bi-chevron-down');
-                    if (chevron) {
-                        if (isExpanded) {
-                            chevron.style.transform = 'rotate(180deg)';
-                        } else {
-                            chevron.style.transform = 'rotate(0deg)';
-                        }
-                    }
-                }, 10);
+                // Ensure chevron shows correct state
+                const chevron = reportsDropdown.querySelector('.bi-chevron-down');
+                if (chevron) {
+                    chevron.style.transform = 'rotate(180deg)';
+                }
             });
+
+            // Initialize as expanded
+            reportsSubmenu.classList.add('show');
+            reportsDropdown.setAttribute('aria-expanded', 'true');
+
+            // Set chevron to expanded state
+            const chevron = reportsDropdown.querySelector('.bi-chevron-down');
+            if (chevron) {
+                chevron.style.transform = 'rotate(180deg)';
+            }
         }
 
         // Perbaikan utama:

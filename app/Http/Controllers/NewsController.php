@@ -156,7 +156,7 @@ class NewsController extends Controller
         ]);
 
         $status = $news->is_published ? 'dipublikasikan' : 'di-draft';
-        
+
         return back()->with('success', "Berita berhasil {$status}!");
     }
 

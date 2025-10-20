@@ -1,16 +1,17 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\ZakatPaymentController;
-use App\Http\Controllers\ChatbotController;
+use App\Models\Program;
+use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ChatbotController;
+use App\Http\Controllers\ZakatPaymentController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\NewsController;
+use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\ZakatCalculatorController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MuzakkiController;
@@ -18,7 +19,7 @@ use App\Http\Controllers\MustahikController;
 use App\Http\Controllers\ZakatDistributionController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\ArtikelController;
-use App\Http\Controllers\ProgramController;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,9 +33,7 @@ use App\Http\Controllers\ProgramController;
 */
 
 // Public routes
-Route::get('/', [HomeController::class, 'index'])
-    ->name('home');
-
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 
 // Chatbot route
@@ -63,75 +62,23 @@ Route::get('/guest/payment/check-status/{paymentCode}', [ZakatPaymentController:
 // Route::get('/program/{slug}', [ProgramController::class, 'show'])->name('program.show');
 
 
-Route::get('/program', function () {
-    // Fetch all programs grouped by category for the main program page
-    $zakatPrograms = \App\Models\Program::where('category', 'like', 'zakat-%')->active()->get();
-    $infaqPrograms = \App\Models\Program::where('category', 'like', 'infaq-%')->active()->get();
-    $shadaqahPrograms = \App\Models\Program::where('category', 'like', 'shadaqah-%')->active()->get();
-    $pilarPrograms = \App\Models\Program::whereIn('category', ['pendidikan', 'kesehatan', 'ekonomi', 'sosial-dakwah', 'kemanusiaan', 'lingkungan'])->active()->get();
-
-    return view('pages.program', compact('zakatPrograms', 'infaqPrograms', 'shadaqahPrograms', 'pilarPrograms'));
-})->name('program');
+Route::get('/program', [HomeController::class, 'program'])->name('program');
 
 // Tab-specific routes for program categories
 Route::get('/program/zakat', function () {
-    $zakatPrograms = \App\Models\Program::where('category', 'like', 'zakat-%')->active()->get();
-    $infaqPrograms = \App\Models\Program::where('category', 'like', 'infaq-%')->active()->get();
-    $shadaqahPrograms = \App\Models\Program::where('category', 'like', 'shadaqah-%')->active()->get();
-    $pilarPrograms = \App\Models\Program::whereIn('category', ['pendidikan', 'kesehatan', 'ekonomi', 'sosial-dakwah', 'kemanusiaan', 'lingkungan'])->active()->get();
-
-    return view('pages.program', [
-        'activeTab' => 'zakat',
-        'zakatPrograms' => $zakatPrograms,
-        'infaqPrograms' => $infaqPrograms,
-        'shadaqahPrograms' => $shadaqahPrograms,
-        'pilarPrograms' => $pilarPrograms
-    ]);
+    return app(HomeController::class)->programByCategory('zakat');
 })->name('program.zakat');
 
 Route::get('/program/infaq', function () {
-    $zakatPrograms = \App\Models\Program::where('category', 'like', 'zakat-%')->active()->get();
-    $infaqPrograms = \App\Models\Program::where('category', 'like', 'infaq-%')->active()->get();
-    $shadaqahPrograms = \App\Models\Program::where('category', 'like', 'shadaqah-%')->active()->get();
-    $pilarPrograms = \App\Models\Program::whereIn('category', ['pendidikan', 'kesehatan', 'ekonomi', 'sosial-dakwah', 'kemanusiaan', 'lingkungan'])->active()->get();
-
-    return view('pages.program', [
-        'activeTab' => 'infaq',
-        'zakatPrograms' => $zakatPrograms,
-        'infaqPrograms' => $infaqPrograms,
-        'shadaqahPrograms' => $shadaqahPrograms,
-        'pilarPrograms' => $pilarPrograms
-    ]);
+    return app(HomeController::class)->programByCategory('infaq');
 })->name('program.infaq');
 
 Route::get('/program/shadaqah', function () {
-    $zakatPrograms = \App\Models\Program::where('category', 'like', 'zakat-%')->active()->get();
-    $infaqPrograms = \App\Models\Program::where('category', 'like', 'infaq-%')->active()->get();
-    $shadaqahPrograms = \App\Models\Program::where('category', 'like', 'shadaqah-%')->active()->get();
-    $pilarPrograms = \App\Models\Program::whereIn('category', ['pendidikan', 'kesehatan', 'ekonomi', 'sosial-dakwah', 'kemanusiaan', 'lingkungan'])->active()->get();
-
-    return view('pages.program', [
-        'activeTab' => 'shadaqah',
-        'zakatPrograms' => $zakatPrograms,
-        'infaqPrograms' => $infaqPrograms,
-        'shadaqahPrograms' => $shadaqahPrograms,
-        'pilarPrograms' => $pilarPrograms
-    ]);
+    return app(HomeController::class)->programByCategory('shadaqah');
 })->name('program.shadaqah');
 
 Route::get('/program/pilar', function () {
-    $zakatPrograms = \App\Models\Program::where('category', 'like', 'zakat-%')->active()->get();
-    $infaqPrograms = \App\Models\Program::where('category', 'like', 'infaq-%')->active()->get();
-    $shadaqahPrograms = \App\Models\Program::where('category', 'like', 'shadaqah-%')->active()->get();
-    $pilarPrograms = \App\Models\Program::whereIn('category', ['pendidikan', 'kesehatan', 'ekonomi', 'sosial-dakwah', 'kemanusiaan', 'lingkungan'])->active()->get();
-
-    return view('pages.program', [
-        'activeTab' => 'pilar',
-        'zakatPrograms' => $zakatPrograms,
-        'infaqPrograms' => $infaqPrograms,
-        'shadaqahPrograms' => $shadaqahPrograms,
-        'pilarPrograms' => $pilarPrograms
-    ]);
+    return app(HomeController::class)->programByCategory('pilar');
 })->name('program.pilar');
 
 Route::get('/program/pendidikan', function () {
@@ -380,19 +327,20 @@ Route::get('/campaigns/all', [CampaignController::class, 'all'])->name('campaign
 Route::get('/campaigns/{category}', [CampaignController::class, 'index'])->name('campaigns.index');
 Route::get('/campaigns/{category}/{campaign}', [CampaignController::class, 'show'])->name('campaigns.show');
 
-Route::get('/tentang', function () {
-    return view('pages.tentang');
-})->name('tentang');
+// Route::get('/tentang', function () {
+//     return view('pages.tentang');
+// })->name('tentang');
+Route::get('/tentang', [HomeController::class, 'tentang'])->name('tentang');
 
 
-Route::get('/berita', [NewsController::class, 'index'])->name('berita');
+Route::get('/berita', [HomeController::class, 'berita'])->name('berita');
 Route::get('/news', [NewsController::class, 'all'])->name('news.all');
 Route::get('/news/{slug}', [NewsController::class, 'show'])->name('news.show');
 
 // Artikel routes
-Route::get('/artikel', [ArtikelController::class, 'publicIndex'])->name('artikel.index');
-Route::get('/artikel/all', [ArtikelController::class, 'publicIndex'])->name('artikel.all');
-Route::get('/artikel/{slug}', [ArtikelController::class, 'publicShow'])->name('artikel.show');
+Route::get('/artikel', [HomeController::class, 'artikel'])->name('artikel.index');
+Route::get('/artikel/all', [HomeController::class, 'artikelAll'])->name('artikel.all');
+Route::get('/artikel/{slug}', [HomeController::class, 'artikelShow'])->name('artikel.show');
 
 // Image serving route to avoid 403 errors
 Route::get('/images/{path}', function ($path) {
@@ -663,6 +611,37 @@ Route::post('/firebase-login', function (Request $request) {
     }
 })->name('firebase.login');
 
+// Test route for image URL generation
+Route::get('/test-image', function () {
+    $program = Program::first();
+    if ($program) {
+        return response()->json([
+            'image_url' => $program->image_url,
+            'photo_attribute' => $program->photo,
+            'is_absolute_url' => strpos($program->image_url, 'http') === 0,
+        ]);
+    }
+    return response()->json(['message' => 'No program found']);
+});
+
+// Test route for program image functionality
+Route::get('/test-program-image', function () {
+    // Create a test program
+    $program = new \App\Models\Program();
+    $program->name = 'Test Program';
+    $program->category = 'zakat-test';
+    $program->photo = 'programs/test-image.jpg';
+    $program->save();
+
+    return response()->json([
+        'program_id' => $program->id,
+        'photo' => $program->photo,
+        'image_url' => $program->image_url,
+        'full_image_url' => $program->image_url,
+    ]);
+});
+
+
 // Test route to verify image URL functionality
 Route::get('/test-image-url', function () {
     // Create a test program with a CDN URL
@@ -684,4 +663,47 @@ Route::get('/test-image-url', function () {
         'expected_cdn' => 'https://example.com/cdn-image.jpg',
         'expected_local' => Storage::url('programs/local-image.jpg'),
     ]);
+});
+
+// Debug route for image URL testing
+Route::get('/debug-image-url', function () {
+    $program = Program::where('image_url', '!=', '')->whereNotNull('image_url')->first();
+    if ($program) {
+        // Get the image URL using the accessor
+        $imageUrl = $program->image_url;
+
+        // Check if it's a local storage path
+        $isLocalStorage = strpos($imageUrl, '/storage/') === 0;
+
+        return response()->json([
+            'program_id' => $program->id,
+            'program_name' => $program->name,
+            'image_url_attribute' => $imageUrl,
+            'is_local_storage_path' => $isLocalStorage,
+            'full_url' => $isLocalStorage ? url($imageUrl) : $imageUrl,
+        ]);
+    }
+    return response()->json(['message' => 'No program with image found']);
+});
+
+// Debug route for program data
+Route::get('/debug-programs', function () {
+    $programs = \App\Models\Program::with('programType')->orderBy('category')->orderBy('name')->get();
+
+    $debugData = [];
+    foreach ($programs as $program) {
+        $debugData[] = [
+            'id' => $program->id,
+            'name' => $program->name,
+            'category' => $program->category,
+            'target_amount' => $program->target_amount,
+            'total_target' => $program->total_target,
+            'total_collected' => $program->total_collected,
+            'formatted_total_target' => $program->formatted_total_target,
+            'formatted_total_collected' => $program->formatted_total_collected,
+            'progress_percentage' => $program->progress_percentage,
+        ];
+    }
+
+    return response()->json($debugData);
 });

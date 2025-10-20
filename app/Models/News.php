@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class News extends Model
 {
@@ -19,6 +20,13 @@ class News extends Model
         'is_published',
         'excerpt',
         'author_id'
+    ];
+
+    protected $appends = [
+        'image_url',
+        'category_label',
+        'formatted_date',
+        'category_color'
     ];
 
     protected $casts = [
@@ -46,13 +54,45 @@ class News extends Model
     }
 
     /**
+     * Get image URL (support CDN dan Storage Public)
+     */
+    public function getImageUrlAttribute()
+    {
+        if (!$this->image) {
+            return 'https://via.placeholder.com/400x250?text=No+Image';
+        }
+
+        $image = trim($this->image);
+
+        // Jika sudah URL CDN (http:// atau https://)
+        if (filter_var($image, FILTER_VALIDATE_URL)) {
+            return $image;
+        }
+
+        // Jika path lokal, gunakan Storage URL
+        if (!empty($image)) {
+            return Storage::url($image);
+        }
+
+        return 'https://via.placeholder.com/400x250?text=No+Image';
+    }
+
+    /**
+     * Accessor untuk image_url (alias getImageUrlAttribute)
+     */
+    public function getImageAttribute($value)
+    {
+        return $value;
+    }
+
+    /**
      * Generate slug from title
      */
     public static function generateSlug($title)
     {
         $slug = Str::slug($title);
         $count = static::where('slug', 'LIKE', "$slug%")->count();
-        
+
         return $count ? "{$slug}-{$count}" : $slug;
     }
 
@@ -96,7 +136,7 @@ class News extends Model
         if ($value) {
             return $value;
         }
-        
+
         return Str::limit(strip_tags($this->content), 150);
     }
 

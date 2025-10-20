@@ -56,7 +56,7 @@
 </div>
 
 <!-- Campaigns Terbaru Section -->
-<div class="py-16 bg-gray-50">
+<div class="py-16 bg-gradient-to-br from-gray-50 via-white to-green-50">
     <div class="max-w-6xl mx-auto px-4">
         <div class="text-center mb-12 animate-fadeInUp">
             <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Campaigns Terbaru</h2>
@@ -66,13 +66,13 @@
         <!-- Slider Container -->
         <div class="relative">
             <!-- Navigation Buttons -->
-            <button id="campaigns-prev" class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-lg hover:bg-green-600 hover:text-white transition-all duration-300 opacity-0 group-hover:opacity-100">
+            <button id="campaigns-prev" class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-lg hover:bg-green-600 hover:text-white transition-all duration-300 opacity-0 group-hover:opacity-100 md:opacity-0 md:group-hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2" aria-label="Previous campaign">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                 </svg>
             </button>
 
-            <button id="campaigns-next" class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-lg hover:bg-green-600 hover:text-white transition-all duration-300 opacity-0 group-hover:opacity-100">
+            <button id="campaigns-next" class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-lg hover:bg-green-600 hover:text-white transition-all duration-300 opacity-0 group-hover:opacity-100 md:opacity-0 md:group-hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2" aria-label="Next campaign">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                 </svg>
@@ -80,10 +80,10 @@
 
             <!-- Slider Wrapper -->
             <div class="group">
-                <div id="campaigns-slider" class="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 scrollbar-hide">
+                <div id="campaigns-slider" class="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 scrollbar-hide scroll-smooth">
                     @foreach(\App\Models\Campaign::published()->latest()->take(10)->get() as $campaign)
                     <div class="flex-shrink-0 w-72 snap-start">
-                        <div class="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 animate-fadeInUp h-full flex flex-col">
+                        <div class="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 card-hover h-full flex flex-col">
                             @if($campaign->photo)
                             <div class="h-40 overflow-hidden">
                                 @php
@@ -95,7 +95,7 @@
                                 ? $rawImage
                                 : asset('storage/' . $campaign->photo);
                                 @endphp
-                                <img src="{{ $imageUrl }}" alt="{{ $campaign->title }}" class="w-full h-full object-cover">
+                                <img src="{{ $imageUrl }}" alt="Campaign: {{ $campaign->title }}" class="w-full h-full object-cover loading=" lazy"">
                             </div>
                             @else
                             <div class="h-40 bg-gray-200 flex items-center justify-center">
@@ -105,11 +105,24 @@
                             </div>
                             @endif
                             <div class="p-4 flex flex-col flex-grow">
+                                <!-- Category Badge -->
+                                <div class="flex flex-wrap gap-1 mb-2">
+                                    <span class="text-xs font-semibold px-2 py-1 rounded-full bg-green-100 text-green-800">
+                                        {{ $campaign->program_category ?? 'Zakat' }}
+                                    </span>
+                                </div>
                                 <h3 class="text-base font-bold text-gray-800 mb-1 line-clamp-2 flex-grow-0">{{ $campaign->title }}</h3>
                                 <p class="text-sm text-gray-600 mb-3 line-clamp-2 flex-grow">{{ Str::limit(strip_tags($campaign->description), 80) }}</p>
 
+                                <!-- Donor count and time remaining -->
+                                <div class="text-xs text-gray-500 mb-3">
+                                    <span>{{ $campaign->donors_count ?? 0 }} donatur</span>
+                                    <span class="mx-1">·</span>
+                                    <span>{{ $campaign->remaining_days ?? 0 }} hari lagi</span>
+                                </div>
+
                                 <!-- Progress Bar -->
-                                <div class="mb-3 flex-grow-0">
+                                <div class="mb-3 flex-grow-0 relative">
                                     <div class="flex justify-between text-xs text-gray-600 mb-1">
                                         <span>Terkumpul</span>
                                         <span>{{ 'Rp ' . number_format($campaign->collected_amount, 0, ',', '.') }}</span>
@@ -117,39 +130,56 @@
                                     @php
                                     $progress = $campaign->progress_percentage;
                                     if ($progress > 100) $progress = 100;
-                                    @endphp
-                                    <div class="w-full bg-gray-200 rounded-full h-2">
-                                        <div class="bg-green-600 h-2 rounded-full" style="width: <?php echo number_format($progress, 0); ?>%"></div>
-                                    </div>
-                                    <div class="flex justify-between text-xs text-gray-600 mt-1">
-                                        <span>Target: {{ 'Rp ' . number_format($campaign->target_amount, 0, ',', '.') }}</span>
-                                        <span>{{ number_format($campaign->progress_percentage, 1) }}%</span>
-                                    </div>
+
+                                    // Determine progress bar color based on percentage
+                                    $progressBarColor = 'bg-green-600';
+                                    if ($progress < 30) {
+                                        $progressBarColor='bg-blue-500' ;
+                                        } elseif ($progress < 70) {
+                                        $progressBarColor='bg-yellow-500' ;
+                                        }
+                                        @endphp
+                                        <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="h-2 rounded-full progress-bar {{ $progressBarColor }}" style="width: <?php echo number_format($progress, 0); ?>%"></div>
+                                </div>
+                                <div class="flex justify-between text-xs text-gray-600 mt-1">
+                                    <span>Target: {{ 'Rp ' . number_format($campaign->target_amount, 0, ',', '.') }}</span>
+                                    <span>{{ number_format($campaign->progress_percentage, 1) }}%</span>
                                 </div>
 
-                                <a href="{{ route('campaigns.show', [$campaign->program_category, $campaign]) }}"
-                                    class="inline-block w-full text-center bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-1.5 px-3 rounded-lg transition-colors duration-300 flex-grow-0">
-                                    Lihat Selengkapnya
-                                </a>
                             </div>
+
+                            <a href="{{ route('campaigns.show', [$campaign->program_category, $campaign]) }}"
+                                class="inline-block w-full text-center bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-1.5 px-3 rounded-lg transition-colors duration-300 flex-grow-0">
+                                Lihat Selengkapnya
+                            </a>
                         </div>
                     </div>
-                    @endforeach
                 </div>
+                @endforeach
+            </div>
+
+            <!-- Slider Indicators -->
+            <div class="flex justify-center mt-4 space-x-2 campaigns-indicators">
+                <!-- Indicators will be populated by JavaScript -->
             </div>
         </div>
+    </div>
 
-        <div class="text-center mt-10">
-            <a href="{{ route('campaigns.index', 'all') }}"
-                class="inline-block bg-white border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-green-700 font-bold py-2.5 px-6 rounded-full transition-all duration-300 transform hover:scale-105 text-sm">
-                Lihat Semua Campaign
-            </a>
-        </div>
+    <div class="text-center mt-10">
+        <a href="{{ route('campaigns.index', 'all') }}"
+            class="inline-flex items-center gap-2 bg-white border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white font-bold py-2.5 px-6 rounded-full transition-all duration-300 transform hover:scale-105 text-sm group">
+            Lihat Semua Campaign
+            <svg class="w-4 h-4 animate-bounce-x" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+        </a>
     </div>
 </div>
 
+
 <!-- Berita Terbaru Section -->
-<div class="py-16 bg-white">
+<div class="py-16 bg-gradient-to-br from-white via-green-50 to-gray-100">
     <div class="max-w-6xl mx-auto px-4">
         <div class="text-center mb-12 animate-fadeInUp">
             <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Berita Terbaru</h2>
@@ -159,13 +189,13 @@
         <!-- Slider Container -->
         <div class="relative">
             <!-- Navigation Buttons -->
-            <button id="news-prev" class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-lg hover:bg-green-600 hover:text-white transition-all duration-300 opacity-0 group-hover:opacity-100">
+            <button id="news-prev" class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-lg hover:bg-green-600 hover:text-white transition-all duration-300 opacity-0 group-hover:opacity-100 md:opacity-0 md:group-hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2" aria-label="Previous news">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                 </svg>
             </button>
 
-            <button id="news-next" class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-lg hover:bg-green-600 hover:text-white transition-all duration-300 opacity-0 group-hover:opacity-100">
+            <button id="news-next" class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-lg hover:bg-green-600 hover:text-white transition-all duration-300 opacity-0 group-hover:opacity-100 md:opacity-0 md:group-hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2" aria-label="Next news">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                 </svg>
@@ -173,10 +203,10 @@
 
             <!-- Slider Wrapper -->
             <div class="group">
-                <div id="news-slider" class="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 scrollbar-hide">
+                <div id="news-slider" class="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 scrollbar-hide scroll-smooth">
                     @foreach(\App\Models\News::published()->latest()->take(10)->get() as $news)
                     <div class="flex-shrink-0 w-72 snap-start">
-                        <div class="bg-gray-50 rounded-lg shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 animate-fadeInUp">
+                        <div class="bg-gray-50 rounded-lg shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md hover:-translate-y-1 card-hover">
                             @if($news->image)
                             <div class="h-40 overflow-hidden">
                                 @php
@@ -188,7 +218,7 @@
                                 ? $rawImage
                                 : asset('storage/' . $news->image);
                                 @endphp
-                                <img src="{{ $imageUrl }}" alt="{{ $news->title }}" class="w-full h-full object-cover">
+                                <img src="{{ $imageUrl }}" alt="News: {{ $news->title }}" class="w-full h-full object-cover loading=" lazy"">
                             </div>
                             @else
                             <div class="h-40 bg-gray-200 flex items-center justify-center">
@@ -204,6 +234,12 @@
                                     </svg>
                                     <span>{{ $news->created_at->format('d M Y') }}</span>
                                 </div>
+                                <!-- Category Badge -->
+                                <div class="flex flex-wrap gap-1 mb-2">
+                                    <span class="text-xs font-semibold px-2 py-1 rounded-full bg-blue-100 text-blue-800">
+                                        Berita
+                                    </span>
+                                </div>
                                 <h3 class="text-base font-bold text-gray-800 mb-2 line-clamp-2">{{ $news->title }}</h3>
                                 <p class="text-sm text-gray-600 mb-3 line-clamp-2">{{ $news->excerpt }}</p>
                                 <a href="{{ route('news.show', $news->slug) }}"
@@ -218,20 +254,28 @@
                     </div>
                     @endforeach
                 </div>
+
+                <!-- Slider Indicators -->
+                <div class="flex justify-center mt-4 space-x-2 news-indicators">
+                    <!-- Indicators will be populated by JavaScript -->
+                </div>
             </div>
         </div>
 
         <div class="text-center mt-10">
             <a href="{{ route('news.all') }}"
-                class="inline-block bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 px-6 rounded-full transition-all duration-300 transform hover:scale-105 text-sm">
+                class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 px-6 rounded-full transition-all duration-300 transform hover:scale-105 text-sm group">
                 Lihat Semua Berita
+                <svg class="w-4 h-4 animate-bounce-x" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
             </a>
         </div>
     </div>
 </div>
 
 <!-- Artikel Terbaru Section -->
-<div class="py-16 bg-gray-50">
+<div class="py-16 bg-gradient-to-br from-gray-50 via-white to-emerald-50">
     <div class="max-w-6xl mx-auto px-4">
         <div class="text-center mb-12 animate-fadeInUp">
             <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Artikel Terbaru</h2>
@@ -241,13 +285,13 @@
         <!-- Slider Container -->
         <div class="relative">
             <!-- Navigation Buttons -->
-            <button id="artikel-prev" class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-lg hover:bg-green-600 hover:text-white transition-all duration-300 opacity-0 group-hover:opacity-100">
+            <button id="artikel-prev" class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-lg hover:bg-green-600 hover:text-white transition-all duration-300 opacity-0 group-hover:opacity-100 md:opacity-0 md:group-hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2" aria-label="Previous article">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                 </svg>
             </button>
 
-            <button id="artikel-next" class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-lg hover:bg-green-600 hover:text-white transition-all duration-300 opacity-0 group-hover:opacity-100">
+            <button id="artikel-next" class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-lg hover:bg-green-600 hover:text-white transition-all duration-300 opacity-0 group-hover:opacity-100 md:opacity-0 md:group-hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2" aria-label="Next article">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                 </svg>
@@ -255,10 +299,10 @@
 
             <!-- Slider Wrapper -->
             <div class="group">
-                <div id="artikel-slider" class="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 scrollbar-hide">
+                <div id="artikel-slider" class="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 scrollbar-hide scroll-smooth">
                     @foreach(\App\Models\Artikel::published()->latest()->take(10)->get() as $artikel)
                     <div class="flex-shrink-0 w-72 snap-start">
-                        <div class="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 animate-fadeInUp">
+                        <div class="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 card-hover">
                             @if($artikel->image)
                             <div class="h-40 overflow-hidden">
                                 @php
@@ -270,7 +314,7 @@
                                 ? $rawImage
                                 : asset('storage/' . $artikel->image);
                                 @endphp
-                                <img src="{{ $imageUrl }}" alt="{{ $artikel->title }}" class="w-full h-full object-cover">
+                                <img src="{{ $imageUrl }}" alt="Article: {{ $artikel->title }}" class="w-full h-full object-cover loading=" lazy"">
                             </div>
                             @else
                             <div class="h-40 bg-gray-200 flex items-center justify-center">
@@ -286,6 +330,12 @@
                                     </svg>
                                     <span>{{ $artikel->created_at->format('d M Y') }}</span>
                                 </div>
+                                <!-- Category Badge -->
+                                <div class="flex flex-wrap gap-1 mb-2">
+                                    <span class="text-xs font-semibold px-2 py-1 rounded-full bg-purple-100 text-purple-800">
+                                        Artikel
+                                    </span>
+                                </div>
                                 <h3 class="text-base font-bold text-gray-800 mb-2 line-clamp-2">{{ $artikel->title }}</h3>
                                 <p class="text-sm text-gray-600 mb-3 line-clamp-2">{{ $artikel->excerpt }}</p>
                                 <a href="{{ route('artikel.show', $artikel->slug) }}"
@@ -300,13 +350,21 @@
                     </div>
                     @endforeach
                 </div>
+
+                <!-- Slider Indicators -->
+                <div class="flex justify-center mt-4 space-x-2 artikel-indicators">
+                    <!-- Indicators will be populated by JavaScript -->
+                </div>
             </div>
         </div>
 
         <div class="text-center mt-10">
             <a href="{{ route('artikel.all') }}"
-                class="inline-block bg-white border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white font-bold py-2.5 px-6 rounded-full transition-all duration-300 transform hover:scale-105 text-sm">
+                class="inline-flex items-center gap-2 bg-white border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white font-bold py-2.5 px-6 rounded-full transition-all duration-300 transform hover:scale-105 text-sm group">
                 Lihat Semua Artikel
+                <svg class="w-4 h-4 animate-bounce-x" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
             </a>
         </div>
     </div>
@@ -465,6 +523,56 @@
         margin-bottom: 12px;
         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         animation: fadeInUp 0.3s ease-out forwards;
+    }
+
+    /* Add bounce animation for arrows */
+    @keyframes bounce-x {
+
+        0%,
+        100% {
+            transform: translateX(0);
+        }
+
+        50% {
+            transform: translateX(4px);
+        }
+    }
+
+    .animate-bounce-x {
+        animation: bounce-x 1s infinite;
+    }
+
+    /* Enhanced card hover effect */
+    .card-hover:hover {
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Progress bar animation */
+    .progress-bar {
+        transition: width 0.6s ease-in-out;
+    }
+
+    /* Scroll snap alignment for better mobile experience */
+    .snap-start {
+        scroll-snap-align: center;
+    }
+
+    /* Hide scrollbar for sliders but keep functionality */
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    /* Responsive adjustments for mobile */
+    @media (max-width: 767px) {
+        .group:hover .opacity-0 {
+            opacity: 0 !important;
+        }
     }
 </style>
 
@@ -703,4 +811,167 @@
         // Initialize chatbot immediately
         initializeChatbot();
     });
+
+    // Slider functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize all sliders
+        initSlider('campaigns');
+        initSlider('news');
+        initSlider('artikel');
+
+        // Set up auto-scroll for sliders
+        setupAutoScroll('campaigns');
+        setupAutoScroll('news');
+        setupAutoScroll('artikel');
+    });
+
+    function initSlider(sliderName) {
+        const slider = document.getElementById(`${sliderName}-slider`);
+        const prevBtn = document.getElementById(`${sliderName}-prev`);
+        const nextBtn = document.getElementById(`${sliderName}-next`);
+        const indicatorsContainer = document.querySelector(`.${sliderName}-indicators`);
+
+        if (!slider || !prevBtn || !nextBtn) return;
+
+        // Create indicators
+        const items = slider.querySelectorAll('.flex-shrink-0');
+        const itemCount = items.length;
+
+        if (indicatorsContainer && itemCount > 0) {
+            for (let i = 0; i < itemCount; i++) {
+                const indicator = document.createElement('span');
+                indicator.classList.add('w-2', 'h-2', 'rounded-full', 'cursor-pointer', 'transition-all', 'duration-300');
+                if (i === 0) {
+                    indicator.classList.add('bg-green-600', 'w-4');
+                } else {
+                    indicator.classList.add('bg-gray-300');
+                }
+                indicator.dataset.index = i;
+                indicatorsContainer.appendChild(indicator);
+
+                // Add click event to indicators
+                indicator.addEventListener('click', () => {
+                    scrollToSlide(slider, i);
+                    updateIndicators(indicatorsContainer, i);
+                });
+            }
+        }
+
+        // Navigation button events
+        prevBtn.addEventListener('click', () => {
+            scrollSlider(slider, -1);
+            updateIndicatorsOnScroll(slider, indicatorsContainer);
+        });
+
+        nextBtn.addEventListener('click', () => {
+            scrollSlider(slider, 1);
+            updateIndicatorsOnScroll(slider, indicatorsContainer);
+        });
+
+        // Update indicators when scrolling
+        slider.addEventListener('scroll', () => {
+            updateIndicatorsOnScroll(slider, indicatorsContainer);
+        });
+
+        // Hide navigation buttons on mobile
+        function toggleNavigationButtons() {
+            if (window.innerWidth < 768) { // md breakpoint
+                prevBtn.classList.add('hidden');
+                nextBtn.classList.add('hidden');
+            } else {
+                prevBtn.classList.remove('hidden');
+                nextBtn.classList.remove('hidden');
+            }
+        }
+
+        // Initial check
+        toggleNavigationButtons();
+
+        // Check on resize
+        window.addEventListener('resize', toggleNavigationButtons);
+    }
+
+    function scrollSlider(slider, direction) {
+        const scrollAmount = slider.clientWidth * 0.8; // Scroll by 80% of visible area
+        slider.scrollBy({
+            left: direction * scrollAmount,
+            behavior: 'smooth'
+        });
+    }
+
+    function scrollToSlide(slider, index) {
+        const slideWidth = slider.querySelector('.flex-shrink-0').offsetWidth + 16; // width + gap
+        slider.scrollTo({
+            left: index * slideWidth,
+            behavior: 'smooth'
+        });
+    }
+
+    function updateIndicators(indicatorsContainer, activeIndex) {
+        const indicators = indicatorsContainer.querySelectorAll('span');
+        indicators.forEach((indicator, index) => {
+            if (index === activeIndex) {
+                indicator.classList.remove('bg-gray-300');
+                indicator.classList.add('bg-green-600', 'w-4');
+            } else {
+                indicator.classList.remove('bg-green-600', 'w-4');
+                indicator.classList.add('bg-gray-300', 'w-2');
+            }
+        });
+    }
+
+    function updateIndicatorsOnScroll(slider, indicatorsContainer) {
+        if (!indicatorsContainer) return;
+
+        const scrollLeft = slider.scrollLeft;
+        const slideWidth = slider.querySelector('.flex-shrink-0').offsetWidth + 16; // width + gap
+        const activeIndex = Math.round(scrollLeft / slideWidth);
+
+        updateIndicators(indicatorsContainer, activeIndex);
+    }
+
+    function setupAutoScroll(sliderName) {
+        const slider = document.getElementById(`${sliderName}-slider`);
+        const nextBtn = document.getElementById(`${sliderName}-next`);
+
+        if (!slider || !nextBtn) return;
+
+        let autoScrollInterval;
+
+        function startAutoScroll() {
+            autoScrollInterval = setInterval(() => {
+                // Check if we're at the end of the slider
+                if (slider.scrollLeft + slider.clientWidth >= slider.scrollWidth - 10) {
+                    // Scroll to beginning
+                    slider.scrollTo({
+                        left: 0,
+                        behavior: 'smooth'
+                    });
+                } else {
+                    // Scroll to next slide
+                    scrollSlider(slider, 1);
+                }
+            }, 5000); // 5 seconds
+        }
+
+        function stopAutoScroll() {
+            if (autoScrollInterval) {
+                clearInterval(autoScrollInterval);
+            }
+        }
+
+        // Start auto scroll
+        startAutoScroll();
+
+        // Stop auto scroll on hover
+        slider.addEventListener('mouseenter', stopAutoScroll);
+        slider.addEventListener('mouseleave', startAutoScroll);
+
+        // Stop auto scroll when navigation buttons are used
+        const prevBtn = document.getElementById(`${sliderName}-prev`);
+        if (prevBtn) {
+            prevBtn.addEventListener('click', stopAutoScroll);
+        }
+        nextBtn.addEventListener('click', stopAutoScroll);
+    }
 </script>

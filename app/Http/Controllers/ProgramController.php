@@ -15,9 +15,11 @@ class ProgramController extends Controller
      */
     public function adminIndex()
     {
-        $programs = Program::with('programType')->orderBy('category')->orderBy('name')->get();
+        $programs = Program::with('programType')
+            ->orderBy('category')
+            ->orderBy('name')
+            ->get();
 
-        // Group programs by category for easier display
         $groupedPrograms = $programs->groupBy('category');
 
         return view('admin.programs.index', compact('groupedPrograms'));
@@ -35,7 +37,7 @@ class ProgramController extends Controller
     }
 
     /**
-     * Show the form for creating programs in bulk.
+     * Show the form for bulk creating programs.
      */
     public function adminBulkCreate()
     {
@@ -59,43 +61,15 @@ class ProgramController extends Controller
         ]);
 
         $data = $request->only(['name', 'description', 'target_amount', 'status']);
+        $data['category'] = $this->resolveCategory($request->all());
 
-        // ✅ Cek kategori utama & subkategori
-        switch ($request->category) {
-            case 'zakat':
-                if ($request->zakat_type === 'other' && $request->filled('zakat_type_other')) {
-                    $data['category'] = 'zakat-' . Str::slug($request->zakat_type_other, '-');
-                } else {
-                    $data['category'] = 'zakat-' . ($request->zakat_type ?? 'umum');
-                }
-                break;
-
-            case 'infaq':
-                if ($request->infaq_type === 'other' && $request->filled('infaq_type_other')) {
-                    $data['category'] = 'infaq-' . Str::slug($request->infaq_type_other, '-');
-                } else {
-                    $data['category'] = 'infaq-' . ($request->infaq_type ?? 'umum');
-                }
-                break;
-
-            case 'shadaqah':
-                if ($request->shadaqah_type === 'other' && $request->filled('shadaqah_type_other')) {
-                    $data['category'] = 'shadaqah-' . Str::slug($request->shadaqah_type_other, '-');
-                } else {
-                    $data['category'] = 'shadaqah-' . ($request->shadaqah_type ?? 'umum');
-                }
-                break;
-
-            case 'pilar':
-                if ($request->pilar_category === 'other' && $request->filled('pilar_type_other')) {
-                    $data['category'] = Str::slug($request->pilar_type_other, '-');
-                } else {
-                    $data['category'] = $request->pilar_category ?? 'umum';
-                }
-                break;
+        // Cek duplikasi nama + kategori
+        if (Program::where('name', $data['name'])->where('category', $data['category'])->exists()) {
+            return redirect()->back()->withInput()
+                ->withErrors(['name' => 'Program dengan nama dan kategori ini sudah ada.']);
         }
 
-        // Upload foto
+        // Upload foto jika ada
         if ($request->hasFile('photo')) {
             $data['photo'] = $request->file('photo')->store('programs', 'public');
         }
@@ -103,7 +77,7 @@ class ProgramController extends Controller
         Program::create($data);
 
         return redirect()->route('admin.programs.index')
-            ->with('success', 'Program created successfully.');
+            ->with('success', 'Program berhasil ditambahkan.');
     }
 
     /**
@@ -125,23 +99,22 @@ class ProgramController extends Controller
                 'description' => $programData['description'] ?? '',
                 'target_amount' => $programData['target_amount'] ?? 0,
                 'status' => $programData['status'],
+                'category' => $this->resolveCategory($programData),
             ];
 
-            // Set category based on selection
-            if ($programData['category'] === 'zakat') {
-                $data['category'] = 'zakat-' . ($programData['zakat_type'] ?? 'umum');
-            } elseif ($programData['category'] === 'infaq') {
-                $data['category'] = 'infaq-' . ($programData['infaq_type'] ?? 'umum');
-            } elseif ($programData['category'] === 'shadaqah') {
-                $data['category'] = 'shadaqah-' . ($programData['shadaqah_type'] ?? 'umum');
-            } else {
-                $data['category'] = $programData['pilar_category'] ?? 'umum';
+            // Cek duplikasi
+            if (Program::where('name', $data['name'])->where('category', $data['category'])->exists()) {
+                return redirect()->back()->withInput()
+                    ->withErrors([
+                        'programs' => 'Program "' . $data['name'] . '" dengan kategori "' . $data['category'] . '" sudah ada.'
+                    ]);
             }
 
             Program::create($data);
         }
 
-        return redirect()->route('admin.programs.index')->with('success', 'All programs created successfully.');
+        return redirect()->route('admin.programs.index')
+            ->with('success', 'Semua program berhasil dibuat.');
     }
 
     /**
@@ -152,9 +125,8 @@ class ProgramController extends Controller
         $programTypes = ProgramType::active()->get();
         $categories = $this->getAvailableCategories();
 
-        // Extract category type and subtype
-        $categoryType = '';
-        $categorySubtype = '';
+        $categoryType = 'pilar';
+        $categorySubtype = $program->category;
 
         if (strpos($program->category, 'zakat-') === 0) {
             $categoryType = 'zakat';
@@ -165,9 +137,6 @@ class ProgramController extends Controller
         } elseif (strpos($program->category, 'shadaqah-') === 0) {
             $categoryType = 'shadaqah';
             $categorySubtype = substr($program->category, 9);
-        } else {
-            $categoryType = 'pilar';
-            $categorySubtype = $program->category;
         }
 
         return view('admin.programs.edit', compact('program', 'programTypes', 'categories', 'categoryType', 'categorySubtype'));
@@ -188,43 +157,9 @@ class ProgramController extends Controller
         ]);
 
         $data = $request->only(['name', 'description', 'target_amount', 'status']);
+        $data['category'] = $this->resolveCategory($request->all());
 
-        // ✅ Periksa apakah user memilih "Lainnya"
-        switch ($request->category) {
-            case 'zakat':
-                if ($request->zakat_type === 'other' && $request->filled('zakat_type_other')) {
-                    $data['category'] = 'zakat-' . Str::slug($request->zakat_type_other, '-');
-                } else {
-                    $data['category'] = 'zakat-' . ($request->zakat_type ?? 'umum');
-                }
-                break;
-
-            case 'infaq':
-                if ($request->infaq_type === 'other' && $request->filled('infaq_type_other')) {
-                    $data['category'] = 'infaq-' . Str::slug($request->infaq_type_other, '-');
-                } else {
-                    $data['category'] = 'infaq-' . ($request->infaq_type ?? 'umum');
-                }
-                break;
-
-            case 'shadaqah':
-                if ($request->shadaqah_type === 'other' && $request->filled('shadaqah_type_other')) {
-                    $data['category'] = 'shadaqah-' . Str::slug($request->shadaqah_type_other, '-');
-                } else {
-                    $data['category'] = 'shadaqah-' . ($request->shadaqah_type ?? 'umum');
-                }
-                break;
-
-            case 'pilar':
-                if ($request->pilar_category === 'other' && $request->filled('pilar_type_other')) {
-                    $data['category'] = Str::slug($request->pilar_type_other, '-');
-                } else {
-                    $data['category'] = $request->pilar_category ?? 'umum';
-                }
-                break;
-        }
-
-        // Ganti foto kalau diupload baru
+        // Upload foto baru dan hapus yang lama
         if ($request->hasFile('photo')) {
             if ($program->photo) {
                 Storage::disk('public')->delete($program->photo);
@@ -235,7 +170,7 @@ class ProgramController extends Controller
         $program->update($data);
 
         return redirect()->route('admin.programs.index')
-            ->with('success', 'Program updated successfully.');
+            ->with('success', 'Program berhasil diperbarui.');
     }
 
     /**
@@ -243,20 +178,55 @@ class ProgramController extends Controller
      */
     public function adminDestroy(Program $program)
     {
-        // Delete photo if exists
         if ($program->photo) {
             Storage::disk('public')->delete($program->photo);
         }
 
         $program->delete();
 
-        return redirect()->route('admin.programs.index')->with('success', 'Program deleted successfully.');
+        return redirect()->route('admin.programs.index')
+            ->with('success', 'Program berhasil dihapus.');
+    }
+
+    /**
+     * Resolve category based on type and custom input.
+     */
+    private function resolveCategory(array $data): string
+    {
+        switch ($data['category']) {
+            case 'zakat':
+                if (!empty($data['zakat_type'] ?? null) && $data['zakat_type'] === 'other' && !empty($data['zakat_type_other'] ?? null)) {
+                    return 'zakat-' . Str::slug($data['zakat_type_other'], '-');
+                }
+                return 'zakat-' . ($data['zakat_type'] ?? 'umum');
+
+            case 'infaq':
+                if (!empty($data['infaq_type'] ?? null) && $data['infaq_type'] === 'other' && !empty($data['infaq_type_other'] ?? null)) {
+                    return 'infaq-' . Str::slug($data['infaq_type_other'], '-');
+                }
+                return 'infaq-' . ($data['infaq_type'] ?? 'umum');
+
+            case 'shadaqah':
+                if (!empty($data['shadaqah_type'] ?? null) && $data['shadaqah_type'] === 'other' && !empty($data['shadaqah_type_other'] ?? null)) {
+                    return 'shadaqah-' . Str::slug($data['shadaqah_type_other'], '-');
+                }
+                return 'shadaqah-' . ($data['shadaqah_type'] ?? 'umum');
+
+            case 'pilar':
+                if (!empty($data['pilar_category'] ?? null) && $data['pilar_category'] === 'other' && !empty($data['pilar_type_other'] ?? null)) {
+                    return Str::slug($data['pilar_type_other'], '-');
+                }
+                return $data['pilar_category'] ?? 'umum';
+
+            default:
+                return 'umum';
+        }
     }
 
     /**
      * Get available categories for programs.
      */
-    private function getAvailableCategories()
+    private function getAvailableCategories(): array
     {
         return [
             'zakat' => [
@@ -291,7 +261,7 @@ class ProgramController extends Controller
                 'sosial-dakwah' => 'Sosial & Dakwah',
                 'kemanusiaan' => 'Kemanusiaan',
                 'lingkungan' => 'Lingkungan',
-            ]
+            ],
         ];
     }
 }

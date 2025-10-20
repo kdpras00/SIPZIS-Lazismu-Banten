@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Campaign extends Model
 {
@@ -14,12 +15,14 @@ class Campaign extends Model
         'target_amount',
         'collected_amount',
         'photo',
-        'status'
+        'status',
+        'end_date'
     ];
 
     protected $casts = [
         'target_amount' => 'decimal:2',
         'collected_amount' => 'decimal:2',
+        'end_date' => 'date'
     ];
 
     // Relationships
@@ -65,6 +68,27 @@ class Campaign extends Model
     public function getFormattedCollectedAmountAttribute()
     {
         return 'Rp ' . number_format($this->collected_amount, 0, ',', '.');
+    }
+
+    public function getDonorsCountAttribute()
+    {
+        return $this->zakatPayments()->count();
+    }
+
+    public function getRemainingDaysAttribute()
+    {
+        if (!$this->end_date) {
+            return null;
+        }
+
+        $endDate = Carbon::parse($this->end_date);
+        $now = Carbon::now();
+
+        if ($endDate->isPast()) {
+            return 0;
+        }
+
+        return $endDate->diffInDays($now);
     }
 
     // Scopes

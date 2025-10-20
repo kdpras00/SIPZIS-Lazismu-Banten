@@ -94,7 +94,15 @@
                                             <option value="perdagangan" {{ (old('zakat_type', $categorySubtype) == 'perdagangan') ? 'selected' : '' }}>
                                                 Zakat Perdagangan
                                             </option>
+                                            <option value="other" {{ (old('zakat_type', $categorySubtype) == 'other') ? 'selected' : '' }}>
+                                                Lainnya...
+                                            </option>
                                         </select>
+                                    </div>
+                                    <div class="form-group mb-3" id="zakat_type_other_container" style="display: none;">
+                                        <label for="zakat_type_other" class="form-control-label">Jenis Zakat Lainnya</label>
+                                        <input type="text" id="zakat_type_other" name="zakat_type_other" class="form-control"
+                                            placeholder="Tulis jenis zakat lainnya" value="{{ old('zakat_type_other') }}">
                                     </div>
                                 </div>
 
@@ -122,7 +130,15 @@
                                             <option value="sosial" {{ (old('infaq_type', $categorySubtype) == 'sosial') ? 'selected' : '' }}>
                                                 Infaq Sosial
                                             </option>
+                                            <option value="other" {{ (old('infaq_type', $categorySubtype) == 'other') ? 'selected' : '' }}>
+                                                Lainnya...
+                                            </option>
                                         </select>
+                                    </div>
+                                    <div class="form-group mb-3" id="infaq_type_other_container" style="display: none;">
+                                        <label for="infaq_type_other" class="form-control-label">Jenis Infaq Lainnya</label>
+                                        <input type="text" id="infaq_type_other" name="infaq_type_other" class="form-control"
+                                            placeholder="Tulis jenis infaq lainnya" value="{{ old('infaq_type_other') }}">
                                     </div>
                                 </div>
 
@@ -150,7 +166,15 @@
                                             <option value="fidyah" {{ (old('shadaqah_type', $categorySubtype) == 'fidyah') ? 'selected' : '' }}>
                                                 Fidyah
                                             </option>
+                                            <option value="other" {{ (old('shadaqah_type', $categorySubtype) == 'other') ? 'selected' : '' }}>
+                                                Lainnya...
+                                            </option>
                                         </select>
+                                    </div>
+                                    <div class="form-group mb-3" id="shadaqah_type_other_container" style="display: none;">
+                                        <label for="shadaqah_type_other" class="form-control-label">Jenis Shadaqah Lainnya</label>
+                                        <input type="text" id="shadaqah_type_other" name="shadaqah_type_other" class="form-control"
+                                            placeholder="Tulis jenis shadaqah lainnya" value="{{ old('shadaqah_type_other') }}">
                                     </div>
                                 </div>
 
@@ -181,7 +205,15 @@
                                             <option value="lingkungan" {{ (old('pilar_category', $categorySubtype) == 'lingkungan') ? 'selected' : '' }}>
                                                 Lingkungan
                                             </option>
+                                            <option value="other" {{ (old('pilar_category', $categorySubtype) == 'other') ? 'selected' : '' }}>
+                                                Lainnya...
+                                            </option>
                                         </select>
+                                    </div>
+                                    <div class="form-group mb-3" id="pilar_type_other_container" style="display: none;">
+                                        <label for="pilar_type_other" class="form-control-label">Kategori Pilar Lainnya</label>
+                                        <input type="text" id="pilar_type_other" name="pilar_type_other" class="form-control"
+                                            placeholder="Tulis kategori pilar lainnya" value="{{ old('pilar_type_other') }}">
                                     </div>
                                 </div>
 
@@ -229,7 +261,7 @@
                                     <label for="photo" class="form-control-label">Foto Program</label>
                                     <div class="card bg-gradient-dark mb-3">
                                         <div class="card-body text-center p-3">
-                                            <img id="preview" src="{{ $program->photo ? (filter_var($program->photo, FILTER_VALIDATE_URL) ? $program->photo : asset('storage/' . $program->photo)) : asset('img/masjid.webp') }}"
+                                            <img id="preview" src="{{ $program->image_url }}"
                                                 class="img-fluid rounded mb-3"
                                                 alt="Preview Foto"
                                                 style="height: 250px; object-fit: cover; width: 100%;">
@@ -306,6 +338,38 @@
                 }
                 reader.readAsDataURL(file);
             }
+        });
+
+        // Other type functionality
+        const types = [{
+                select: 'zakat_type',
+                other: 'zakat_type_other_container'
+            },
+            {
+                select: 'infaq_type',
+                other: 'infaq_type_other_container'
+            },
+            {
+                select: 'shadaqah_type',
+                other: 'shadaqah_type_other_container'
+            },
+            {
+                select: 'pilar_category',
+                other: 'pilar_type_other_container'
+            },
+        ];
+
+        types.forEach(t => {
+            const select = document.getElementById(t.select);
+            const otherDiv = document.getElementById(t.other);
+            if (!select || !otherDiv) return;
+
+            const toggle = () => {
+                otherDiv.style.display = (select.value === 'other') ? 'block' : 'none';
+            };
+
+            select.addEventListener('change', toggle);
+            toggle(); // Jalankan saat halaman pertama kali dimuat (untuk old() data)
         });
     });
 </script>

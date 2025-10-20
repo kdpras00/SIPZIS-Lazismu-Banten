@@ -14,9 +14,10 @@ class ZakatPayment extends Model
         'midtrans_order_id',
         'snap_token',
         'muzakki_id',
+        'program_id', // ✅ tambahkan ini
         'program_category',
         'program_type_id',
-        'zakat_type_id', // Add this back since it's still used in some places
+        'zakat_type_id',
         'zakat_amount',
         'paid_amount',
         'payment_method',
@@ -186,8 +187,9 @@ class ZakatPayment extends Model
 
     public function program()
     {
-        return $this->belongsTo(Program::class);
+        return $this->belongsTo(Program::class, 'program_id', 'id');
     }
+
 
     // Event handling for notifications
     public static function boot()

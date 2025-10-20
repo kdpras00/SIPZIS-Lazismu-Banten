@@ -15,6 +15,7 @@ class Program extends Model
         'target_amount',
         'status',
         'photo',
+        'image_url',
     ];
 
     protected $casts = [
@@ -37,9 +38,9 @@ class Program extends Model
     // Relationship to get zakat payments directly associated with this program
     public function zakatPayments()
     {
-        // For program-based donations, we need to match the program category
-        return $this->hasMany(ZakatPayment::class, 'program_category', 'category');
+        return $this->hasMany(ZakatPayment::class, 'program_id', 'id');
     }
+
 
     public function notifications()
     {
@@ -56,18 +57,32 @@ class Program extends Model
      */
     public function getImageUrlAttribute()
     {
-        // If photo is empty, return a default image
-        if (empty($this->photo)) {
+        // Use image_url if available, otherwise fallback to photo
+        $imagePath = $this->image_url ?? $this->photo;
+
+        // If image path is empty, return a default image
+        if (empty($imagePath)) {
             return asset('img/masjid.webp');
         }
 
-        // Check if photo is a full URL (CDN)
-        if (filter_var($this->photo, FILTER_VALIDATE_URL)) {
-            return $this->photo;
+        // Check if image path is a full URL (CDN)
+        if (filter_var($imagePath, FILTER_VALIDATE_URL)) {
+            return $imagePath;
         }
 
-        // Otherwise, assume it's a local file path
-        return Storage::url($this->photo);
+        // For local storage paths, ensure they start with 'programs/' directory
+        if (strpos($imagePath, 'programs/') === 0) {
+            // Use Storage::url() for proper URL generation
+            return Storage::url($imagePath);
+        }
+
+        // For other relative paths, prepend storage directory
+        if (strpos($imagePath, '/') !== 0) {
+            $imagePath = 'programs/' . $imagePath;
+        }
+
+        // Use Storage::url() for proper URL generation
+        return Storage::url(ltrim($imagePath, '/'));
     }
 
     // Total dana terkumpul dari semua campaign yang published
