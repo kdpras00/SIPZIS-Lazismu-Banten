@@ -39,9 +39,15 @@ class Program extends Model
     // Relationship to get zakat payments directly associated with this program
     public function zakatPayments()
     {
-        return $this->hasMany(ZakatPayment::class, 'program_id', 'id');
+        return $this->hasMany(ZakatPayment::class, 'program_id', 'id')
+            ->where('status', 'completed');
     }
 
+    // Relationship to get zakat distributions related to this program
+    public function zakatDistributions()
+    {
+        return $this->hasMany(ZakatDistribution::class, 'program_name', 'category');
+    }
 
     public function notifications()
     {
@@ -91,7 +97,6 @@ class Program extends Model
     {
         // First check for direct program-based donations
         $directPayments = $this->zakatPayments()
-            ->completed()
             ->sum('paid_amount');
 
         // Then check for campaign-based donations
@@ -100,16 +105,28 @@ class Program extends Model
             ->with('zakatPayments')
             ->get()
             ->sum(function ($campaign) {
-                return $campaign->zakatPayments()->completed()->sum('paid_amount');
+                return $campaign->zakatPayments()->sum('paid_amount');
             });
 
         return $directPayments + $campaignPayments;
     }
 
+    // Total dana yang telah didistribusikan
+    public function getTotalDistributedAttribute()
+    {
+        return $this->zakatDistributions()->sum('amount');
+    }
+
+    // Total dana bersih (terkumpul - didistribusikan)
+    public function getNetTotalCollectedAttribute()
+    {
+        return max(0, $this->total_collected - $this->total_distributed);
+    }
+
     // Format total terkumpul dalam bentuk rupiah
     public function getFormattedTotalCollectedAttribute()
     {
-        return 'Rp ' . number_format($this->total_collected ?? 0, 0, ',', '.');
+        return 'Rp ' . number_format($this->net_total_collected ?? 0, 0, ',', '.');
     }
 
     // Total target (ambil dari program langsung atau dari campaign)
@@ -137,7 +154,8 @@ class Program extends Model
             return 0;
         }
 
-        return min(100, ($this->total_collected / $this->total_target) * 100);
+        // Use net collected amount for progress calculation
+        return min(100, ($this->net_total_collected / $this->total_target) * 100);
     }
 
     // Ensure slug is always available

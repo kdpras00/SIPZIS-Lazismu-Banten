@@ -118,7 +118,21 @@
                                 <div class="text-xs text-gray-500 mb-3">
                                     <span>{{ $campaign->donors_count ?? 0 }} donatur</span>
                                     <span class="mx-1">·</span>
-                                    <span>{{ $campaign->remaining_days ?? 0 }} hari lagi</span>
+                                    @if($campaign->end_date)
+                                    @if($campaign->remaining_days > 0)
+                                    <span>{{ $campaign->remaining_days }} hari lagi</span>
+                                    @elseif($campaign->remaining_days == 0)
+                                    <span>Hari terakhir</span>
+                                    @elseif($campaign->remaining_days == -1)
+                                    @if($campaign->status == 'completed')
+                                    <span>Selesai</span>
+                                    @else
+                                    <span>Waktu Habis</span>
+                                    @endif
+                                    @endif
+                                    @else
+                                    <span>Tidak ada batas waktu</span>
+                                    @endif
                                 </div>
 
                                 <!-- Progress Bar -->

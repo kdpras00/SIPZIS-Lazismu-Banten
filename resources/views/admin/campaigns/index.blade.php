@@ -28,6 +28,7 @@
                                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Target</th>
                                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Terkumpul</th>
                                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Progress</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Sisa Hari</th>
                                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
                                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Aksi</th>
                                 </tr>
@@ -77,6 +78,23 @@
                                                 </div>
                                             </div>
                                         </div>
+                                    </td>
+                                    <td class="align-middle text-center text-sm">
+                                        @if($campaign->end_date)
+                                        @if($campaign->remaining_days > 0)
+                                        <span class="badge bg-info">{{ $campaign->remaining_days }} hari</span>
+                                        @elseif($campaign->remaining_days == 0)
+                                        <span class="badge bg-warning text-dark">Hari terakhir</span>
+                                        @elseif($campaign->remaining_days == -1)
+                                        @if($campaign->status == 'completed')
+                                        <span class="badge bg-success">Selesai</span>
+                                        @else
+                                        <span class="badge bg-danger">Waktu Habis</span>
+                                        @endif
+                                        @endif
+                                        @else
+                                        <span class="badge bg-light text-dark">Tidak ada batas waktu</span>
+                                        @endif
                                     </td>
                                     <td class="align-middle text-center text-sm">
                                         @if($campaign->status == 'published')

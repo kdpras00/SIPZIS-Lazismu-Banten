@@ -99,6 +99,37 @@
                     </p>
                 </div>
 
+                <!-- Donors List -->
+                @if($campaign->zakatPayments->count() > 0)
+                <div class="mb-5">
+                    <h2 class="text-base font-semibold text-gray-900 mb-2">Para Donatur</h2>
+                    <div class="bg-gray-50 rounded-lg p-3 max-h-60 overflow-y-auto">
+                        @foreach($campaign->zakatPayments as $payment)
+                        <div class="flex items-center justify-between py-2 border-b border-gray-200 last:border-0">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                                    <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-medium text-gray-900">
+                                        {{ $payment->muzakki ? $payment->muzakki->name : 'Anonim' }}
+                                    </div>
+                                    <div class="text-xs text-gray-500">
+                                        {{ $payment->created_at->diffForHumans() }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-sm font-semibold text-green-600">
+                                {{ $payment->formatted_amount }}
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
                 <!-- Donation Button -->
                 <button id="donateButton"
                     class="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-3.5 rounded-xl font-semibold text-base shadow-md hover:shadow-lg transition-colors duration-300 hover:from-green-700 hover:to-green-800">

@@ -141,6 +141,23 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="end_date" class="form-control-label">Tanggal Berakhir</label>
+                                            <input class="form-control @error('end_date') is-invalid @enderror"
+                                                type="date"
+                                                id="end_date"
+                                                name="end_date"
+                                                value="{{ old('end_date', $campaign->end_date ? $campaign->end_date->format('Y-m-d') : '') }}">
+                                            <small class="form-text text-muted">Kosongkan jika tidak ada batas waktu.</small>
+                                            @error('end_date')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="col-md-4">

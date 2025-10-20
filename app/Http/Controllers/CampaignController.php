@@ -24,8 +24,11 @@ class CampaignController extends Controller
         $totalTarget = 0;
 
         foreach ($campaigns as $campaign) {
-            // Calculate collected amount for each campaign
-            $collected = $campaign->zakatPayments()->sum('paid_amount');
+            // Check if campaign should be completed automatically
+            $campaign->checkAndCompleteIfExpired();
+
+            // Calculate collected amount for each campaign (now using dynamic calculation)
+            $collected = $campaign->collected_amount;
             // Add to campaign object as a custom attribute for the view
             $campaign->display_collected_amount = $collected;
             $totalCollected += $collected;
@@ -45,9 +48,10 @@ class CampaignController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Update collected amounts dynamically
+        // Update collected amounts dynamically and check for expired campaigns
         foreach ($campaigns as $campaign) {
-            $campaign->display_collected_amount = $campaign->zakatPayments()->sum('paid_amount');
+            $campaign->checkAndCompleteIfExpired();
+            $campaign->display_collected_amount = $campaign->collected_amount;
         }
 
         // Get program for this category
@@ -61,7 +65,7 @@ class CampaignController extends Controller
         } else {
             // Fallback to direct calculation if program doesn't exist
             $totalCollected = $campaigns->sum(function ($campaign) {
-                return $campaign->display_collected_amount ?? $campaign->collected_amount;
+                return $campaign->display_collected_amount;
             });
             $totalTarget = $campaigns->sum('target_amount');
         }
@@ -76,9 +80,12 @@ class CampaignController extends Controller
      */
     public function show($category, Campaign $campaign)
     {
+        // Check if campaign should be completed automatically
+        $campaign->checkAndCompleteIfExpired();
+
         // Load related payments for this campaign and update collected amount
         $campaign->load('zakatPayments.muzakki');
-        $campaign->display_collected_amount = $campaign->zakatPayments()->sum('paid_amount');
+        $campaign->display_collected_amount = $campaign->collected_amount;
 
         // Get program for this category
         $program = Program::byCategory($category)->first();
@@ -89,7 +96,7 @@ class CampaignController extends Controller
         } else {
             // Fallback to direct calculation
             $totalCollected = Campaign::published()->byCategory($category)->get()->sum(function ($campaign) {
-                return $campaign->zakatPayments()->sum('paid_amount');
+                return $campaign->collected_amount;
             });
         }
 
@@ -97,7 +104,6 @@ class CampaignController extends Controller
 
         return view('campaigns.show', compact('campaign', 'category', 'categoryDetails', 'totalCollected'));
     }
-
     /**
      * Store a newly created campaign in storage.
      */
@@ -109,7 +115,8 @@ class CampaignController extends Controller
             'program_category' => 'required|string|max:50',
             'target_amount' => 'required|numeric|min:0',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'status' => 'required|in:draft,published,completed,cancelled'
+            'status' => 'required|in:draft,published,completed,cancelled',
+            'end_date' => 'nullable|date|after:today'
         ]);
 
         $data = $request->only([
@@ -117,7 +124,8 @@ class CampaignController extends Controller
             'description',
             'program_category',
             'target_amount',
-            'status'
+            'status',
+            'end_date'
         ]);
 
         // Set collected_amount to 0 for new campaigns
@@ -176,7 +184,8 @@ class CampaignController extends Controller
             'program_id' => 'nullable|exists:programs,id',
             'target_amount' => 'required|numeric|min:0',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'status' => 'required|in:draft,published,completed,cancelled'
+            'status' => 'required|in:draft,published,completed,cancelled',
+            'end_date' => 'nullable|date|after:today'
         ]);
 
         $data = $request->only([
@@ -185,7 +194,8 @@ class CampaignController extends Controller
             'program_category',
             'program_id',
             'target_amount',
-            'status'
+            'status',
+            'end_date'
         ]);
 
         // Set collected_amount to 0 for new campaigns
@@ -225,7 +235,8 @@ class CampaignController extends Controller
             'target_amount' => 'required|numeric|min:0',
             // Remove collected_amount from validation as it should be readonly
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'status' => 'required|in:draft,published,completed,cancelled'
+            'status' => 'required|in:draft,published,completed,cancelled',
+            'end_date' => 'nullable|date|after:today'
         ]);
 
         $data = $request->only([
@@ -234,7 +245,8 @@ class CampaignController extends Controller
             'program_category',
             'program_id',
             'target_amount',
-            'status'
+            'status',
+            'end_date'
         ]);
 
         // Ensure collected_amount remains unchanged (readonly)
