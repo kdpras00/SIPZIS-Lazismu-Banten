@@ -88,13 +88,18 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group mb-3">
-                                <label for="programs[${programIndex}][category]" class="form-control-label">Kategori Utama</label>
-                                <select class="form-control program-category" name="programs[${programIndex}][category]" required>
+                                <label for="programs[${programIndex}][category]" class="form-control-label">Kategori</label>
+                                <select class="form-control" name="programs[${programIndex}][category]" required>
                                     <option value="">Pilih Kategori</option>
                                     <option value="zakat">Zakat</option>
                                     <option value="infaq">Infaq</option>
                                     <option value="shadaqah">Shadaqah</option>
-                                    <option value="pilar">Program Pilar</option>
+                                    <option value="pendidikan">Pendidikan</option>
+                                    <option value="kesehatan">Kesehatan</option>
+                                    <option value="ekonomi">Ekonomi</option>
+                                    <option value="sosial-dakwah">Sosial & Dakwah</option>
+                                    <option value="kemanusiaan">Kemanusiaan</option>
+                                    <option value="lingkungan">Lingkungan</option>
                                 </select>
                             </div>
                         </div>
@@ -122,64 +127,6 @@
                         <label for="programs[${programIndex}][description]" class="form-control-label">Deskripsi</label>
                         <textarea class="form-control" name="programs[${programIndex}][description]" rows="2"></textarea>
                     </div>
-
-                    <!-- Sub-category Selection (Dynamic) -->
-                    <div class="subcategory-section" id="zakat-subcategory-${programIndex}" style="display: none;">
-                        <div class="form-group mb-3">
-                            <label for="programs[${programIndex}][zakat_type]" class="form-control-label">Jenis Zakat</label>
-                            <select class="form-control" name="programs[${programIndex}][zakat_type]">
-                                <option value="umum">Tidak Ada Jenis Khusus</option>
-                                <option value="fitrah">Zakat Fitrah</option>
-                                <option value="mal">Zakat Mal</option>
-                                <option value="profesi">Zakat Profesi</option>
-                                <option value="pertanian">Zakat Pertanian</option>
-                                <option value="perdagangan">Zakat Perdagangan</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="subcategory-section" id="infaq-subcategory-${programIndex}" style="display: none;">
-                        <div class="form-group mb-3">
-                            <label for="programs[${programIndex}][infaq_type]" class="form-control-label">Jenis Infaq</label>
-                            <select class="form-control" name="programs[${programIndex}][infaq_type]">
-                                <option value="umum">Tidak Ada Jenis Khusus</option>
-                                <option value="masjid">Infaq Masjid</option>
-                                <option value="pendidikan">Infaq Pendidikan</option>
-                                <option value="kemanusiaan">Infaq Kemanusiaan</option>
-                                <option value="bencana">Infaq Bencana</option>
-                                <option value="sosial">Infaq Sosial</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="subcategory-section" id="shadaqah-subcategory-${programIndex}" style="display: none;">
-                        <div class="form-group mb-3">
-                            <label for="programs[${programIndex}][shadaqah_type]" class="form-control-label">Jenis Shadaqah</label>
-                            <select class="form-control" name="programs[${programIndex}][shadaqah_type]">
-                                <option value="umum">Tidak Ada Jenis Khusus</option>
-                                <option value="rutin">Shadaqah Rutin</option>
-                                <option value="jariyah">Shadaqah Jariyah</option>
-                                <option value="tetangga">Shadaqah Tetangga</option>
-                                <option value="pakaian">Shadaqah Pakaian</option>
-                                <option value="fidyah">Fidyah</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="subcategory-section" id="pilar-subcategory-${programIndex}" style="display: none;">
-                        <div class="form-group mb-3">
-                            <label for="programs[${programIndex}][pilar_category]" class="form-control-label">Kategori Program Pilar</label>
-                            <select class="form-control" name="programs[${programIndex}][pilar_category]">
-                                <option value="umum">Tidak Ada Jenis Khusus</option>
-                                <option value="pendidikan">Pendidikan</option>
-                                <option value="kesehatan">Kesehatan</option>
-                                <option value="ekonomi">Ekonomi</option>
-                                <option value="sosial-dakwah">Sosial & Dakwah</option>
-                                <option value="kemanusiaan">Kemanusiaan</option>
-                                <option value="lingkungan">Lingkungan</option>
-                            </select>
-                        </div>
-                    </div>
                 </div>
             `;
             container.appendChild(programDiv);
@@ -190,24 +137,6 @@
             removeButton.addEventListener('click', function() {
                 programDiv.remove();
                 updateProgramNumbers();
-            });
-
-            // Add event listener for category change
-            const categorySelect = programDiv.querySelector('.program-category');
-            categorySelect.addEventListener('change', function() {
-                // Hide all subcategory sections for this program
-                programDiv.querySelectorAll('.subcategory-section').forEach(section => {
-                    section.style.display = 'none';
-                });
-
-                // Show selected subcategory section
-                const selectedCategory = this.value;
-                if (selectedCategory) {
-                    const subcategorySection = programDiv.querySelector(`#${selectedCategory}-subcategory-${programDiv.dataset.index || (programIndex - 1)}`);
-                    if (subcategorySection) {
-                        subcategorySection.style.display = 'block';
-                    }
-                }
             });
         }
 

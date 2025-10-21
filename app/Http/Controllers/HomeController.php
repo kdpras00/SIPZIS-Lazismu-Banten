@@ -86,10 +86,10 @@ class HomeController extends Controller
     {
         if ($redirect = $this->preventAdminAccess()) return $redirect;
 
-        // Fetch all programs grouped by category for the main program page
-        $zakatPrograms = Program::where('category', 'like', 'zakat-%')->active()->get();
-        $infaqPrograms = Program::where('category', 'like', 'infaq-%')->active()->get();
-        $shadaqahPrograms = Program::where('category', 'like', 'shadaqah-%')->active()->get();
+        // Fetch all programs grouped by main categories
+        $zakatPrograms = Program::where('category', 'zakat')->active()->get();
+        $infaqPrograms = Program::where('category', 'infaq')->active()->get();
+        $shadaqahPrograms = Program::where('category', 'shadaqah')->active()->get();
         $pilarPrograms = Program::whereIn('category', ['pendidikan', 'kesehatan', 'ekonomi', 'sosial-dakwah', 'kemanusiaan', 'lingkungan'])->active()->get();
 
         return view('pages.program', compact('zakatPrograms', 'infaqPrograms', 'shadaqahPrograms', 'pilarPrograms'));
@@ -99,9 +99,10 @@ class HomeController extends Controller
     {
         if ($redirect = $this->preventAdminAccess()) return $redirect;
 
-        $zakatPrograms = Program::where('category', 'like', 'zakat-%')->active()->get();
-        $infaqPrograms = Program::where('category', 'like', 'infaq-%')->active()->get();
-        $shadaqahPrograms = Program::where('category', 'like', 'shadaqah-%')->active()->get();
+        // Fetch all programs grouped by main categories
+        $zakatPrograms = Program::where('category', 'zakat')->active()->get();
+        $infaqPrograms = Program::where('category', 'infaq')->active()->get();
+        $shadaqahPrograms = Program::where('category', 'shadaqah')->active()->get();
         $pilarPrograms = Program::whereIn('category', ['pendidikan', 'kesehatan', 'ekonomi', 'sosial-dakwah', 'kemanusiaan', 'lingkungan'])->active()->get();
 
         return view('pages.program', [

@@ -383,6 +383,7 @@ Route::get('/calculator/gold-price', [ZakatCalculatorController::class, 'getGold
 
 // Guest payment routes (no login required)
 Route::prefix('donasi')->name('guest.payment.')->group(function () {
+    // Redirect /donasi to guest create page instead of program page
     Route::get('/', [ZakatPaymentController::class, 'guestCreate'])->name('create');
     Route::post('/store', [ZakatPaymentController::class, 'guestStore'])->name('store');
     Route::get('/summary/{paymentCode}', [ZakatPaymentController::class, 'guestSummary'])->name('summary');

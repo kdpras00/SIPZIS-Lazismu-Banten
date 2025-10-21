@@ -55,14 +55,14 @@ class ProgramController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'category' => 'required|string|in:zakat,infaq,shadaqah,pilar',
+            'category' => 'required|string|in:zakat,infaq,shadaqah,pendidikan,kesehatan,ekonomi,sosial-dakwah,kemanusiaan,lingkungan',
             'target_amount' => 'nullable|numeric|min:0',
             'status' => 'required|in:active,inactive',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $data = $request->only(['name', 'description', 'target_amount', 'status']);
-        $data['category'] = $this->resolveCategory($request->all());
+        $data['category'] = $request->category; // Use category directly
         $data['slug'] = Str::slug($data['name']);
 
         // Cek duplikasi nama + kategori
@@ -90,7 +90,7 @@ class ProgramController extends Controller
         $request->validate([
             'programs' => 'required|array',
             'programs.*.name' => 'required|string|max:255',
-            'programs.*.category' => 'required|string|in:zakat,infaq,shadaqah,pilar',
+            'programs.*.category' => 'required|string|in:zakat,infaq,shadaqah,pendidikan,kesehatan,ekonomi,sosial-dakwah,kemanusiaan,lingkungan',
             'programs.*.target_amount' => 'nullable|numeric|min:0',
             'programs.*.status' => 'required|in:active,inactive',
         ]);
@@ -101,7 +101,7 @@ class ProgramController extends Controller
                 'description' => $programData['description'] ?? '',
                 'target_amount' => $programData['target_amount'] ?? 0,
                 'status' => $programData['status'],
-                'category' => $this->resolveCategory($programData),
+                'category' => $programData['category'], // Use category directly
                 'slug' => Str::slug($programData['name']),
             ];
 
@@ -128,21 +128,7 @@ class ProgramController extends Controller
         $programTypes = ProgramType::active()->get();
         $categories = $this->getAvailableCategories();
 
-        $categoryType = 'pilar';
-        $categorySubtype = $program->category;
-
-        if (strpos($program->category, 'zakat-') === 0) {
-            $categoryType = 'zakat';
-            $categorySubtype = substr($program->category, 6);
-        } elseif (strpos($program->category, 'infaq-') === 0) {
-            $categoryType = 'infaq';
-            $categorySubtype = substr($program->category, 6);
-        } elseif (strpos($program->category, 'shadaqah-') === 0) {
-            $categoryType = 'shadaqah';
-            $categorySubtype = substr($program->category, 9);
-        }
-
-        return view('admin.programs.edit', compact('program', 'programTypes', 'categories', 'categoryType', 'categorySubtype'));
+        return view('admin.programs.edit', compact('program', 'programTypes', 'categories'));
     }
 
     /**
@@ -153,14 +139,14 @@ class ProgramController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'category' => 'required|string|in:zakat,infaq,shadaqah,pilar',
+            'category' => 'required|string|in:zakat,infaq,shadaqah,pendidikan,kesehatan,ekonomi,sosial-dakwah,kemanusiaan,lingkungan',
             'target_amount' => 'nullable|numeric|min:0',
             'status' => 'required|in:active,inactive',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $data = $request->only(['name', 'description', 'target_amount', 'status']);
-        $data['category'] = $this->resolveCategory($request->all());
+        $data['category'] = $request->category; // Use category directly
         $data['slug'] = Str::slug($data['name']);
 
         // Upload foto baru dan hapus yang lama
@@ -211,79 +197,20 @@ class ProgramController extends Controller
     }
 
     /**
-     * Resolve category based on type and custom input.
-     */
-    private function resolveCategory(array $data): string
-    {
-        switch ($data['category']) {
-            case 'zakat':
-                if (!empty($data['zakat_type'] ?? null) && $data['zakat_type'] === 'other' && !empty($data['zakat_type_other'] ?? null)) {
-                    return 'zakat-' . Str::slug($data['zakat_type_other'], '-');
-                }
-                return 'zakat-' . ($data['zakat_type'] ?? 'umum');
-
-            case 'infaq':
-                if (!empty($data['infaq_type'] ?? null) && $data['infaq_type'] === 'other' && !empty($data['infaq_type_other'] ?? null)) {
-                    return 'infaq-' . Str::slug($data['infaq_type_other'], '-');
-                }
-                return 'infaq-' . ($data['infaq_type'] ?? 'umum');
-
-            case 'shadaqah':
-                if (!empty($data['shadaqah_type'] ?? null) && $data['shadaqah_type'] === 'other' && !empty($data['shadaqah_type_other'] ?? null)) {
-                    return 'shadaqah-' . Str::slug($data['shadaqah_type_other'], '-');
-                }
-                return 'shadaqah-' . ($data['shadaqah_type'] ?? 'umum');
-
-            case 'pilar':
-                if (!empty($data['pilar_category'] ?? null) && $data['pilar_category'] === 'other' && !empty($data['pilar_type_other'] ?? null)) {
-                    return Str::slug($data['pilar_type_other'], '-');
-                }
-                return $data['pilar_category'] ?? 'umum';
-
-            default:
-                return 'umum';
-        }
-    }
-
-    /**
-     * Get available categories for programs.
+     * Get available categories for programs (main categories only).
      */
     private function getAvailableCategories(): array
     {
         return [
-            'zakat' => [
-                'umum' => 'Tidak Ada Jenis Khusus',
-                'fitrah' => 'Zakat Fitrah',
-                'mal' => 'Zakat Mal',
-                'profesi' => 'Zakat Profesi',
-                'pertanian' => 'Zakat Pertanian',
-                'perdagangan' => 'Zakat Perdagangan',
-            ],
-            'infaq' => [
-                'umum' => 'Tidak Ada Jenis Khusus',
-                'masjid' => 'Infaq Masjid',
-                'pendidikan' => 'Infaq Pendidikan',
-                'kemanusiaan' => 'Infaq Kemanusiaan',
-                'bencana' => 'Infaq Bencana',
-                'sosial' => 'Infaq Sosial',
-            ],
-            'shadaqah' => [
-                'umum' => 'Tidak Ada Jenis Khusus',
-                'rutin' => 'Shadaqah Rutin',
-                'jariyah' => 'Shadaqah Jariyah',
-                'tetangga' => 'Shadaqah Tetangga',
-                'pakaian' => 'Shadaqah Pakaian',
-                'fidyah' => 'Fidyah',
-            ],
-            'pilar' => [
-                'umum' => 'Tidak Ada Jenis Khusus',
-                'pendidikan' => 'Pendidikan',
-                'kesehatan' => 'Kesehatan',
-                'ekonomi' => 'Ekonomi',
-                'sosial-dakwah' => 'Sosial & Dakwah',
-                'kemanusiaan' => 'Kemanusiaan',
-                'lingkungan' => 'Lingkungan',
-            ],
+            'zakat' => 'Zakat',
+            'infaq' => 'Infaq',
+            'shadaqah' => 'Shadaqah',
+            'pendidikan' => 'Pendidikan',
+            'kesehatan' => 'Kesehatan',
+            'ekonomi' => 'Ekonomi',
+            'sosial-dakwah' => 'Sosial & Dakwah',
+            'kemanusiaan' => 'Kemanusiaan',
+            'lingkungan' => 'Lingkungan',
         ];
     }
 }
