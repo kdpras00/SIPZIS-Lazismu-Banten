@@ -702,12 +702,6 @@ class ZakatPaymentController extends Controller
             DB::rollback();
             return back()->withInput()->with('error', 'Terjadi kesalahan dalam memproses pembayaran.');
         }
-
-        $campaign->collected_amount += $request->paid_amount;
-        if ($campaign->collected_amount >= $campaign->target_amount) {
-            $campaign->status = 'completed';
-        }
-        $campaign->save();
     }
 
     /**

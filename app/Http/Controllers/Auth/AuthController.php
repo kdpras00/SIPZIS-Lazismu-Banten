@@ -108,7 +108,11 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
+            'phone' => 'nullable|string|max:20|unique:users', // Tambahkan unique validation
             'password' => 'required|string|min:8|confirmed',
+        ], [
+            'email.unique' => 'Email sudah terdaftar.',
+            'phone.unique' => 'Nomor telepon sudah terdaftar.', // Custom error message
         ]);
 
         if ($validator->fails()) {
@@ -116,16 +120,26 @@ class AuthController extends Controller
         }
 
         try {
+            // Gabungkan kode negara dengan nomor telepon
+            $fullPhone = null;
+            if ($request->phone) {
+                $countryCode = $request->country_code ?? '+62';
+                // Hapus karakter + dari country code
+                $countryCode = str_replace('+', '', $countryCode);
+                // Hapus leading zero jika ada
+                $phone = ltrim($request->phone, '0');
+                $fullPhone = $countryCode . $phone;
+            }
+
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'role' => 'muzakki',
                 'is_active' => true,
-                'phone' => $request->phone ?? null,
+                'phone' => $fullPhone,
             ]);
 
-            // Gunakan updateOrCreate untuk hindari duplikat
             Muzakki::updateOrCreate(
                 ['email' => $request->email],
                 [
@@ -144,10 +158,8 @@ class AuthController extends Controller
                 ]
             );
 
-            // Store the registered email in session for pre-filling on next registration
             session(['registered_email' => $request->email]);
 
-            // Redirect to login page with success message instead of auto-login
             return redirect()->route('login')->with('success', 'Registrasi berhasil! Silakan login dengan akun Anda.');
         } catch (\Exception $e) {
             if (isset($user)) {

@@ -51,20 +51,22 @@
                 <!-- No. Telepon -->
                 <div>
                     <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
-                        No. Telepon
+                        No. Telepon <span class="text-red-500">*</span>
                     </label>
                     <div class="flex gap-2">
-                        <select class="px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                            <option value="+62">🇮🇩 +62</option>
+                        <select name="country_code" class="px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                            <option value="+62" selected>🇮🇩 +62</option>
                         </select>
                         <input id="phone" type="tel"
                             class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent @error('phone') border-red-500 @enderror"
                             name="phone" value="{{ old('phone') }}"
-                            placeholder="81234567890">
+                            placeholder="81234567890"
+                            required>
                     </div>
                     @error('phone')
                     <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span>
                     @enderror
+                    <p class="text-xs text-gray-500 mt-1">Contoh: 81234567890 (tanpa angka 0 di awal)</p>
                 </div>
 
                 <!-- Kata Sandi -->

@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Notification extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
+
+    protected $dates = ['deleted_at'];
 
     protected $fillable = [
         'user_id',
@@ -30,6 +33,10 @@ class Notification extends Model
         'data' => 'array'
     ];
 
+    protected $dispatchesEvents = [
+        'created' => \App\Events\NotificationCreated::class,
+    ];
+
     // Relationships
     public function user()
     {
@@ -50,6 +57,11 @@ class Notification extends Model
     public function scopeUnread($query)
     {
         return $query->where('is_read', false);
+    }
+
+    public function scopeRead($query)
+    {
+        return $query->where('is_read', true);
     }
 
     public function scopeByType($query, $type)
@@ -197,8 +209,11 @@ class Notification extends Model
         ]);
     }
 
+    // 🔴 PERBAIKAN: Tambahkan muzakki_id untuk program notification
     public static function createProgramNotification($user, $program, $eventType)
     {
+        $muzakki = $user->muzakki; // Ambil muzakki profile
+
         $messages = [
             'event' => 'Kajian Jumat besok pukul 09.00 di Aula Utama.',
             'program' => 'Program Sedekah Subuh kembali dibuka minggu ini.'
@@ -211,6 +226,7 @@ class Notification extends Model
 
         return self::create([
             'user_id' => $user->id,
+            'muzakki_id' => $muzakki ? $muzakki->id : null, // ✅ TAMBAHKAN INI
             'type' => 'program',
             'title' => $titles[$eventType],
             'message' => $messages[$eventType],
@@ -240,7 +256,7 @@ class Notification extends Model
 
         return self::create([
             'user_id' => $user->id,
-            'muzakki_id' => $muzakki ? $muzakki->id : null, // <-- INI PERBAIKANNYA
+            'muzakki_id' => $muzakki ? $muzakki->id : null,
             'type' => 'account',
             'title' => $titles[$eventType],
             'message' => $messages[$eventType],
@@ -249,6 +265,7 @@ class Notification extends Model
             ]
         ]);
     }
+
     public static function createReminderNotification($muzakki, $reminderType)
     {
         $messages = [
@@ -273,10 +290,14 @@ class Notification extends Model
         ]);
     }
 
+    // 🔴 PERBAIKAN: Tambahkan muzakki_id untuk message notification
     public static function createMessageNotification($user, $message, $sender = 'Admin')
     {
+        $muzakki = $user->muzakki; // Ambil muzakki profile
+
         return self::create([
             'user_id' => $user->id,
+            'muzakki_id' => $muzakki ? $muzakki->id : null, // ✅ TAMBAHKAN INI
             'type' => 'message',
             'title' => '📩 Pesan Baru',
             'message' => $sender . ': ' . $message,
@@ -285,5 +306,12 @@ class Notification extends Model
                 'message' => $message
             ]
         ]);
+    }
+
+    protected static function booted()
+    {
+        static::addGlobalScope('latest', function ($query) {
+            $query->orderBy('created_at', 'desc');
+        });
     }
 }

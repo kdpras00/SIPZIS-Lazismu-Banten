@@ -555,6 +555,38 @@ Route::get('/payment/error', [ZakatPaymentController::class, 'error']);
 // Midtrans Notification Route
 Route::post('/midtrans/notification', [ZakatPaymentController::class, 'handleNotification']);
 
+// Test route for notification popup
+Route::get('/test/notification-popup', function () {
+    // Get the first muzakki user
+    $user = \App\Models\User::where('role', 'muzakki')->first();
+
+    if (!$user) {
+        // If no muzakki user exists, get any user
+        $user = \App\Models\User::first();
+        if (!$user) {
+            return response()->json(['error' => 'No user found'], 404);
+        }
+
+        // Change role to muzakki for testing
+        $user->role = 'muzakki';
+        $user->save();
+    }
+
+    // Authenticate the user
+    Auth::login($user);
+
+    // Get the controller instance
+    $controller = new \App\Http\Controllers\ZakatPaymentController();
+
+    // Create a request object
+    $request = new \Illuminate\Http\Request();
+
+    // Call the ajaxNotifications method
+    $response = $controller->ajaxNotifications($request);
+
+    return $response;
+})->name('test.notification-popup');
+
 // Add this route for Firebase login
 Route::post('/firebase-login', function (Request $request) {
     $request->validate([
