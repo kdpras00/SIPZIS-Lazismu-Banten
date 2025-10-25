@@ -345,4 +345,22 @@ class CampaignController extends Controller
             'border_color' => 'border-emerald-200'
         ];
     }
+
+    public function showPersonalCampaign($email)
+    {
+        // Cari muzakki berdasarkan email
+        $muzakki = \App\Models\Muzakki::where('email', $email)->first();
+
+        if (!$muzakki) {
+            abort(404, 'Campaigner tidak ditemukan');
+        }
+
+        // Ambil semua campaign yang dibuat oleh muzakki ini
+        $campaigns = \App\Models\Campaign::where('created_by', $muzakki->user_id)
+            ->where('is_published', true)
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
+
+        return view('campaigns.personal', compact('muzakki', 'campaigns'));
+    }
 }

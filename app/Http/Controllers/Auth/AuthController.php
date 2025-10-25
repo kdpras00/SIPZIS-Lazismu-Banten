@@ -12,6 +12,20 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
+
+    // Di method login() setelah Auth::login($user)
+    protected function authenticated(Request $request, $user)
+    {
+        if ($user->role === 'muzakki') {
+            $muzakki = Muzakki::where('user_id', $user->id)->first();
+
+            if ($muzakki && (empty($muzakki->campaign_url) || !$muzakki->campaign_url)) {
+                $muzakki->campaign_url = url('/campaigner/' . $muzakki->email);
+                $muzakki->save();
+            }
+        }
+    }
+
     public function showLogin()
     {
         return view('auth.login');
@@ -43,6 +57,16 @@ class AuthController extends Controller
             if ($user->role !== 'muzakki') {
                 Auth::logout();
                 return back()->withErrors(['email' => 'Halaman ini hanya untuk muzakki. Silakan gunakan halaman login admin.']);
+            }
+
+            // Generate campaign URL if not exists
+            if ($user->role === 'muzakki') {
+                $muzakki = Muzakki::where('user_id', $user->id)->first();
+
+                if ($muzakki && (empty($muzakki->campaign_url) || !$muzakki->campaign_url)) {
+                    $muzakki->campaign_url = url('/campaigner/' . $muzakki->email);
+                    $muzakki->save();
+                }
             }
 
             $request->session()->regenerate();
@@ -140,6 +164,9 @@ class AuthController extends Controller
                 'phone' => $fullPhone,
             ]);
 
+            // Generate campaign URL
+            $campaignUrl = url('/campaigner/' . $request->email);
+
             Muzakki::updateOrCreate(
                 ['email' => $request->email],
                 [
@@ -155,6 +182,7 @@ class AuthController extends Controller
                     'date_of_birth' => $request->date_of_birth ?? null,
                     'user_id' => $user->id,
                     'is_active' => true,
+                    'campaign_url' => $campaignUrl, // Add campaign URL
                 ]
             );
 
@@ -186,13 +214,61 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        // Tentukan redirect berdasarkan role
-        if ($user && ($user->role === 'admin' || $user->role === 'staff')) {
-            // Jika admin atau staff, arahkan ke halaman login admin
-            return redirect('/admin/login')->with('success', 'Anda telah berhasil logout.');
-        } else {
-            // Jika muzakki (user umum), arahkan ke halaman login umum
-            return redirect('/login')->with('success', 'Anda telah berhasil logout.');
+        // Redirect dengan pesan sukses
+        return redirect('/')->with('success', 'Anda telah berhasil logout.');
+    }
+
+    // Handle Firebase authentication
+    public function firebaseLogin(Request $request)
+    {
+        $request->validate([
+            'uid' => 'required|string',
+            'email' => 'required|email',
+            'name' => 'required|string',
+            'phone' => 'nullable|string',
+        ]);
+
+        try {
+            // Check if user exists or create new one
+            $user = User::firstOrCreate(
+                ['email' => $request->email],
+                [
+                    'name' => $request->name,
+                    'password' => Hash::make(uniqid()), // Generate random password for Firebase users
+                    'role' => 'muzakki',
+                    'is_active' => true,
+                    'phone' => $request->phone ?? null,
+                ]
+            );
+
+            // Update or create muzakki profile
+            // Generate campaign URL
+            $campaignUrl = url('/campaigner/' . $request->email);
+
+            Muzakki::updateOrCreate(
+                ['email' => $request->email],
+                [
+                    'name' => $request->name,
+                    'phone' => $request->phone ?? null,
+                    'user_id' => $user->id,
+                    'is_active' => true,
+                    'campaign_url' => $campaignUrl, // Add campaign URL
+                ]
+            );
+
+            // Log in the user
+            Auth::login($user);
+
+            return response()->json([
+                'success' => true,
+                'redirect' => '/',
+                'message' => 'Login successful'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Authentication failed: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

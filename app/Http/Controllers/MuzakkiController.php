@@ -72,17 +72,23 @@ class MuzakkiController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'nullable|email|unique:muzakki,email',
             'phone' => 'nullable|string|max:20',
-            'nik' => 'nullable|string|max:20|unique:muzakki,nik',
             'gender' => 'required|in:male,female',
             'address' => 'nullable|string',
             'city' => 'nullable|string|max:255',
             'province' => 'nullable|string|max:255',
-            'postal_code' => 'nullable|string|max:10',
-            'occupation' => 'nullable|in:employee,entrepreneur,civil_servant,teacher,doctor,farmer,trader,other',
-            'monthly_income' => 'nullable|numeric|min:0',
+            'district' => 'nullable|string|max:255',
+            'village' => 'nullable|string|max:255',
+            'postal_code' => 'nullable|string|digits:5',
+            'occupation' => 'nullable|string|max:100',
             'date_of_birth' => 'nullable|date',
+            'country' => 'required|string|max:255', // Add country validation
+            'bio' => 'nullable|string', // Add bio validation
+            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Add profile photo validation
+            'ktp_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Add KTP photo validation
             'create_user_account' => 'boolean',
             'password' => 'required_if:create_user_account,1|nullable|string|min:8',
+        ], [
+            'postal_code.digits' => 'Kode pos harus terdiri dari 5 digit angka.',
         ]);
 
         $user = null;
@@ -104,18 +110,41 @@ class MuzakkiController extends Controller
             ]);
         }
 
+        // Handle location data - use names instead of IDs
+        $country = $request->country;
+        $province = $request->province_name ?? $request->province;
+        $city = $request->city_name ?? $request->city;
+        $district = $request->district_name ?? $request->district;
+        $village = $request->village_name ?? $request->village;
+
+        // Handle file uploads
+        $profilePhotoPath = null;
+        $ktpPhotoPath = null;
+
+        if ($request->hasFile('profile_photo')) {
+            $profilePhotoPath = $request->file('profile_photo')->store('profile_photos', 'public');
+        }
+
+        if ($request->hasFile('ktp_photo')) {
+            $ktpPhotoPath = $request->file('ktp_photo')->store('ktp_photos', 'public');
+        }
+
         $muzakki = Muzakki::create([
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
-            'nik' => $request->nik,
             'gender' => $request->gender,
             'address' => $request->address,
-            'city' => $request->city,
-            'province' => $request->province,
+            'city' => $city,
+            'province' => $province,
+            'district' => $district,
+            'village' => $village,
             'postal_code' => $request->postal_code,
+            'country' => $country, // Add country
+            'profile_photo' => $profilePhotoPath, // Add profile photo
+            'ktp_photo' => $ktpPhotoPath, // Add KTP photo
+            'bio' => $request->bio, // Add bio
             'occupation' => $request->occupation,
-            'monthly_income' => $request->monthly_income,
             'date_of_birth' => $request->date_of_birth,
             'user_id' => $user?->id,
             'is_active' => true,
@@ -168,7 +197,7 @@ class MuzakkiController extends Controller
      */
     public function update(Request $request, Muzakki $muzakki = null)
     {
-        // If no muzakki is provided, get current user's muzakki profile (for profile update)
+        // If no muzakki is provided, get current user's muzakki profile
         if (!$muzakki) {
             $muzakki = Auth::user()->muzakki;
             if (!$muzakki) {
@@ -177,83 +206,169 @@ class MuzakkiController extends Controller
         }
 
         // Check if this is a password-only update
-        $isPasswordUpdate = $request->has('current_password') && $request->has('new_password');
-
-        if ($isPasswordUpdate) {
-            // Validate password fields with custom rules
+        if ($request->has('current_password') && $request->has('new_password')) {
             $request->validate([
                 'current_password' => 'required|string',
-                'new_password' => [
-                    'required',
-                    'string',
-                    'min:8',
-                    'confirmed',
-                    function ($attribute, $value, $fail) {
-                        if (!preg_match('/[A-Z]/', $value)) {
-                            $fail('Password harus mengandung minimal 1 huruf kapital.');
-                        }
-                        if (!preg_match('/\d/', $value)) {
-                            $fail('Password harus mengandung minimal 1 angka.');
-                        }
-                    },
-                ],
-            ], [
-                'new_password.min' => 'Password harus mengandung minimal 8 karakter.',
-                'new_password.confirmed' => 'Konfirmasi password tidak sesuai.',
+                'new_password' => 'required|string|min:8|confirmed',
             ]);
 
-            // Check if current password is correct
-            if (!Hash::check($request->current_password, $muzakki->user->password)) {
+            if (!Hash::check($request->current_password, Auth::user()->password)) {
                 return back()->withErrors(['current_password' => 'Password saat ini tidak sesuai.']);
             }
 
-            // Update password
-            $muzakki->user->update([
-                'password' => Hash::make($request->new_password),
+            Auth::user()->update([
+                'password' => Hash::make($request->new_password)
             ]);
 
-            // Check if this is a profile update (no muzakki parameter) vs admin update
-            if (request()->route()->hasParameter('muzakki')) {
-                return redirect()->route('muzakki.index')->with('success', 'Password berhasil diperbarui.');
-            } else {
-                return redirect()->route('muzakki.dashboard.management')->with('success', 'Password berhasil diperbarui.');
-            }
+            return back()->with('success', 'Password berhasil diperbarui.');
+        }
+
+        // Validation rules
+        $rules = [
+            'name' => 'required|string|max:255',
+            'email' => [
+                'required', // Make email required
+                'email',
+                Rule::unique('muzakki')->ignore($muzakki->id),
+                Rule::unique('users')->ignore($muzakki->user_id),
+            ],
+            'phone' => 'required|string|max:20', // Make phone required
+            'nik' => [
+                'nullable',
+                'string',
+                'max:20',
+                Rule::unique('muzakki')->ignore($muzakki->id),
+            ],
+            'gender' => 'required|in:male,female',
+            'address' => 'nullable|string',
+            'city' => 'nullable|string|max:255',
+            'province' => 'nullable|string|max:255',
+            'district' => 'nullable|string|max:255',
+            'village' => 'nullable|string|max:255',
+            'postal_code' => 'nullable|string|max:10',
+            'occupation' => 'nullable|string|max:100',
+            'monthly_income' => 'nullable|numeric|min:0',
+            'date_of_birth' => 'nullable|date',
+            'bio' => 'nullable|string',
+            'is_active' => 'boolean',
+            'country' => 'nullable|string|max:255',
+            'campaign_url' => 'nullable|url|max:500',
+            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Add profile photo validation
+            'ktp_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Add KTP photo validation
+        ];
+
+        $request->validate($rules, [
+            'postal_code.max' => 'Kode pos maksimal 10 karakter.',
+        ]);
+
+        // Prepare update data - START WITH EXISTING DATA
+        $updateData = $muzakki->toArray();
+
+        // Update only fields that are present in request
+        $updateData['name'] = $request->name;
+        $updateData['email'] = $request->email;
+        $updateData['phone'] = $request->phone;
+        $updateData['gender'] = $request->gender;
+        $updateData['address'] = $request->address;
+        $updateData['occupation'] = $request->occupation;
+        $updateData['bio'] = $request->bio;
+        $updateData['is_active'] = $request->is_active ?? $muzakki->is_active;
+
+        // Handle file uploads
+        if ($request->hasFile('profile_photo')) {
+            $profilePhotoPath = $request->file('profile_photo')->store('profile_photos', 'public');
+            $updateData['profile_photo'] = $profilePhotoPath;
+        }
+
+        if ($request->hasFile('ktp_photo')) {
+            $ktpPhotoPath = $request->file('ktp_photo')->store('ktp_photos', 'public');
+            $updateData['ktp_photo'] = $ktpPhotoPath;
+        }
+
+        // Handle country - prefer country_name from hidden input
+        if ($request->filled('country_name')) {
+            $updateData['country'] = $request->country_name;
+        } elseif ($request->filled('country')) {
+            $updateData['country'] = $request->country;
+        }
+        // If still null, set default to Indonesia
+        if (empty($updateData['country'])) {
+            $updateData['country'] = 'Indonesia';
+        }
+
+        // Handle campaign_url
+        if ($request->filled('campaign_url')) {
+            $updateData['campaign_url'] = $request->campaign_url;
         } else {
-            // Regular profile update - validate all fields
-            $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => ['nullable', 'email', Rule::unique('muzakki', 'email')->ignore($muzakki->id)],
-                'phone' => 'nullable|string|max:20',
-                'nik' => ['nullable', 'string', 'max:20', Rule::unique('muzakki', 'nik')->ignore($muzakki->id)],
-                'gender' => 'required|in:male,female',
-                'address' => 'nullable|string',
-                'city' => 'nullable|string|max:255',
-                'province' => 'nullable|string|max:255',
-                'postal_code' => 'nullable|string|max:10',
-                'occupation' => 'nullable|in:employee,entrepreneur,civil_servant,teacher,doctor,farmer,trader,other',
-                'monthly_income' => 'nullable|numeric|min:0',
-                'date_of_birth' => 'nullable|date',
-                'is_active' => 'boolean',
+            // Auto-generate campaign URL if email exists
+            if (!empty($updateData['email'])) {
+                $updateData['campaign_url'] = url('/campaigner/' . $updateData['email']);
+            }
+        }
+
+        // Handle date of birth
+        if ($request->filled('date_of_birth')) {
+            $updateData['date_of_birth'] = $request->date_of_birth;
+        }
+
+        // Handle phone verification - THIS IS CRITICAL
+        if ($request->has('phone_verified')) {
+            $updateData['phone_verified'] = (int)$request->phone_verified;
+        }
+
+        // Handle location data - use names from hidden inputs
+        if ($request->filled('province_name')) {
+            $updateData['province'] = $request->province_name;
+        } elseif ($request->filled('province')) {
+            $updateData['province'] = $request->province;
+        }
+
+        if ($request->filled('city_name')) {
+            $updateData['city'] = $request->city_name;
+        } elseif ($request->filled('city')) {
+            $updateData['city'] = $request->city;
+        }
+
+        if ($request->filled('district_name')) {
+            $updateData['district'] = $request->district_name;
+        } elseif ($request->filled('district')) {
+            $updateData['district'] = $request->district;
+        }
+
+        if ($request->filled('village_name')) {
+            $updateData['village'] = $request->village_name;
+        } elseif ($request->filled('village')) {
+            $updateData['village'] = $request->village;
+        }
+
+        if ($request->filled('postal_code')) {
+            $updateData['postal_code'] = $request->postal_code;
+        }
+
+        // Remove timestamps from update data
+        unset($updateData['created_at'], $updateData['updated_at']);
+
+        // Log the update data for debugging
+        \Illuminate\Support\Facades\Log::info('Muzakki Update Data:', $updateData);
+
+        // Update muzakki record
+        $muzakki->update($updateData);
+
+        // Handle user account if needed
+        if ($muzakki->user) {
+            $muzakki->user->update([
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'is_active' => $request->is_active ?? true,
             ]);
+        }
 
-            $muzakki->update($request->all());
-
-            // Update related user account if exists
-            if ($muzakki->user) {
-                $muzakki->user->update([
-                    'name' => $request->name,
-                    'email' => $request->email,
-                    'phone' => $request->phone,
-                    'is_active' => $request->is_active ?? true,
-                ]);
-            }
-
-            // Check if this is a profile update (no muzakki parameter) vs admin update
-            if (request()->route()->hasParameter('muzakki')) {
-                return redirect()->route('muzakki.index')->with('success', 'Data muzakki berhasil diperbarui.');
-            } else {
-                return redirect()->route('muzakki.dashboard.management')->with('success', 'Profil berhasil diperbarui.');
-            }
+        // Redirect based on context
+        if (request()->route()->hasParameter('muzakki')) {
+            return redirect()->route('muzakki.index')->with('success', 'Data muzakki berhasil diperbarui.');
+        } else {
+            return redirect()->route('profile.show')->with('success', 'Profil berhasil diperbarui.');
         }
     }
 

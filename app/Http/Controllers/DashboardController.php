@@ -145,12 +145,16 @@ class DashboardController extends Controller
         // Zakat types available
         $zakatTypes = ZakatType::active()->get();
 
+        // Calculate profile completeness
+        $profileCompleteness = $muzakki->profile_completeness;
+
         return view('dashboard.muzakki', compact(
             'muzakki',
             'stats',
             'recentPayments',
             'yearlyPayments',
-            'zakatTypes'
+            'zakatTypes',
+            'profileCompleteness'
         ));
     }
 

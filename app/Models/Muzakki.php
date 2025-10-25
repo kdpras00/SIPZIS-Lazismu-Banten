@@ -15,23 +15,29 @@ class Muzakki extends Model
         'name',
         'email',
         'phone',
-        'nik',
+        'phone_verified',
         'gender',
         'address',
         'city',
         'province',
+        'district',
+        'village',
         'postal_code',
+        'country', // Add country
+        'campaign_url', // Add campaign_url
+        'profile_photo', // Add profile_photo
+        'ktp_photo', // Add ktp_photo
+        'bio', // Add bio
         'occupation',
-        'monthly_income',
         'date_of_birth',
         'is_active',
         'user_id'
     ];
 
     protected $casts = [
-        'monthly_income' => 'decimal:2',
         'date_of_birth' => 'date',
         'is_active' => 'boolean',
+        'phone_verified' => 'boolean',
     ];
 
     // Add a method to find or create a muzakki record
@@ -131,5 +137,40 @@ class Muzakki extends Model
     public function scopeByOccupation($query, $occupation)
     {
         return $query->where('occupation', $occupation);
+    }
+
+    // Add method to calculate profile completeness
+    public function getProfileCompletenessAttribute()
+    {
+        $fields = [
+            'name' => $this->name,
+            'email' => $this->email,
+            'phone' => $this->phone,
+            'gender' => $this->gender,
+            'address' => $this->address,
+            'city' => $this->city,
+            'province' => $this->province,
+            'district' => $this->district,
+            'village' => $this->village,
+            'postal_code' => $this->postal_code,
+            'country' => $this->country, // Add country
+            'campaign_url' => $this->campaign_url, // Add campaign_url
+            'profile_photo' => $this->profile_photo, // Add profile_photo
+            'ktp_photo' => $this->ktp_photo, // Add ktp_photo
+            'bio' => $this->bio, // Add bio
+            'occupation' => $this->occupation,
+            'date_of_birth' => $this->date_of_birth,
+        ];
+
+        $filledFields = 0;
+        $totalFields = count($fields);
+
+        foreach ($fields as $value) {
+            if (!is_null($value) && $value !== '') {
+                $filledFields++;
+            }
+        }
+
+        return $totalFields > 0 ? round(($filledFields / $totalFields) * 100) : 0;
     }
 }

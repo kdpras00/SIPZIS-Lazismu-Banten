@@ -25,40 +25,7 @@ $currentRoute = Route::currentRouteName();
             </a>
         </li>
 
-        @if($user->role === 'muzakki')
-        {{-- Muzakki Menu --}}
-        <li class="nav-item">
-            <a href="{{ route('muzakki.dashboard.transactions') }}"
-                class="nav-link {{ $currentRoute === 'muzakki.dashboard.transactions' ? 'active' : '' }}">
-                <i class="bi bi-credit-card me-2"></i>
-                <span>Transaksi Saya</span>
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a href="{{ route('muzakki.dashboard.recurring') }}"
-                class="nav-link {{ $currentRoute === 'muzakki.dashboard.recurring' ? 'active' : '' }}">
-                <i class="bi bi-arrow-repeat me-2"></i>
-                <span>Donasi Rutin</span>
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a href="{{ route('muzakki.dashboard.bank-accounts') }}"
-                class="nav-link {{ $currentRoute === 'muzakki.dashboard.bank-accounts' ? 'active' : '' }}">
-                <i class="bi bi-bank me-2"></i>
-                <span>Akun Bank</span>
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a href="{{ route('muzakki.dashboard.management') }}"
-                class="nav-link {{ $currentRoute === 'muzakki.dashboard.management' ? 'active' : '' }}">
-                <i class="bi bi-person me-2"></i>
-                <span>Manajemen Akun</span>
-            </a>
-        </li>
-        @else
+        @if($user->role !== 'muzakki')
         {{-- Admin/Staff Menu --}}
         <li class="nav-item">
             <a href="{{ route('muzakki.index') }}"
@@ -188,14 +155,10 @@ $currentRoute = Route::currentRouteName();
 </div> --}}
 </div>
 
-{{-- Mobile Toggle Button --}}
-<button class="btn btn-primary d-md-none sidebar-toggle" type="button" style="position: fixed; top: 10px; left: 10px; z-index: 1060;">
-    <i class="bi bi-list"></i>
-</button>
+<!-- Overlay for mobile sidebar -->
+<div id="sidebar-overlay"></div>
 
 <style>
-    /* GANTI SEMUA CSS LAMA ANDA DENGAN BLOK INI */
-
     /* ===== SIDEBAR BASE ===== */
     #sidebar {
         background: linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%);
@@ -203,10 +166,102 @@ $currentRoute = Route::currentRouteName();
         width: 100%;
         max-width: 280px;
         overflow-y: auto;
-        /* HANYA scroll vertikal */
-        /* overflow-x: hidden; <-- INI DIHAPUS, PENYEBAB UTAMA MASALAH */
+        overflow-x: hidden;
         position: sticky;
         top: 0;
+        transition: transform 0.3s ease-in-out;
+        will-change: transform;
+    }
+
+    /* ===== DESKTOP: Toggle functionality ===== */
+    @media (min-width: 768px) {
+
+        /* Fixed positioning for collapsed sidebar to prevent layout shifts */
+        #sidebar.collapsed {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 1050;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* When sidebar is collapsed on desktop, adjust main content */
+        aside.col-md-3.sidebar-collapsed,
+        aside.col-lg-2.sidebar-collapsed {
+            position: relative;
+            width: 0;
+            overflow: hidden;
+            padding: 0;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: width;
+        }
+
+        /* Main content expands when sidebar is collapsed */
+        main.sidebar-collapsed {
+            margin-left: 0 !important;
+            transition: margin 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: margin;
+        }
+    }
+
+    /* ===== MOBILE: Hide Sidebar by default, show on toggle ===== */
+    @media (max-width: 767.98px) {
+
+        /* Don't hide the aside, but position it properly */
+        aside.col-md-3,
+        aside.col-lg-2 {
+            position: static;
+            display: block !important;
+        }
+
+        /* Hide sidebar by default on mobile */
+        #sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 1050;
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+            will-change: transform;
+        }
+
+        /* Show sidebar when it has 'show' class */
+        #sidebar.show {
+            transform: translateX(0);
+        }
+
+        /* Overlay */
+        #sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1040;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: opacity, visibility;
+        }
+
+        #sidebar-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Full width main content on mobile */
+        main.col-md-9,
+        main.col-lg-10 {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin-left: 0 !important;
+            transition: margin 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: margin;
+        }
     }
 
     /* ===== NAV LINKS ===== */
@@ -245,7 +300,6 @@ $currentRoute = Route::currentRouteName();
         flex-grow: 1;
         white-space: nowrap;
         overflow: hidden;
-        /* Biarkan ini hidden agar teks panjang terpotong rapi */
         text-overflow: ellipsis;
     }
 
@@ -259,7 +313,6 @@ $currentRoute = Route::currentRouteName();
 
     #sidebar .collapse .nav-link {
         padding: 0.6rem 1rem 0.6rem 2.5rem;
-        /* Indentasi untuk link submenu */
         font-size: 0.9rem;
         color: rgba(255, 255, 255, 0.8);
     }
@@ -273,12 +326,11 @@ $currentRoute = Route::currentRouteName();
         color: #ffffff;
         font-weight: bold;
         background-color: transparent;
-        /* Tidak perlu background pada link aktif di submenu */
     }
 
     /* Chevron rotation */
     #sidebar .nav-link[data-bs-toggle="collapse"] .bi-chevron-down {
-        transition: transform 0.3s ease;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         font-size: 0.8rem;
         margin-left: auto;
     }
@@ -287,22 +339,15 @@ $currentRoute = Route::currentRouteName();
         transform: rotate(180deg);
     }
 
-    /* ===== MOBILE RESPONSIVE ===== */
-    @media (max-width: 767.98px) {
-        #sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            z-index: 1050;
-            transform: translateX(-100%);
-            transition: transform 0.3s ease-in-out;
-        }
+    /* Hide scrollbar */
+    #sidebar::-webkit-scrollbar {
+        width: 0px;
+        background: transparent;
+    }
 
-        #sidebar.show {
-            transform: translateX(0);
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-        }
+    #sidebar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
     }
 
     /* ===== UTILITAS LAINNYA ===== */
@@ -321,71 +366,140 @@ $currentRoute = Route::currentRouteName();
     aside.col-md-3,
     aside.col-lg-2 {
         padding: 0;
+        max-width: 280px;
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        will-change: width;
+    }
+
+    .sidebar {
+        overflow-x: hidden;
+    }
+
+    /* Desktop collapse */
+    aside.sidebar-collapsed {
+        width: 0 !important;
+        overflow: hidden !important;
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        will-change: width;
+    }
+
+    main.sidebar-collapsed {
+        margin-left: 0 !important;
+        width: 100% !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        will-change: margin, width;
+    }
+
+    /* Mobile overlay behavior */
+    #sidebar-overlay.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* Align bullet/indicator styling with default profiles */
+    #sidebar .nav-link.active::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: #ffffff;
+    }
+
+    #sidebar .nav-link {
+        position: relative;
+        padding-left: 1.5rem;
+    }
+
+    #sidebar .nav-link.active {
+        position: relative;
     }
 </style>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const sidebar = document.getElementById('sidebar');
-        const toggleBtn = document.querySelector('.sidebar-toggle');
-        const reportsDropdown = document.getElementById('reportsDropdown');
-        const reportsSubmenu = document.getElementById('reportsSubmenu');
+    document.addEventListener("DOMContentLoaded", function() {
+        const sidebar = document.getElementById("sidebar");
+        const toggleBtn = document.getElementById("sidebarToggle");
+        const overlay = document.getElementById("sidebar-overlay");
+        const main = document.querySelector("main");
+        const aside = sidebar ? sidebar.closest("aside") : null;
 
-        if (!sidebar || !toggleBtn) return;
+        // Only initialize if sidebar and toggle button exist
+        if (!sidebar || !toggleBtn) {
+            return;
+        }
 
-        // Toggle sidebar (mobile)
-        toggleBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            sidebar.classList.toggle('show');
-        });
+        // Use requestAnimationFrame for smoother animations
+        function smoothToggle() {
+            const isMobile = window.innerWidth < 768;
 
-        // Handle reports dropdown - keep it always open
-        if (reportsDropdown && reportsSubmenu) {
-            // Prevent the default click behavior
-            reportsDropdown.addEventListener('click', function(e) {
-                e.preventDefault();
-                // Keep the submenu always shown
-                reportsSubmenu.classList.add('show');
-                reportsDropdown.setAttribute('aria-expanded', 'true');
-
-                // Ensure chevron shows correct state
-                const chevron = reportsDropdown.querySelector('.bi-chevron-down');
-                if (chevron) {
-                    chevron.style.transform = 'rotate(180deg)';
+            if (isMobile) {
+                // === Mobile Mode ===
+                sidebar.classList.toggle("show");
+                if (overlay) {
+                    overlay.classList.toggle("show");
                 }
-            });
-
-            // Initialize as expanded
-            reportsSubmenu.classList.add('show');
-            reportsDropdown.setAttribute('aria-expanded', 'true');
-
-            // Set chevron to expanded state
-            const chevron = reportsDropdown.querySelector('.bi-chevron-down');
-            if (chevron) {
-                chevron.style.transform = 'rotate(180deg)';
+            } else {
+                // === Desktop Mode ===
+                if (aside) {
+                    aside.classList.toggle("sidebar-collapsed");
+                }
+                if (main) {
+                    main.classList.toggle("sidebar-collapsed");
+                }
             }
         }
 
-        // Perbaikan utama:
-        // Jangan tutup sidebar ketika klik di dalamnya, termasuk submenu dropdown
-        sidebar.addEventListener('click', function(e) {
-            // Jika elemen yang diklik berada di dalam sidebar, jangan lanjutkan event close
-            e.stopPropagation();
+        // Debounce function to limit how often resize events fire
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        toggleBtn.addEventListener("click", function(e) {
+            e.preventDefault();
+            requestAnimationFrame(smoothToggle);
         });
 
-        // Tutup sidebar hanya jika klik di luar sidebar dan bukan tombol toggle
-        document.addEventListener('click', function(e) {
-            const clickedOutside = !sidebar.contains(e.target) && !toggleBtn.contains(e.target);
-            if (clickedOutside && sidebar.classList.contains('show')) {
-                sidebar.classList.remove('show');
-            }
-        });
+        // Tutup sidebar kalau klik overlay (mobile)
+        if (overlay) {
+            overlay.addEventListener("click", function() {
+                requestAnimationFrame(() => {
+                    sidebar.classList.remove("show");
+                    if (overlay) {
+                        overlay.classList.remove("show");
+                    }
+                });
+            });
+        }
 
-        // Tutup sidebar otomatis kalau layar diperbesar
-        window.addEventListener('resize', function() {
+        // Reset ke mode normal saat resize dengan debounce
+        const handleResize = debounce(function() {
             if (window.innerWidth >= 768) {
-                sidebar.classList.remove('show');
+                sidebar.classList.remove("show");
+                if (overlay) {
+                    overlay.classList.remove("show");
+                }
+            } else {
+                if (aside) {
+                    aside.classList.remove("sidebar-collapsed");
+                }
+                if (main) {
+                    main.classList.remove("sidebar-collapsed");
+                }
             }
-        });
+        }, 150);
+
+        window.addEventListener("resize", handleResize);
     });
 </script>

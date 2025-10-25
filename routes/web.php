@@ -19,7 +19,10 @@ use App\Http\Controllers\MustahikController;
 use App\Http\Controllers\ZakatDistributionController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\ArtikelController;
+use App\Http\Controllers\RegionController; // Add this 
+use App\Http\Controllers\OTPController;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log; // Add this import
 
 /*
 |--------------------------------------------------------------------------
@@ -639,3 +642,147 @@ Route::post('/firebase-login', function (Request $request) {
         ], 500);
     }
 })->name('firebase.login');
+
+
+
+// New region routes for cascading dropdowns
+Route::prefix('regions')->name('regions.')->group(function () {
+    Route::get('/countries', [RegionController::class, 'countries'])->name('countries');
+    Route::get('/provinces/{country}', [RegionController::class, 'provinces'])->name('provinces');
+    Route::get('/cities/{provinceId}', [RegionController::class, 'cities'])->name('cities');
+    Route::get('/districts/{cityId}', [RegionController::class, 'districts'])->name('districts');
+    Route::get('/villages/{districtId}', [RegionController::class, 'villages'])->name('villages');
+    // New postal code validation routes
+    Route::post('/validate-postal-code', [RegionController::class, 'validatePostalCode'])->name('validate.postal.code');
+    Route::post('/get-postal-code', [RegionController::class, 'getPostalCodeByVillage'])->name('get.postal.code');
+});
+
+
+// Routes for sending and verifying OTP
+
+Route::post('/send-otp', [OTPController::class, 'sendOTP'])->name('otp.send');
+Route::post('/verify-otp', [OTPController::class, 'verifyOTP'])->name('otp.verify');
+Route::post('/resend-otp', [OTPController::class, 'resendOTP'])->name('otp.resend');
+
+// Personal campaign URL based on email
+Route::get('/campaigner/{email}', [CampaignController::class, 'showPersonalCampaign'])
+    ->name('campaigner.personal');
+
+
+// Test route to check regions data
+Route::get('/test-regions', function () {
+    $count = \App\Models\Region::count();
+    $firstRegion = \App\Models\Region::first();
+    return response()->json([
+        'count' => $count,
+        'first_region' => $firstRegion
+    ]);
+});
+
+// Test route for postal code validation
+Route::get('/test-postal-code', function () {
+    return view('test-postal-code');
+});
+
+// Test route for specific district and village validation
+Route::get('/test-postal-code-specific', function () {
+    return view('test-postal-code-specific');
+});
+
+// Quick test route to verify postal code validation logic
+Route::get('/quick-test-postal', function () {
+    // Test the logic directly
+    $district = 'Jatiuwung';
+    $village = 'Alam Jaya';
+
+    try {
+        // Use the kodepos API to validate postal code
+        $response = \Illuminate\Support\Facades\Http::get("https://kodepos.vercel.app/search?q=" . urlencode($district));
+
+        if ($response->successful()) {
+            $data = $response->json();
+
+            // Return the raw data for debugging
+            Log::info('Raw API Response', ['data' => $data]);
+
+            if (!empty($data) && isset($data['data']) && is_array($data['data'])) {
+                // Filter by village
+                $filteredData = array_filter($data['data'], function ($item) use ($village) {
+                    return isset($item['village']) &&
+                        strtolower($item['village']) === strtolower($village);
+                });
+
+                Log::info('Filtered Data', ['filtered' => $filteredData]);
+
+                if (!empty($filteredData)) {
+                    $firstMatch = reset($filteredData);
+                    return response()->json([
+                        'success' => true,
+                        'postal_code' => $firstMatch['code'],
+                        'village' => $firstMatch['village'],
+                        'district' => $firstMatch['district'],
+                        'message' => 'Kode pos valid untuk kelurahan ' . $firstMatch['village']
+                    ]);
+                } else {
+                    // Return all district codes if no village match
+                    $postalCodes = collect($data['data'])->pluck('code')->unique()->values();
+                    return response()->json([
+                        'success' => true,
+                        'postal_codes' => $postalCodes,
+                        'suggestion' => $postalCodes->first() ?? null,
+                        'message' => 'Berikut kode pos yang tersedia untuk kecamatan ' . $district,
+                        'debug' => [
+                            'district' => $district,
+                            'village' => $village,
+                            'total_results' => count($data['data']),
+                            'filtered_count' => count($filteredData)
+                        ]
+                    ]);
+                }
+            }
+        }
+
+        return response()->json(['success' => false, 'message' => 'API request failed']);
+    } catch (\Exception $e) {
+        return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+});
+
+// Test route for validating postal code 15133 with Jatiuwung district
+Route::get('/test-postal-code-15133', function () {
+    $district = 'Jatiuwung';
+
+    try {
+        // Use the kodepos API to validate postal code
+        $response = \Illuminate\Support\Facades\Http::get("https://kodepos.vercel.app/search?q=" . urlencode($district));
+
+        if ($response->successful()) {
+            $data = $response->json();
+
+            if (!empty($data) && isset($data['data']) && is_array($data['data'])) {
+                // Get unique postal codes for the district
+                $postalCodes = collect($data['data'])->pluck('code')->unique()->values();
+                $isValid = $postalCodes->contains(15133);
+
+                return response()->json([
+                    'success' => true,
+                    'postal_codes' => $postalCodes,
+                    'contains_15133' => $isValid,
+                    'message' => $isValid ? '15133 is valid for Jatiuwung' : '15133 is NOT valid for Jatiuwung'
+                ]);
+            }
+        }
+
+        return response()->json(['success' => false, 'message' => 'API request failed']);
+    } catch (\Exception $e) {
+        return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+});
+
+// Test route for OTP functionality
+Route::get('/test-otp', function () {
+    return response()->json(['message' => 'OTP test route working']);
+});
+
+Route::post('/test-send-otp', [App\Http\Controllers\OTPController::class, 'sendOTP']);
+Route::post('/test-verify-otp', [App\Http\Controllers\OTPController::class, 'verifyOTP']);

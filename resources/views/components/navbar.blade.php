@@ -1,6 +1,6 @@
-<nav class="navbar navbar-expand-lg shadow-sm py-3 mb-3" style="background: linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%); border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+<nav class="navbar navbar-expand-lg shadow-sm py-3 mb-3" style="background: linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%); border-bottom: 1px solid rgba(255, 255, 255, 0.1); position: relative; z-index: 1051;">
     <div class="container-fluid">
-        <button class="btn btn-outline-light d-lg-none" type="button" id="sidebarToggle">
+        <button class="btn btn-outline-light" type="button" id="sidebarToggle" style="position: relative; z-index: 1052;">
             <i class="bi bi-list"></i>
         </button>
 
@@ -152,6 +152,8 @@
     .navbar {
         margin-bottom: 0;
         border-radius: 0;
+        max-width: 100%;
+        overflow: visible !important;
     }
 
     /* Custom colors for notification icons */
@@ -166,5 +168,30 @@
     /* Notification item hover effect */
     .dropdown-item:hover {
         background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    /* Memastikan container navbar tidak menyebabkan horizontal scroll */
+    .container-fluid {
+        max-width: 100%;
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .navbar .container-fluid {
+        overflow: visible !important;
+    }
+
+
+    /* Responsive adjustments */
+    @media (max-width: 767.98px) {
+        .container-fluid {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+
+        .navbar {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
     }
 </style>

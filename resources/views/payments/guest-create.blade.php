@@ -100,7 +100,7 @@
                             <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-500">Rp.</span>
                             <input type="text" id="donation_amount_display" inputmode="numeric" oninput="formatAndSetValues(this)" class="w-full border-2 border-gray-200 rounded-xl pl-12 pr-4 py-3 focus:border-emerald-500 focus:outline-none transition-colors" placeholder="Masukkan nominal lain" required autocomplete="off">
                         </div>
-                        <p class="text-sm text-gray-500 mt-1">Minimal donasi Rp 1.000</p>
+                        <p class="text-sm text-gray-500 mt-1">Minimal donasi Rp 10.000</p>
                     </div>
 
                     {{-- Hidden input for payment method --}}

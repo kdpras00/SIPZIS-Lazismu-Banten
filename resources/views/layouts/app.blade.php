@@ -31,7 +31,6 @@
 
 
 
-
     @stack('styles')
 
     <style>
@@ -54,14 +53,99 @@
             background: #555;
         }
 
-        /* Smooth transitions */
-        * {
+        a,
+        button,
+        input,
+        select,
+        textarea {
             transition: all 0.3s ease;
         }
 
         /* Body styling */
         body {
             font-family: 'Figtree', sans-serif;
+            overflow-x: hidden;
+            /* Mencegah horizontal scroll */
+        }
+
+        /* Container styling untuk memastikan layout tidak melebihi viewport */
+        .container-fluid {
+            max-width: 100%;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        /* Main content styling */
+        main {
+            width: 100%;
+            max-width: 100%;
+            transition: margin 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: margin;
+        }
+
+        /* Untuk muzakki layout */
+        .muzakki-layout {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+
+        /* Responsive adjustments for main content */
+        @media (max-width: 767.98px) {
+            .p-4 {
+                padding: 1rem !important;
+            }
+
+            /* Don't hide the aside on mobile, let the sidebar handle visibility */
+            aside.col-md-3,
+            aside.col-lg-2 {
+                position: static;
+                display: block !important;
+            }
+
+            main.col-md-9,
+            main.col-lg-10 {
+                width: 100%;
+                max-width: 100%;
+                margin-left: 0 !important;
+                transition: margin 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                will-change: margin;
+            }
+        }
+
+        /* Desktop sidebar collapsed behavior */
+        @media (min-width: 768px) {
+            main.sidebar-collapsed {
+                margin-left: 0 !important;
+                transition: margin 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                will-change: margin;
+            }
+
+            /* Ensure smooth transition for main content */
+            main.col-md-9,
+            main.col-lg-10 {
+                transition: margin 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                will-change: margin;
+            }
+
+            aside.sidebar-collapsed {
+                width: 0 !important;
+                overflow: hidden !important;
+                transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                will-change: width;
+            }
+
+            main.sidebar-collapsed {
+                margin-left: 0 !important;
+                width: 100% !important;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                will-change: margin, width;
+            }
+        }
+
+        /* Mobile overlay behavior */
+        #sidebar-overlay.show {
+            opacity: 1;
+            visibility: visible;
         }
     </style>
 </head>
@@ -69,25 +153,38 @@
 <body class="bg-light">
     <div class="container-fluid p-0">
         <div class="row g-0 min-vh-100">
+            @auth
+            @if(auth()->user()->role !== 'muzakki')
             <aside class="col-md-3 col-lg-2 p-0">
-                @auth
                 @include('components.sidebar', [
                 'user' => auth()->user(),
                 'currentRoute' => request()->route()->getName() ?? ''
                 ])
-                @endauth
             </aside>
-
             <main class="col-md-9 col-lg-10 p-0">
-                @auth
                 @include('components.navbar')
-                @endauth
-
                 <div class="p-4">
                     @include('components.alerts')
                     @yield('content')
                 </div>
             </main>
+            @else
+            <main class="col-12 p-0 muzakki-layout">
+                <div class="p-4">
+                    @include('components.alerts')
+                    @yield('content')
+                </div>
+            </main>
+            @endif
+            @else
+            <main class="col-12 p-0">
+                @include('components.navbar')
+                <div class="p-4">
+                    @include('components.alerts')
+                    @yield('content')
+                </div>
+            </main>
+            @endauth
         </div>
     </div>
 
@@ -106,18 +203,8 @@
     @stack('scripts')
 
     <script>
-        // Toggle sidebar on mobile
+        // Auto-hide alerts after 5 seconds
         document.addEventListener('DOMContentLoaded', function() {
-            const sidebarToggle = document.getElementById('sidebarToggle');
-            const sidebar = document.getElementById('sidebar');
-
-            if (sidebarToggle && sidebar) {
-                sidebarToggle.addEventListener('click', function() {
-                    sidebar.classList.toggle('show');
-                });
-            }
-
-            // Auto-hide alerts after 5 seconds
             const alerts = document.querySelectorAll('.alert');
             alerts.forEach(alert => {
                 setTimeout(() => {

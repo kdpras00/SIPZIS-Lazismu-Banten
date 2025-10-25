@@ -13,6 +13,40 @@
                 </a>
             </div>
 
+            <!-- Mobile Icons - Notification and Hamburger Menu Buttons -->
+            <div class="md:hidden flex items-center space-x-3">
+                <!-- Notification Icon for Mobile -->
+                @auth
+                @if(Auth::user()->role === 'muzakki' && Auth::user()->muzakki)
+                @php
+                $unreadNotificationsCount = Auth::user()->muzakki->unread_notifications_count;
+                @endphp
+                <div class="relative" id="mobile-notification-container">
+                    <button type="button" class="flex text-sm rounded-full focus:outline-none" id="mobile-notification-button">
+                        <div class="h-6 w-6 rounded-full bg-yellow-500 flex items-center justify-center text-white hover:bg-yellow-600 transition-colors">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                            </svg>
+                        </div>
+                    </button>
+                    <!-- Notification Badge -->
+                    @if($unreadNotificationsCount > 0)
+                    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                        {{ $unreadNotificationsCount }}
+                    </span>
+                    @endif
+                </div>
+                @endif
+                @endauth
+
+                <!-- Hamburger Menu Button - Mobile -->
+                <button id="mobile-menu-button" class="text-white hover:text-green-200 focus:outline-none">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+
             <!-- Navigation Links - Center -->
             <div class="hidden md:flex items-center justify-center flex-1">
                 <div class="flex items-center space-x-8" id="href-navbar">
@@ -26,6 +60,71 @@
                         class="px-3 py-2 text-white hover:border-b-2 hover:border-white transition duration-300 navbar-link">Berita</a>
                     <a href="{{ route('artikel.all') }}"
                         class="px-3 py-2 text-white hover:border-b-2 hover:border-white transition duration-300 navbar-link">Artikel</a>
+                </div>
+            </div>
+
+            <!-- Mobile Menu (Hidden by default) -->
+            <div id="mobile-menu" class="md:hidden fixed inset-0 bg-green-800 bg-opacity-95 z-40 hidden">
+                <div class="flex flex-col h-full">
+                    <div class="flex justify-between items-center p-4 border-b border-green-700">
+                        <h1 style="font-family: 'Poppins', sans-serif; font-size: 1.5rem; background: linear-gradient(45deg, #fff, #e0e7ff, #c7d2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-shadow: 0 0 20px rgba(255,255,255,0.5); letter-spacing: 0.1em; font-weight: 800;">
+                            SIPZIS
+                        </h1>
+                        <button id="close-mobile-menu" class="text-white hover:text-green-200 focus:outline-none">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="flex flex-col py-4 space-y-4 overflow-y-auto">
+                        <!-- <a href="{{ route('home') }}"
+                            class="px-4 py-2 text-white hover:bg-green-700 transition duration-300 navbar-link">Home</a> -->
+                        <a href="{{ route('tentang') }}"
+                            class="px-4 py-2 text-white hover:bg-green-700 transition duration-300 navbar-link">Tentang</a>
+                        <a href="{{ route('program') }}"
+                            class="px-4 py-2 text-white hover:bg-green-700 transition duration-300 navbar-link">Program</a>
+                        <a href="{{ route('berita') }}"
+                            class="px-4 py-2 text-white hover:bg-green-700 transition duration-300 navbar-link">Berita</a>
+                        <a href="{{ route('artikel.all') }}"
+                            class="px-4 py-2 text-white hover:bg-green-700 transition duration-300 navbar-link">Artikel</a>
+
+                        @auth
+                        @if(Auth::user()->role === 'admin' || Auth::user()->role === 'staff')
+                        <div class="border-t border-green-700 mt-4 pt-4">
+                            <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-white hover:bg-green-700 transition duration-300">
+                                Dashboard Admin
+                            </a>
+                            <form method="POST" action="{{ route('logout') }}" class="px-4 py-2">
+                                @csrf
+                                <button type="submit" class="w-full text-left text-white hover:bg-green-700 transition duration-300">
+                                    Logout
+                                </button>
+                            </form>
+                        </div>
+                        @else
+                        <div class="border-t border-green-700 mt-4 pt-4">
+                            <a href="{{ route('muzakki.dashboard') }}" class="block px-4 py-2 text-white hover:bg-green-700 transition duration-300">
+                                Profil
+                            </a>
+                            <form method="POST" action="{{ route('logout') }}" class="px-4 py-2">
+                                @csrf
+                                <button type="submit" class="w-full text-left text-white hover:bg-green-700 transition duration-300">
+                                    Logout
+                                </button>
+                            </form>
+                        </div>
+                        @endif
+                        @else
+                        <div class="border-t border-green-700 mt-4 pt-4">
+                            <a href="{{ route('login') }}" class="block px-4 py-2 text-white hover:bg-green-700 transition duration-300">
+                                Masuk
+                            </a>
+                            <a href="{{ route('register') }}" class="block px-4 py-2 text-white hover:bg-green-700 transition duration-300">
+                                Daftar
+                            </a>
+                        </div>
+                        @endauth
+                    </div>
                 </div>
             </div>
 
@@ -101,7 +200,7 @@
 
                     <!-- Dropdown menu -->
                     <div class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 hidden" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1" id="user-dropdown">
-                        <a href="{{ route('profile.show') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="-1">Profil</a>
+                        <a href="{{ route('muzakki.dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="-1">Profil</a>
                         <!-- <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" tabindex="-1">Dashboard</a> -->
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
@@ -235,7 +334,37 @@
         });
     }
 
-    // Notification popup functionality
+    // Mobile menu functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const closeMobileMenu = document.getElementById('close-mobile-menu');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        if (mobileMenuButton && closeMobileMenu && mobileMenu) {
+            // Open mobile menu
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.remove('hidden');
+                document.body.style.overflow = 'hidden'; // Prevent scrolling when menu is open
+            });
+
+            // Close mobile menu
+            closeMobileMenu.addEventListener('click', function() {
+                mobileMenu.classList.add('hidden');
+                document.body.style.overflow = ''; // Re-enable scrolling
+            });
+
+            // Close mobile menu when clicking on a link
+            const mobileLinks = mobileMenu.querySelectorAll('a, button');
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    mobileMenu.classList.add('hidden');
+                    document.body.style.overflow = '';
+                });
+            });
+        }
+    });
+
+    // Notification popup functionality for desktop
     document.addEventListener('DOMContentLoaded', function() {
         const notificationButton = document.getElementById('notification-button');
         const notificationPopup = document.getElementById('notification-popup');
@@ -279,6 +408,78 @@
             // Close popup when clicking outside
             document.addEventListener('click', function(event) {
                 if (!notificationButton.contains(event.target) && !notificationPopup.contains(event.target)) {
+                    if (!notificationPopup.classList.contains('hidden')) {
+                        notificationPopup.classList.add('opacity-0', 'scale-95');
+                        setTimeout(() => {
+                            notificationPopup.classList.add('hidden');
+                        }, 200);
+                    }
+                }
+            });
+        }
+
+        // Load notifications via AJAX
+        function loadNotifications() {
+            fetch('{{ route("muzakki.notifications.ajax") }}')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        notificationContent.innerHTML = data.html;
+                    } else {
+                        notificationContent.innerHTML = '<div class="text-center py-6 text-gray-500"><p>Gagal memuat notifikasi</p></div>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading notifications:', error);
+                    notificationContent.innerHTML = '<div class="text-center py-6 text-gray-500"><p>Terjadi kesalahan saat memuat notifikasi</p></div>';
+                });
+        }
+    });
+
+    // Notification popup functionality for mobile
+    document.addEventListener('DOMContentLoaded', function() {
+        const mobileNotificationButton = document.getElementById('mobile-notification-button');
+        const notificationPopup = document.getElementById('notification-popup');
+        const closeNotification = document.getElementById('close-notification');
+        const notificationContent = document.getElementById('notification-content');
+
+        if (mobileNotificationButton && notificationPopup) {
+            // Toggle notification popup from mobile button
+            mobileNotificationButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+
+                // Toggle popup visibility with animation
+                if (notificationPopup.classList.contains('hidden')) {
+                    // Show popup with animation
+                    notificationPopup.classList.remove('hidden');
+                    setTimeout(() => {
+                        notificationPopup.classList.remove('opacity-0', 'scale-95');
+                    }, 10);
+
+                    // Load notifications if popup is opened
+                    loadNotifications();
+                } else {
+                    // Hide popup with animation
+                    notificationPopup.classList.add('opacity-0', 'scale-95');
+                    setTimeout(() => {
+                        notificationPopup.classList.add('hidden');
+                    }, 200);
+                }
+            });
+
+            // Close notification popup
+            if (closeNotification) {
+                closeNotification.addEventListener('click', function() {
+                    notificationPopup.classList.add('opacity-0', 'scale-95');
+                    setTimeout(() => {
+                        notificationPopup.classList.add('hidden');
+                    }, 200);
+                });
+            }
+
+            // Close popup when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!mobileNotificationButton.contains(event.target) && !notificationPopup.contains(event.target)) {
                     if (!notificationPopup.classList.contains('hidden')) {
                         notificationPopup.classList.add('opacity-0', 'scale-95');
                         setTimeout(() => {
