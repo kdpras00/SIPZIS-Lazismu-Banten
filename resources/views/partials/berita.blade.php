@@ -1,169 +1,136 @@
-<div class="relative bg-gradient-to-br from-green-50 via-emerald-50 to-teal-100 min-h-screen overflow-hidden" id="berita" style="background-image: url('{{ asset('img/masjid.webp') }}'); background-size: cover; background-position: center; background-attachment: fixed;">
-    <!-- Animated Background Elements -->
+<div class="relative bg-gradient-to-br from-green-50 via-emerald-50 to-teal-100 min-h-screen overflow-hidden"
+    id="berita">
+    <!-- Optimized Background -->
+    <div class="absolute inset-0 bg-cover bg-center"
+        style="background-image: url('{{ asset('img/masjid.webp') }}'); will-change: transform;" loading="lazy"></div>
+
+    <!-- Simplified Background Elements (removed heavy blur animations) -->
     <div class="absolute inset-0">
         <div class="absolute inset-0 bg-gradient-to-br from-green-600/40 via-emerald-600/30 to-teal-600/40"></div>
-        <div class="absolute top-10 left-10 w-72 h-72 bg-green-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce animation-delay-1000"></div>
-        <div class="absolute top-20 right-10 w-72 h-72 bg-emerald-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce animation-delay-3000"></div>
-        <div class="absolute -bottom-8 left-20 w-72 h-72 bg-teal-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-bounce animation-delay-5000"></div>
     </div>
 
     <div class="relative z-10 py-20">
         <div class="container mx-auto px-4 py-16">
 
             <!-- Enhanced Main News -->
-            <div class="relative bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-10 mb-12 border border-white/20">
-                <div class="absolute inset-0 bg-gradient-to-r from-green-50/50 via-emerald-50/50 to-teal-50/50 rounded-3xl"></div>
+            <div class="relative bg-white/95 rounded-3xl shadow-lg p-10 mb-12 border border-white/20">
+                <div
+                    class="absolute inset-0 bg-gradient-to-r from-green-50/50 via-emerald-50/50 to-teal-50/50 rounded-3xl">
+                </div>
                 <div class="relative z-10">
                     <div class="text-center mb-12">
-                        <h2 class="text-4xl md:text-5xl font-black text-green-800 mb-4">Berita Zakat, Infaq & Sedekah</h2>
-                        <p class="text-lg text-green-700 max-w-2xl mx-auto">Update terbaru seputar program zakat, infaq, dan sedekah yang telah tersalurkan untuk membantu sesama</p>
+                        <h2 class="text-4xl md:text-5xl font-black text-green-800 mb-4">Berita Zakat, Infaq & Sedekah
+                        </h2>
+                        <p class="text-lg text-green-700 max-w-2xl mx-auto">Update terbaru seputar program zakat, infaq,
+                            dan sedekah yang telah tersalurkan untuk membantu sesama</p>
                         <div class="flex justify-center mt-4">
-                            <div class="w-24 h-1 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 rounded-full"></div>
+                            <div
+                                class="w-24 h-1 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 rounded-full">
+                            </div>
                         </div>
                     </div>
 
                     <!-- News Grid -->
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         @forelse($news as $item)
-                        <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                            <div class="relative">
-                                @php
-                                $rawImage = trim($item->image ?? '');
-                                // Cek apakah image adalah URL penuh (CDN)
-                                $isFullUrl = filter_var($rawImage, FILTER_VALIDATE_URL);
-                                // Tentukan URL akhir
-                                $imageUrl = $isFullUrl
-                                ? $rawImage
-                                : (!empty($rawImage) ? Storage::url($rawImage) : 'https://via.placeholder.com/400x250');
-                                @endphp
-
-                                <img src="{{ $imageUrl }}" alt="{{ $item->title }}" class="w-full h-48 object-cover">
-
-                                <div class="absolute top-4 left-4">
+                            <div
+                                class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-200">
+                                <div class="relative">
                                     @php
-                                    $categoryColors = [
-                                    'zakat' => 'from-green-500 to-green-700',
-                                    'infaq' => 'from-blue-500 to-blue-700',
-                                    'sedekah' => 'from-purple-500 to-purple-700'
-                                    ];
-                                    $textColors = [
-                                    'zakat' => 'text-green-600',
-                                    'infaq' => 'text-blue-600',
-                                    'sedekah' => 'text-purple-600'
-                                    ];
-                                    $bgColors = [
-                                    'zakat' => 'bg-green-50',
-                                    'infaq' => 'bg-blue-50',
-                                    'sedekah' => 'bg-purple-50'
-                                    ];
-                                    $hoverColors = [
-                                    'zakat' => 'hover:text-green-800',
-                                    'infaq' => 'hover:text-blue-800',
-                                    'sedekah' => 'hover:text-purple-800'
-                                    ];
+                                        $rawImage = trim($item->image ?? '');
+                                        // Cek apakah image adalah URL penuh (CDN)
+                                        $isFullUrl = filter_var($rawImage, FILTER_VALIDATE_URL);
+                                        // Tentukan URL akhir
+                                        $imageUrl = $isFullUrl
+                                            ? $rawImage
+                                            : (!empty($rawImage)
+                                                ? Storage::url($rawImage)
+                                                : 'https://via.placeholder.com/400x250');
                                     @endphp
-                                    <span class="inline-block bg-gradient-to-r {{ $categoryColors[$item->category] ?? 'from-gray-500 to-gray-700' }} text-white text-xs px-4 py-2 rounded-full uppercase font-bold tracking-wide shadow-lg">
-                                        {{ $item->category_label }}
-                                    </span>
-                                </div>
-                            </div>
 
-                            <div class="p-6">
-                                <h3 class="text-xl font-bold text-gray-800 mb-2 line-clamp-2">{{ $item->title }}</h3>
-                                <p class="text-gray-600 text-sm mb-4 line-clamp-3">{{ $item->excerpt }}</p>
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center">
-                                        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-2">
-                                            <i class="fas fa-user text-green-600 text-sm"></i>
-                                        </div>
-                                        <span class="text-sm text-gray-600">{{ $item->author->name ?? 'Admin' }}</span>
+                                    <img src="{{ $imageUrl }}" alt="{{ $item->title }}"
+                                        class="w-full h-48 object-cover">
+
+                                    <div class="absolute top-4 left-4">
+                                        @php
+                                            $categoryColors = [
+                                                'zakat' => 'from-green-500 to-green-700',
+                                                'infaq' => 'from-blue-500 to-blue-700',
+                                                'sedekah' => 'from-purple-500 to-purple-700',
+                                            ];
+                                            $textColors = [
+                                                'zakat' => 'text-green-600',
+                                                'infaq' => 'text-blue-600',
+                                                'sedekah' => 'text-purple-600',
+                                            ];
+                                            $bgColors = [
+                                                'zakat' => 'bg-green-50',
+                                                'infaq' => 'bg-blue-50',
+                                                'sedekah' => 'bg-purple-50',
+                                            ];
+                                            $hoverColors = [
+                                                'zakat' => 'hover:text-green-800',
+                                                'infaq' => 'hover:text-blue-800',
+                                                'sedekah' => 'hover:text-purple-800',
+                                            ];
+                                        @endphp
+                                        <span
+                                            class="inline-block bg-gradient-to-r {{ $categoryColors[$item->category] ?? 'from-gray-500 to-gray-700' }} text-white text-xs px-4 py-2 rounded-full uppercase font-bold tracking-wide shadow-lg">
+                                            {{ $item->category_label }}
+                                        </span>
                                     </div>
-                                    <span class="text-xs text-gray-500">{{ $item->created_at->format('d M Y') }}</span>
                                 </div>
 
-                                <!-- Read More Link -->
-                                <div class="mt-4">
-                                    <a href="{{ route('news.show', $item->slug) }}"
-                                        class="text-green-600 hover:text-green-700 font-medium text-sm flex items-center">
-                                        Baca Selengkapnya
-                                        <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                        </svg>
-                                    </a>
+                                <div class="p-6">
+                                    <h3 class="text-xl font-bold text-gray-800 mb-2 line-clamp-2">{{ $item->title }}
+                                    </h3>
+                                    <p class="text-gray-600 text-sm mb-4 line-clamp-3">{{ $item->excerpt }}</p>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <div
+                                                class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-2">
+                                                <i class="fas fa-user text-green-600 text-sm"></i>
+                                            </div>
+                                            <span
+                                                class="text-sm text-gray-600">{{ $item->author->name ?? 'Admin' }}</span>
+                                        </div>
+                                        <span
+                                            class="text-xs text-gray-500">{{ $item->created_at->format('d M Y') }}</span>
+                                    </div>
+
+                                    <!-- Read More Link -->
+                                    <div class="mt-4">
+                                        <a href="{{ route('news.show', $item->slug) }}"
+                                            class="text-green-600 hover:text-green-700 font-medium text-sm flex items-center">
+                                            Baca Selengkapnya
+                                            <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 5l7 7-7 7"></path>
+                                            </svg>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
                         @empty
-                        <div class="col-span-full text-center py-12">
-                            <i class="fas fa-newspaper text-5xl text-gray-300 mb-4"></i>
-                            <h3 class="text-xl font-medium text-gray-500">Tidak ada berita tersedia</h3>
-                            <p class="text-gray-400 mt-2">Saat ini belum ada berita yang dapat ditampilkan.</p>
-                        </div>
+                            <div class="col-span-full text-center py-12">
+                                <i class="fas fa-newspaper text-5xl text-gray-300 mb-4"></i>
+                                <h3 class="text-xl font-medium text-gray-500">Tidak ada berita tersedia</h3>
+                                <p class="text-gray-400 mt-2">Saat ini belum ada berita yang dapat ditampilkan.</p>
+                            </div>
                         @endforelse
                     </div>
                 </div>
             </div>
 
             <!-- Pagination -->
-            @if(isset($news) && $news->hasPages())
-            <div class="mt-12 flex justify-center">
-                {{ $news->links() }}
-            </div>
+            @if (isset($news) && $news->hasPages())
+                <div class="mt-12 flex justify-center">
+                    {{ $news->links() }}
+                </div>
             @endif
         </div>
     </div>
 </div>
 
-<style>
-    @keyframes blob {
-        0% {
-            transform: translate(0px, 0px) scale(1);
-        }
-
-        33% {
-            transform: translate(30px, -50px) scale(1.1);
-        }
-
-        66% {
-            transform: translate(-20px, 20px) scale(0.9);
-        }
-
-        100% {
-            transform: translate(0px, 0px) scale(1);
-        }
-    }
-
-    .animate-blob {
-        animation: blob 7s infinite;
-    }
-
-    .animation-delay-1000 {
-        animation-delay: 1s;
-    }
-
-    .animation-delay-3000 {
-        animation-delay: 3s;
-    }
-
-    .animation-delay-5000 {
-        animation-delay: 5s;
-    }
-
-    .hover\:shadow-3xl:hover {
-        box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.25);
-    }
-
-    .line-clamp-2 {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-
-    .line-clamp-3 {
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-</style>
+<!-- Styles moved to tailwind.config.js for better performance -->

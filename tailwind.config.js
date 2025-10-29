@@ -123,6 +123,22 @@ export default {
             "box-shadow": "0 10px 25px rgba(0, 0, 0, 0.15)",
           },
         },
+        ".performance-boost": {
+          "will-change": "transform",
+          contain: "layout style paint",
+        },
+        ".line-clamp-2": {
+          display: "-webkit-box",
+          "-webkit-line-clamp": "2",
+          "-webkit-box-orient": "vertical",
+          overflow: "hidden",
+        },
+        ".line-clamp-3": {
+          display: "-webkit-box",
+          "-webkit-line-clamp": "3",
+          "-webkit-box-orient": "vertical",
+          overflow: "hidden",
+        },
       };
       addUtilities(newUtilities);
     },
