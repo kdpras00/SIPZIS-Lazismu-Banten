@@ -13,21 +13,16 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-    <script src="https://cdn.tailwindcss.com"></script>
-
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-        crossorigin="anonymous">
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
         integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
-        crossorigin="anonymous"
-        referrerpolicy="no-referrer" />
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 
 
 
@@ -154,47 +149,46 @@
     <div class="container-fluid p-0">
         <div class="row g-0 min-vh-100">
             @auth
-            @if(auth()->user()->role !== 'muzakki')
-            <aside class="col-md-3 col-lg-2 p-0">
-                @include('components.sidebar', [
-                'user' => auth()->user(),
-                'currentRoute' => request()->route()->getName() ?? ''
-                ])
-            </aside>
-            <main class="col-md-9 col-lg-10 p-0">
-                @include('components.navbar')
-                <div class="p-4">
-                    @include('components.alerts')
-                    @yield('content')
-                </div>
-            </main>
+                @if (auth()->user()->role !== 'muzakki')
+                    <aside class="col-md-3 col-lg-2 p-0">
+                        @include('components.sidebar', [
+                            'user' => auth()->user(),
+                            'currentRoute' => request()->route()->getName() ?? '',
+                        ])
+                    </aside>
+                    <main class="col-md-9 col-lg-10 p-0">
+                        @include('components.navbar')
+                        <div class="p-4">
+                            @include('components.alerts')
+                            @yield('content')
+                        </div>
+                    </main>
+                @else
+                    <main class="col-12 p-0 muzakki-layout">
+                        <div class="p-4">
+                            @include('components.alerts')
+                            @yield('content')
+                        </div>
+                    </main>
+                @endif
             @else
-            <main class="col-12 p-0 muzakki-layout">
-                <div class="p-4">
-                    @include('components.alerts')
-                    @yield('content')
-                </div>
-            </main>
-            @endif
-            @else
-            <main class="col-12 p-0">
-                @include('components.navbar')
-                <div class="p-4">
-                    @include('components.alerts')
-                    @yield('content')
-                </div>
-            </main>
+                <main class="col-12 p-0">
+                    @include('components.navbar')
+                    <div class="p-4">
+                        @include('components.alerts')
+                        @yield('content')
+                    </div>
+                </main>
             @endauth
         </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
-        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
-        crossorigin="anonymous"></script>
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script>
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 

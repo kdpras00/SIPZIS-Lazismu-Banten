@@ -1,2 +1,9 @@
-/* If you want to use Tailwind via CDN, you can leave this file mostly empty */
-/* Or include only custom CSS that you need */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  a {
+    @apply no-underline;
+  }
+}

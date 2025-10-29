@@ -111,7 +111,7 @@ class DashboardController extends Controller
         $muzakki = $user->muzakki;
 
         if (!$muzakki) {
-            return redirect()->route('profile.create')->with('info', 'Silakan lengkapi profil muzakki Anda.');
+            return redirect()->route('profile.show')->with('info', 'Silakan lengkapi profil muzakki Anda.');
         }
 
         // Get current year
@@ -188,7 +188,7 @@ class DashboardController extends Controller
         $muzakki = $user->muzakki;
 
         if (!$muzakki) {
-            return redirect()->route('profile.create')->with('info', 'Silakan lengkapi profil muzakki Anda.');
+            return redirect()->route('profile.show')->with('info', 'Silakan lengkapi profil muzakki Anda.');
         }
 
         $payments = $muzakki->zakatPayments()
@@ -205,7 +205,7 @@ class DashboardController extends Controller
         $muzakki = $user->muzakki;
 
         if (!$muzakki) {
-            return redirect()->route('profile.create')->with('info', 'Silakan lengkapi profil muzakki Anda.');
+            return redirect()->route('profile.show')->with('info', 'Silakan lengkapi profil muzakki Anda.');
         }
 
         // For now, we're just returning the view
@@ -219,7 +219,7 @@ class DashboardController extends Controller
         $muzakki = $user->muzakki;
 
         if (!$muzakki) {
-            return redirect()->route('profile.create')->with('info', 'Silakan lengkapi profil muzakki Anda.');
+            return redirect()->route('profile.show')->with('info', 'Silakan lengkapi profil muzakki Anda.');
         }
 
         // For now, we're just returning the view
@@ -233,7 +233,7 @@ class DashboardController extends Controller
         $muzakki = $user->muzakki;
 
         if (!$muzakki) {
-            return redirect()->route('profile.create')->with('info', 'Silakan lengkapi profil muzakki Anda.');
+            return redirect()->route('profile.show')->with('info', 'Silakan lengkapi profil muzakki Anda.');
         }
 
         return view('muzakki.dashboard.account-management', compact('muzakki'));

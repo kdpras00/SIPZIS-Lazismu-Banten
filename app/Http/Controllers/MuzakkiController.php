@@ -183,9 +183,19 @@ class MuzakkiController extends Controller
     {
         // If no muzakki is provided, get current user's muzakki profile (for profile editing)
         if (!$muzakki) {
-            $muzakki = Auth::user()->muzakki;
+            $user = Auth::user();
+            $muzakki = $user->muzakki;
+
+            // If muzakki profile doesn't exist, create it
             if (!$muzakki) {
-                abort(404, 'Profil muzakki tidak ditemukan.');
+                $muzakki = Muzakki::create([
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'phone' => $user->phone,
+                    'user_id' => $user->id,
+                    'is_active' => $user->is_active ?? true,
+                    'campaign_url' => url('/campaigner/' . $user->email),
+                ]);
             }
         }
 
@@ -232,7 +242,12 @@ class MuzakkiController extends Controller
                 Rule::unique('muzakki')->ignore($muzakki->id),
                 Rule::unique('users')->ignore($muzakki->user_id),
             ],
-            'phone' => 'required|string|max:20', // Make phone required
+            'phone' => [
+                'required',
+                'string',
+                'max:20',
+                Rule::unique('users')->ignore($muzakki->user_id),
+            ],
             'nik' => [
                 'nullable',
                 'string',

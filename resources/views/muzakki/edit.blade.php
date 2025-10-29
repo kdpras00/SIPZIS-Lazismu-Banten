@@ -89,8 +89,9 @@
                             class="form-control border-0 rounded-0 @error('campaign_url') is-invalid @enderror"
                             id="campaign_url"
                             name="campaign_url"
-                            value="{{ old('campaign_url', $muzakki->campaign_url) }}">
-                        <button type="button" class="btn btn-link text-success text-decoration-none small">Edit</button>
+                            value="{{ old('campaign_url', $muzakki->campaign_url) }}"
+                            readonly
+                            style="background-color: #f8f9fa; cursor: not-allowed;">
                     </div>
                     @error('campaign_url')
                     <div class="invalid-feedback">{{ $message }}</div>
